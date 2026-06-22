@@ -191,8 +191,12 @@ class _IKSolver:
         self._joint_resolver.set_qpos(qpos, values16[:8], "right")
         self._joint_resolver.set_qpos(qpos, values16[8:16], "left")
         self._config.update(q=qpos)
-        self._gripper[0] = values16[7]
-        self._gripper[1] = values16[15]
+        # Gripper is intentionally NOT synced here. set_gripper() is the sole
+        # writer of self._gripper ("IK does not solve for it"); syncing it
+        # from the raw driver state here would race with set_gripper() calls
+        # (e.g. from a VR trigger) arriving on a similar cadence, causing the
+        # commanded gripper to flicker between the real motor position and
+        # the trigger-commanded value depending on event arrival order.
 
     def ready(self) -> bool:
         return len(self._pending) == 0
