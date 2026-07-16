@@ -57,6 +57,8 @@ class IKParams:
     dt: float = 0.1
     max_iters: int = 5
     velocity_limits: dict[str, float] | None = None
+    posture_target_mode: str = "home"
+    posture_home_rate: float = 0.0
 
 
 class Kinematics:
@@ -113,6 +115,10 @@ class Kinematics:
         idx = 0 if side == "right" else 1
         self._require_ik()._gripper[idx] = value
 
+    def reset_posture_target(self) -> None:
+        """Reset the posture regularizer according to the configured mode."""
+        self._require_ik().reset_posture_target()
+
     def _require_ik(self) -> _IKSolver:
         if self._ik is None:
             raise RuntimeError("Kinematics was not initialized with IKParams.")
@@ -135,7 +141,14 @@ class _IKSolver:
 
         self._config = mink.Configuration(setup.model)
         self._config.update(q=setup.data.qpos.copy())
-        mid_qpos = self._config.data.qpos.copy()
+        self._home_qpos = self._config.data.qpos.copy()
+        self._posture_target_mode = params.posture_target_mode
+        self._posture_home_rate = params.posture_home_rate
+        self._posture_reset_pending = self._posture_target_mode in (
+            "current",
+            "current-to-home",
+        )
+        self._posture_target_qpos = self._home_qpos.copy()
 
         task_kwargs = dict(
             position_cost=params.position_cost,
@@ -173,7 +186,7 @@ class _IKSolver:
             self._limits.append(mink.VelocityLimit(setup.model, params.velocity_limits))
 
         self._posture_task = mink.PostureTask(setup.model, cost=params.posture_cost)
-        self._posture_task.set_target(mid_qpos)
+        self._posture_task.set_target(self._posture_target_qpos)
 
         self._solver_params: dict = {"damping": params.damping}
         if params.diag_reg > 0.0:
@@ -186,11 +199,35 @@ class _IKSolver:
         self._tasks[side].set_target(pose_to_se3(pose))
         self._pending.discard(side)
 
+    def reset_posture_target(self) -> None:
+        if self._posture_target_mode == "home":
+            self._set_posture_target(self._home_qpos)
+        else:
+            self._posture_reset_pending = True
+
+    def _set_posture_target(self, qpos: np.ndarray) -> None:
+        self._posture_target_qpos = qpos.copy()
+        self._posture_task.set_target(self._posture_target_qpos)
+
+    def _relax_posture_target_toward_home(self) -> None:
+        if (
+            self._posture_target_mode != "current-to-home"
+            or self._posture_home_rate <= 0.0
+        ):
+            return
+        rate = min(max(self._posture_home_rate, 0.0), 1.0)
+        self._set_posture_target(
+            self._posture_target_qpos * (1.0 - rate) + self._home_qpos * rate
+        )
+
     def sync(self, values16: np.ndarray) -> None:
         qpos = self._config.data.qpos.copy()
         self._joint_resolver.set_qpos(qpos, values16[:8], "right")
         self._joint_resolver.set_qpos(qpos, values16[8:16], "left")
         self._config.update(q=qpos)
+        if self._posture_reset_pending:
+            self._set_posture_target(qpos)
+            self._posture_reset_pending = False
         # Gripper is intentionally NOT synced here. set_gripper() is the sole
         # writer of self._gripper ("IK does not solve for it"); syncing it
         # from the raw driver state here would race with set_gripper() calls
@@ -239,6 +276,7 @@ class _IKSolver:
             self._config.integrate_inplace(vel, self._dt)
 
         self._pending = set(self._sides)
+        self._relax_posture_target_toward_home()
 
         qpos = self._config.data.qpos
         right_joints, _ = self._joint_resolver.get_driver(qpos, "right")
@@ -368,6 +406,24 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         default=500.0,
         help="Dora tick rate in Hz; must match the dataflow timer (default: 500.0).",
     )
+    parser.add_argument(
+        "--posture-target-mode",
+        choices=["home", "current", "current-to-home"],
+        default="home",
+        help=(
+            "Posture regularizer target: home, current after reset, or current "
+            "after reset with slow drift toward home (default: home)."
+        ),
+    )
+    parser.add_argument(
+        "--posture-home-rate",
+        type=float,
+        default=0.0,
+        help=(
+            "Per-solve interpolation rate toward home when "
+            "--posture-target-mode=current-to-home (default: 0.0)."
+        ),
+    )
 
 
 def ik_params_from_args(args: argparse.Namespace) -> IKParams:
@@ -397,4 +453,6 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         dt=args.dt,
         max_iters=args.max_iters,
         velocity_limits=velocity_limits,
+        posture_target_mode=args.posture_target_mode,
+        posture_home_rate=args.posture_home_rate,
     )
