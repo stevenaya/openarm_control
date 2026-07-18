@@ -159,15 +159,17 @@ class _IKSolver:
             for j in range(setup.model.njnt)
             if setup.model.jnt_qposadr[j] not in active_qpos
         ]
-        print(active_qpos)
-        print(freeze_dofs)
         self._freeze_task: mink.DofFreezingTask | None = (
             mink.DofFreezingTask(model=setup.model, dof_indices=freeze_dofs)
             if freeze_dofs
             else None
         )
 
-        self._limits = [mink.ConfigurationLimit(setup.model)]
+        # Only constrain the DoFs that IK can move. Frozen DoFs such as the
+        # gripper and lifter may be valid in driver space but outside the MuJoCo
+        # model range; constraining and freezing them at the same time makes the
+        # QP infeasible.
+        self._limits = [_configuration_limit_for_qpos(setup.model, active_qpos)]
 
         if params.velocity_limits is not None:
             self._limits.append(mink.VelocityLimit(setup.model, params.velocity_limits))
@@ -220,22 +222,8 @@ class _IKSolver:
                     **self._solver_params,
                 )
             except mink.exceptions.NoSolutionFound:
-                try:
-                    vel = mink.solve_ik(
-                        self._config,
-                        tasks,
-                        self._dt,
-                        self._solver_name,
-                        limits=[],
-                        constraints=constraints,
-                        safety_break=False,
-                        **self._solver_params,
-                    )
-                except mink.exceptions.NoSolutionFound:
-                    print(
-                        "Warning: IK solver failed (constrained and unconstrained). Skipping step."
-                    )
-                    return None
+                print("Warning: constrained IK solver failed. Skipping step.")
+                return None
             self._config.integrate_inplace(vel, self._dt)
 
         self._pending = set(self._sides)
@@ -262,6 +250,23 @@ def _frame_name(setup: ArmSetup, side: str) -> str:
     return mujoco.mj_id2name(setup.model, obj, fid)
 
 
+def _configuration_limit_for_qpos(
+    model: mujoco.MjModel, qpos_indices: set[int]
+) -> mink.ConfigurationLimit:
+    limit = mink.ConfigurationLimit(model)
+    active_qpos = {int(index) for index in qpos_indices}
+    active_dofs = [
+        int(model.jnt_dofadr[j])
+        for j in range(model.njnt)
+        if model.jnt_limited[j] and int(model.jnt_qposadr[j]) in active_qpos
+    ]
+    indices = np.asarray(active_dofs, dtype=int)
+    indices.setflags(write=False)
+    limit.indices = indices
+    limit.projection_matrix = np.eye(model.nv)[indices] if indices.size else None
+    return limit
+
+
 def _convert_velocity(
     rad_per_sec: float,
     dt: float,
@@ -276,25 +281,37 @@ def _convert_velocity(
 def _load_velocity_caps(config_path: pathlib.Path | None) -> list[float]:
     """Return per-joint velocity caps in rad/s.
 
-    With no config path, returns the built-in ARM_JOINT_VELOCITY_LIMITS_RAD_S. When a
-    path is given, reads the top-level 'arm_velocity_limits' list from the YAML and uses
-    it instead; the library stays config-format-agnostic beyond that single key.
+    With no config path, returns the built-in ARM_JOINT_VELOCITY_LIMITS_RAD_S.
+    When a path is given, reads 'arm_velocity_limits' or the driver config's
+    'joint_delta_position_limits' from the YAML.
     """
     if config_path is None:
         return ARM_JOINT_VELOCITY_LIMITS_RAD_S
 
     with open(config_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
-    if not isinstance(data, dict) or "arm_velocity_limits" not in data:
+    if not isinstance(data, dict):
+        raise ValueError(f"Config file {config_path} must contain a YAML mapping.")
+
+    key = None
+    if "arm_velocity_limits" in data:
+        key = "arm_velocity_limits"
+    elif "joint_delta_position_limits" in data:
+        key = "joint_delta_position_limits"
+    if key is None:
         raise ValueError(
-            f"Config file {config_path} has no top-level 'arm_velocity_limits' list."
+            f"Config file {config_path} has no top-level 'arm_velocity_limits' "
+            "or 'joint_delta_position_limits' list."
         )
 
-    caps = [float(v) for v in data["arm_velocity_limits"]]
     expected = len(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
+    raw_caps = data[key]
+    if key == "joint_delta_position_limits":
+        raw_caps = raw_caps[:expected]
+    caps = [float(v) for v in raw_caps]
     if len(caps) != expected:
         raise ValueError(
-            f"arm_velocity_limits in {config_path} has {len(caps)} entries; "
+            f"{key} in {config_path} has {len(caps)} arm entries; "
             f"expected {expected}."
         )
     return caps
@@ -351,15 +368,16 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--limit-velocity",
         action="store_true",
-        help="Enable per-joint velocity limits (caps in config.ARM_JOINT_VELOCITY_LIMITS_RAD_S).",
+        help="Enable per-joint IK velocity limits.",
     )
     parser.add_argument(
         "--config",
         type=pathlib.Path,
         default=None,
         help=(
-            "YAML file with a top-level 'arm_velocity_limits: [rad/s, ...]' list that "
-            "overrides the built-in per-joint caps. Used only with --limit-velocity."
+            "YAML file with 'arm_velocity_limits: [rad/s, ...]' or driver "
+            "'joint_delta_position_limits: [rad/s, ...]'. Used only with "
+            "--limit-velocity."
         ),
     )
     parser.add_argument(
