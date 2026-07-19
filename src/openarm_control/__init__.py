@@ -21,7 +21,9 @@ from .kinematics import (
     register_ik_args,
     ik_params_from_args,
 )
+from .nullspace_posture_task import NullspacePostureTask
 from .poses import read_ee_pose, pose_to_se3, se3_to_pose
+from .recoverable_configuration_limit import RecoverableConfigurationLimit
 
 __all__ = [
     # context
@@ -29,6 +31,8 @@ __all__ = [
     # high-level interface
     "Kinematics",
     "IKParams",
+    "NullspacePostureTask",
+    "RecoverableConfigurationLimit",
     # CLI helpers
     "register_common_args",
     "register_ik_args",

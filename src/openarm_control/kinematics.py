@@ -21,7 +21,7 @@ Usage:
     pose_r, pose_l = kin.fk_bimanual(r, l)  # single mj_forward
 
     # FK + IK
-    kin = Kinematics(setup, IKParams(dt=0.1, max_iters=5))
+    kin = Kinematics(setup, IKParams(dt=1.0 / 250.0, max_iters=10))
     kin.set_target("right", pose)
     kin.set_target("left", pose)
     result = kin.solve()                    # float32[16] or None
@@ -40,7 +40,11 @@ import numpy as np
 import yaml
 
 from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S, ArmSetup
+from openarm_control.nullspace_posture_task import NullspacePostureTask
 from openarm_control.poses import pose_to_se3
+from openarm_control.recoverable_configuration_limit import (
+    RecoverableConfigurationLimit,
+)
 
 
 @dataclass
@@ -54,9 +58,16 @@ class IKParams:
     solver: str = "daqp"
     posture_cost: float = 0.01
     diag_reg: float = 0.0
-    dt: float = 0.1
-    max_iters: int = 5
+    dt: float = 1.0 / 250.0
+    max_iters: int = 10
     velocity_limits: dict[str, float] | None = None
+    joint_limit_recovery_velocity_scale: float = 1.1
+    nullspace_cost: float = 0.3
+    nullspace_return_rate: float = 0.5
+    nullspace_max_speed: float = 0.5
+    nullspace_singularity_low: float = 0.02
+    nullspace_singularity_high: float = 0.05
+    nullspace_characteristic_length: float = 0.3
 
 
 class Kinematics:
@@ -126,16 +137,21 @@ class _IKSolver:
     """mink QP-based differential IK. Managed by Kinematics; not public API."""
 
     def __init__(self, setup: ArmSetup, params: IKParams) -> None:
+        if params.dt <= 0.0:
+            raise ValueError("IK control timestep must be positive.")
+        if params.max_iters <= 0:
+            raise ValueError("IK max_iters must be positive.")
+
         self._sides = setup.sides
         self._solver_name = params.solver
         self._posture_cost = params.posture_cost
         self._joint_resolver = setup.joint_resolver
-        self._dt = params.dt
+        self._substep_dt = params.dt / params.max_iters
         self._max_iters = params.max_iters
 
         self._config = mink.Configuration(setup.model)
         self._config.update(q=setup.data.qpos.copy())
-        mid_qpos = self._config.data.qpos.copy()
+        home_qpos = self._config.data.qpos.copy()
 
         task_kwargs = dict(
             position_cost=params.position_cost,
@@ -169,13 +185,40 @@ class _IKSolver:
         # gripper and lifter may be valid in driver space but outside the MuJoCo
         # model range; constraining and freezing them at the same time makes the
         # QP infeasible.
-        self._limits = [_configuration_limit_for_qpos(setup.model, active_qpos)]
-
         if params.velocity_limits is not None:
-            self._limits.append(mink.VelocityLimit(setup.model, params.velocity_limits))
+            self._limits = [
+                RecoverableConfigurationLimit(
+                    model=setup.model,
+                    qpos_indices=active_qpos,
+                    velocities=params.velocity_limits,
+                    recovery_velocity_scale=(
+                        params.joint_limit_recovery_velocity_scale
+                    ),
+                )
+            ]
+        else:
+            self._limits = [_configuration_limit_for_qpos(setup.model, active_qpos)]
 
         self._posture_task = mink.PostureTask(setup.model, cost=params.posture_cost)
-        self._posture_task.set_target(mid_qpos)
+        self._posture_task.set_target(home_qpos)
+
+        self._nullspace_tasks: dict[str, NullspacePostureTask] = {}
+        if params.nullspace_cost > 0.0:
+            for side in setup.sides:
+                arm_qpos = _arm_qpos_indices(setup, side)
+                self._nullspace_tasks[side] = NullspacePostureTask(
+                    model=setup.model,
+                    frame_task=self._tasks[side],
+                    dof_indices=_dof_indices_for_qpos(setup.model, arm_qpos),
+                    home_qpos=home_qpos,
+                    cost=params.nullspace_cost,
+                    dt=self._substep_dt,
+                    return_rate=params.nullspace_return_rate,
+                    max_speed=params.nullspace_max_speed,
+                    singularity_low=params.nullspace_singularity_low,
+                    singularity_high=params.nullspace_singularity_high,
+                    characteristic_length=params.nullspace_characteristic_length,
+                )
 
         self._solver_params: dict = {"damping": params.damping}
         if params.diag_reg > 0.0:
@@ -207,14 +250,20 @@ class _IKSolver:
         tasks = list(self._tasks.values())
         if self._posture_cost > 0.0:
             tasks.append(self._posture_task)
+        tasks.extend(self._nullspace_tasks.values())
         constraints = [self._freeze_task] if self._freeze_task else []
+
+        q_before = self._config.q.copy()
+        # This solve attempt consumes the current target pair. Even on failure,
+        # wait for a fresh target from every active side before trying again.
+        self._pending = set(self._sides)
 
         for _ in range(self._max_iters):
             try:
                 vel = mink.solve_ik(
                     self._config,
                     tasks,
-                    self._dt,
+                    self._substep_dt,
                     self._solver_name,
                     limits=self._limits,
                     constraints=constraints,
@@ -222,11 +271,12 @@ class _IKSolver:
                     **self._solver_params,
                 )
             except mink.exceptions.NoSolutionFound:
+                # Earlier substeps may already have advanced the internal model,
+                # while no command from this failed solve reaches the real arm.
+                self._config.update(q=q_before)
                 print("Warning: constrained IK solver failed. Skipping step.")
                 return None
-            self._config.integrate_inplace(vel, self._dt)
-
-        self._pending = set(self._sides)
+            self._config.integrate_inplace(vel, self._substep_dt)
 
         qpos = self._config.data.qpos
         right_joints, _ = self._joint_resolver.get_driver(qpos, "right")
@@ -250,6 +300,34 @@ def _frame_name(setup: ArmSetup, side: str) -> str:
     return mujoco.mj_id2name(setup.model, obj, fid)
 
 
+def _arm_qpos_indices(setup: ArmSetup, side: str) -> np.ndarray:
+    resolved = (
+        setup.joint_resolver._right if side == "right" else setup.joint_resolver._left
+    )
+    return np.asarray(resolved.arm_qpos, dtype=int)
+
+
+def _dof_indices_for_qpos(
+    model: mujoco.MjModel, qpos_indices: np.ndarray
+) -> np.ndarray:
+    """Map scalar arm-joint qpos addresses to tangent-space DoF addresses."""
+    dof_indices: list[int] = []
+    for qpos_index in qpos_indices:
+        joint_ids = np.flatnonzero(model.jnt_qposadr == int(qpos_index))
+        if joint_ids.size != 1:
+            raise ValueError(
+                f"Expected qpos index {qpos_index} to start exactly one joint."
+            )
+        joint_id = int(joint_ids[0])
+        joint_type = model.jnt_type[joint_id]
+        if joint_type not in (mujoco.mjtJoint.mjJNT_HINGE, mujoco.mjtJoint.mjJNT_SLIDE):
+            raise ValueError(
+                "Nullspace arm joints must be scalar hinge or slide joints."
+            )
+        dof_indices.append(int(model.jnt_dofadr[joint_id]))
+    return np.asarray(dof_indices, dtype=int)
+
+
 def _configuration_limit_for_qpos(
     model: mujoco.MjModel, qpos_indices: set[int]
 ) -> mink.ConfigurationLimit:
@@ -267,23 +345,12 @@ def _configuration_limit_for_qpos(
     return limit
 
 
-def _convert_velocity(
-    rad_per_sec: float,
-    dt: float,
-    max_iters: int,
-    tick_hz: float,
-) -> float:
-    if max_iters <= 0 or dt <= 0.0 or tick_hz <= 0.0:
-        raise ValueError("max_iters, dt, and tick_hz must all be positive.")
-    return rad_per_sec / (max_iters * dt * tick_hz)
-
-
 def _load_velocity_caps(config_path: pathlib.Path | None) -> list[float]:
     """Return per-joint velocity caps in rad/s.
 
     With no config path, returns the built-in ARM_JOINT_VELOCITY_LIMITS_RAD_S.
-    When a path is given, reads 'arm_velocity_limits' or the driver config's
-    'joint_delta_position_limits' from the YAML.
+    When a path is given, reads the legacy IK-specific
+    'arm_velocity_limits' key from the YAML.
     """
     if config_path is None:
         return ARM_JOINT_VELOCITY_LIMITS_RAD_S
@@ -293,26 +360,18 @@ def _load_velocity_caps(config_path: pathlib.Path | None) -> list[float]:
     if not isinstance(data, dict):
         raise ValueError(f"Config file {config_path} must contain a YAML mapping.")
 
-    key = None
-    if "arm_velocity_limits" in data:
-        key = "arm_velocity_limits"
-    elif "joint_delta_position_limits" in data:
-        key = "joint_delta_position_limits"
-    if key is None:
+    key = "arm_velocity_limits"
+    if key not in data:
         raise ValueError(
-            f"Config file {config_path} has no top-level 'arm_velocity_limits' "
-            "or 'joint_delta_position_limits' list."
+            f"Config file {config_path} has no top-level '{key}' list."
         )
 
     expected = len(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
     raw_caps = data[key]
-    if key == "joint_delta_position_limits":
-        raw_caps = raw_caps[:expected]
     caps = [float(v) for v in raw_caps]
     if len(caps) != expected:
         raise ValueError(
-            f"{key} in {config_path} has {len(caps)} arm entries; "
-            f"expected {expected}."
+            f"{key} in {config_path} has {len(caps)} arm entries; expected {expected}."
         )
     return caps
 
@@ -345,13 +404,16 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
     )
     parser.add_argument("--solver", default="daqp", help="QP backend (default: daqp)")
     parser.add_argument(
-        "--max-iters", type=int, default=5, help="IK iterations per event (default: 5)"
+        "--max-iters", type=int, default=10, help="IK substeps per event (default: 10)"
     )
     parser.add_argument(
         "--dt",
         type=float,
-        default=0.1,
-        help="Integration timestep per iteration (default: 0.1)",
+        default=None,
+        help=(
+            "Outer control period in seconds. Defaults to 1 / --tick-hz; "
+            "each IK substep uses this value divided by --max-iters."
+        ),
     )
     parser.add_argument(
         "--posture-cost",
@@ -371,35 +433,83 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         help="Enable per-joint IK velocity limits.",
     )
     parser.add_argument(
+        "--joint-limit-recovery-velocity-scale",
+        type=float,
+        default=1.1,
+        help=(
+            "Velocity-limit multiplier used only while a joint is outside its "
+            "position range (default: 1.1)."
+        ),
+    )
+    parser.add_argument(
         "--config",
         type=pathlib.Path,
         default=None,
         help=(
-            "YAML file with 'arm_velocity_limits: [rad/s, ...]' or driver "
-            "'joint_delta_position_limits: [rad/s, ...]'. Used only with "
-            "--limit-velocity."
+            "Optional YAML file with 'arm_velocity_limits: [rad/s, ...]'. "
+            "Without it, built-in limits are used. Used only with --limit-velocity."
         ),
     )
     parser.add_argument(
         "--tick-hz",
         type=float,
         default=500.0,
-        help="Dora tick rate in Hz; must match the dataflow timer (default: 500.0).",
+        help=(
+            "Dora tick rate used when --dt is omitted; must match the dataflow "
+            "timer (default: 500.0)."
+        ),
+    )
+    parser.add_argument(
+        "--nullspace-cost",
+        type=float,
+        default=0.3,
+        help="One-dimensional nullspace posture cost (default: 0.3).",
+    )
+    parser.add_argument(
+        "--nullspace-return-rate",
+        type=float,
+        default=0.5,
+        help="Nullspace home return rate in 1/s (default: 0.5).",
+    )
+    parser.add_argument(
+        "--nullspace-max-speed",
+        type=float,
+        default=0.5,
+        help="Maximum nullspace-coordinate speed in rad/s (default: 0.5).",
+    )
+    parser.add_argument(
+        "--nullspace-singularity-low",
+        type=float,
+        default=0.02,
+        help="Singularity ratio where nullspace return is disabled (default: 0.02).",
+    )
+    parser.add_argument(
+        "--nullspace-singularity-high",
+        type=float,
+        default=0.05,
+        help="Singularity ratio where nullspace return is fully active (default: 0.05).",
+    )
+    parser.add_argument(
+        "--nullspace-characteristic-length",
+        type=float,
+        default=0.3,
+        help="Length in meters used to normalize translational Jacobian rows.",
     )
 
 
 def ik_params_from_args(args: argparse.Namespace) -> IKParams:
     """Build IKParams from parsed args (requires register_ik_args to have been called)."""
+    control_dt = args.dt
+    if control_dt is None:
+        if args.tick_hz <= 0.0:
+            raise ValueError("--tick-hz must be positive when --dt is omitted.")
+        control_dt = 1.0 / args.tick_hz
+
     velocity_limits: dict[str, float] | None = None
     if args.limit_velocity:
         caps = _load_velocity_caps(getattr(args, "config", None))
         velocity_limits = {
-            f"openarm_{side}_joint{i + 1}": _convert_velocity(
-                rad_per_sec=v,
-                dt=args.dt,
-                max_iters=args.max_iters,
-                tick_hz=args.tick_hz,
-            )
+            f"openarm_{side}_joint{i + 1}": v
             for side in ("left", "right")
             for i, v in enumerate(caps)
         }
@@ -412,7 +522,16 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         solver=args.solver,
         posture_cost=args.posture_cost,
         diag_reg=args.diag_reg,
-        dt=args.dt,
+        dt=control_dt,
         max_iters=args.max_iters,
         velocity_limits=velocity_limits,
+        joint_limit_recovery_velocity_scale=(
+            args.joint_limit_recovery_velocity_scale
+        ),
+        nullspace_cost=args.nullspace_cost,
+        nullspace_return_rate=args.nullspace_return_rate,
+        nullspace_max_speed=args.nullspace_max_speed,
+        nullspace_singularity_low=args.nullspace_singularity_low,
+        nullspace_singularity_high=args.nullspace_singularity_high,
+        nullspace_characteristic_length=args.nullspace_characteristic_length,
     )
