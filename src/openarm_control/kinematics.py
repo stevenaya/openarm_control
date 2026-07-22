@@ -118,6 +118,16 @@ class Kinematics:
         """Sync IK internal config from float32[16] driver state (right[8]+left[8])."""
         self._require_ik().sync(values16)
 
+    def blend_state(
+        self,
+        qpos16: np.ndarray,
+        qvel16: np.ndarray,
+        blend: float,
+        prediction_dt: float = 0.0,
+    ) -> None:
+        """Blend predicted measured arm state into the persistent IK state."""
+        self._require_ik().blend_state(qpos16, qvel16, blend, prediction_dt)
+
     def ready(self) -> bool:
         """Return True once all active arms have received at least one target this cycle."""
         return self._require_ik().ready()
@@ -153,6 +163,12 @@ class _IKSolver:
         self._solver_name = params.solver
         self._posture_cost = params.posture_cost
         self._joint_resolver = setup.joint_resolver
+        self._arm_dofs = {
+            side: _dof_indices_for_qpos(
+                setup.model, _arm_qpos_indices(setup, side)
+            )
+            for side in setup.sides
+        }
         self._substep_dt = params.dt / params.max_iters
         self._max_iters = params.max_iters
 
@@ -286,6 +302,54 @@ class _IKSolver:
         # (e.g. from a VR trigger) arriving on a similar cadence, causing the
         # commanded gripper to flicker between the real motor position and
         # the trigger-commanded value depending on event arrival order.
+
+    def blend_state(
+        self,
+        qpos16: np.ndarray,
+        qvel16: np.ndarray,
+        blend: float,
+        prediction_dt: float,
+    ) -> None:
+        """Correct the IK state toward a short-horizon measured-state estimate."""
+        qpos16 = np.asarray(qpos16, dtype=float)
+        qvel16 = np.asarray(qvel16, dtype=float)
+        if qpos16.shape != (16,) or qvel16.shape != (16,):
+            raise ValueError("Measured qpos and qvel must each contain 16 values.")
+        if not 0.0 <= blend <= 1.0:
+            raise ValueError("State feedback blend must be between 0 and 1.")
+        if prediction_dt < 0.0:
+            raise ValueError("State prediction timestep must be non-negative.")
+        if blend == 0.0:
+            return
+
+        model = self._config.model
+        theoretical_qpos = self._config.q.copy()
+        measured_qpos = theoretical_qpos.copy()
+        measured_qvel = np.zeros(model.nv)
+
+        for side in self._sides:
+            offset = 0 if side == "right" else 8
+            self._joint_resolver.set_qpos(
+                measured_qpos, qpos16[offset : offset + 8], side
+            )
+            measured_qvel[self._arm_dofs[side]] = qvel16[offset : offset + 7]
+
+        if prediction_dt > 0.0:
+            mujoco.mj_integratePos(
+                model, measured_qpos, measured_qvel, prediction_dt
+            )
+
+        correction = np.zeros(model.nv)
+        mujoco.mj_differentiatePos(
+            model,
+            correction,
+            1.0,
+            theoretical_qpos,
+            measured_qpos,
+        )
+        blended_qpos = theoretical_qpos.copy()
+        mujoco.mj_integratePos(model, blended_qpos, correction, blend)
+        self._config.update(q=blended_qpos)
 
     def ready(self) -> bool:
         return len(self._pending) == 0

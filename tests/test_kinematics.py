@@ -158,6 +158,57 @@ class NullspaceTaskTest(unittest.TestCase):
             np.testing.assert_array_equal(task._home_qpos, nullspace_homes[side])
 
 
+class StateFeedbackBlendTest(unittest.TestCase):
+    """Exercise measured q/dq fusion without changing the feedforward default."""
+
+    def test_half_blend_uses_velocity_predicted_measured_position(self) -> None:
+        setup = _setup()
+        kinematics = Kinematics(
+            setup,
+            IKParams(posture_cost=0.0, nullspace_cost=0.0),
+        )
+        solver = kinematics._ik
+        assert solver is not None
+
+        right, _ = setup.joint_resolver.get_driver(solver._config.q, "right")
+        left, _ = setup.joint_resolver.get_driver(solver._config.q, "left")
+        measured_qpos = np.concatenate(
+            [np.append(right, 0.0), np.append(left, 0.0)]
+        )
+        measured_qpos[0] += 0.2
+        measured_qvel = np.zeros(16)
+        measured_qvel[0] = 1.0
+
+        kinematics.blend_state(
+            measured_qpos,
+            measured_qvel,
+            blend=0.5,
+            prediction_dt=0.004,
+        )
+
+        fused_right, _ = setup.joint_resolver.get_driver(solver._config.q, "right")
+        self.assertAlmostEqual(fused_right[0] - right[0], 0.102, places=9)
+
+    def test_zero_blend_preserves_theoretical_state(self) -> None:
+        setup = _setup()
+        kinematics = Kinematics(
+            setup,
+            IKParams(posture_cost=0.0, nullspace_cost=0.0),
+        )
+        solver = kinematics._ik
+        assert solver is not None
+        theoretical = solver._config.q.copy()
+
+        kinematics.blend_state(
+            np.linspace(-0.2, 0.2, 16),
+            np.ones(16),
+            blend=0.0,
+            prediction_dt=0.004,
+        )
+
+        np.testing.assert_array_equal(solver._config.q, theoretical)
+
+
 class SoftLimitTaskTest(unittest.TestCase):
     """Exercise the one-sided joint4 guard independently of the IK solver."""
 
