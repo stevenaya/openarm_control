@@ -17,6 +17,7 @@ from openarm_control import (
     ArmSetup,
     IKParams,
     Kinematics,
+    LowerBoundBrakingLimit,
     RecoverableConfigurationLimit,
     ik_params_from_args,
     read_ee_pose,
@@ -26,12 +27,14 @@ from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S
 from openarm_control.kinematics import (
     _arm_qpos_indices,
     _dof_indices_for_qpos,
+    _elbow_joint_indices,
 )
 from openarm_control.nullspace_posture_task import (
     NullspacePostureTask,
     smoothstep_activation,
     structural_nullspace_direction,
 )
+from openarm_control.soft_limit_task import SoftLimitTask
 
 
 def _setup(mode: str = "bimanual") -> ArmSetup:
@@ -155,6 +158,215 @@ class NullspaceTaskTest(unittest.TestCase):
             np.testing.assert_array_equal(task._home_qpos, nullspace_homes[side])
 
 
+class SoftLimitTaskTest(unittest.TestCase):
+    """Exercise the one-sided joint4 guard independently of the IK solver."""
+
+    def _task_and_configuration(
+        self,
+    ) -> tuple[SoftLimitTask, mink.Configuration, int]:
+        setup = _setup("right")
+        configuration = mink.Configuration(setup.model, q=setup.data.qpos.copy())
+        elbow_qpos, elbow_dof = _elbow_joint_indices(setup, "right")
+        task = SoftLimitTask(
+            model=setup.model,
+            joint_qpos_index=elbow_qpos,
+            joint_dof_index=elbow_dof,
+            cost=2.0,
+            dt=0.01,
+            limit=0.1,
+            max_speed=0.05,
+        )
+        qpos = configuration.q
+        qpos[elbow_qpos] = 0.0
+        configuration.update(q=qpos)
+        return task, configuration, elbow_dof
+
+    def test_straight_arm_requests_only_slow_joint4_bending(self) -> None:
+        task, configuration, elbow_dof = self._task_and_configuration()
+
+        objective = task.compute_qp_objective(configuration)
+
+        selector = np.zeros(configuration.model.nv)
+        selector[elbow_dof] = 1.0
+        expected_h = 2.0**2 * np.outer(selector, selector)
+        expected_c = -(2.0**2) * 0.0005 * selector
+        np.testing.assert_allclose(objective.H, expected_h, atol=1e-12)
+        np.testing.assert_allclose(objective.c, expected_c, atol=1e-12)
+
+    def test_task_turns_off_at_limit(self) -> None:
+        task, configuration, _ = self._task_and_configuration()
+        qpos = configuration.q
+        qpos[task._joint_qpos_index] = task._limit
+        configuration.update(q=qpos)
+        objective = task.compute_qp_objective(configuration)
+        np.testing.assert_array_equal(objective.H, np.zeros_like(objective.H))
+        np.testing.assert_array_equal(objective.c, np.zeros_like(objective.c))
+
+    def test_solver_builds_one_guard_for_each_active_arm(self) -> None:
+        setup = _setup()
+        kinematics = Kinematics(
+            setup,
+            IKParams(
+                posture_cost=0.0,
+                nullspace_cost=0.0,
+                elbow_soft_limit_cost=2.0,
+            ),
+        )
+        solver = kinematics._ik
+        assert solver is not None
+
+        self.assertEqual(set(solver._elbow_soft_limit_tasks), {"left", "right"})
+        for side, task in solver._elbow_soft_limit_tasks.items():
+            expected_qpos, expected_dof = _elbow_joint_indices(setup, side)
+            self.assertEqual(task._joint_qpos_index, expected_qpos)
+            self.assertEqual(task._joint_dof_index, expected_dof)
+
+
+class LowerBoundBrakingLimitTest(unittest.TestCase):
+    """Exercise the preventive joint4 stopping-distance constraint."""
+
+    def _limit_and_configuration(
+        self,
+    ) -> tuple[LowerBoundBrakingLimit, mink.Configuration]:
+        setup = _setup("right")
+        configuration = mink.Configuration(setup.model, q=setup.data.qpos.copy())
+        elbow_qpos, elbow_dof = _elbow_joint_indices(setup, "right")
+        limit = LowerBoundBrakingLimit(
+            model=setup.model,
+            joint_qpos_index=elbow_qpos,
+            joint_dof_index=elbow_dof,
+            guard_position=0.08,
+            max_deceleration=20.0,
+            max_velocity=3.14,
+        )
+        return limit, configuration
+
+    def _allowed_displacement(self, position: float) -> float:
+        limit, configuration = self._limit_and_configuration()
+        q = configuration.q
+        q[limit.joint_qpos_index] = position
+        configuration.update(q=q)
+
+        inequalities = limit.compute_qp_inequalities(configuration, dt=0.0004)
+
+        assert inequalities.G is not None
+        assert inequalities.h is not None
+        self.assertEqual(inequalities.G[0, limit.joint_dof_index], -1.0)
+        return float(inequalities.h[0])
+
+    def test_far_from_guard_uses_joint_velocity_cap(self) -> None:
+        self.assertAlmostEqual(
+            self._allowed_displacement(0.7),
+            3.14 * 0.0004,
+        )
+
+    def test_near_guard_uses_stopping_distance_velocity(self) -> None:
+        margin = 0.05
+        expected_velocity = np.sqrt(2.0 * 20.0 * margin)
+        self.assertAlmostEqual(
+            self._allowed_displacement(0.08 + margin),
+            expected_velocity * 0.0004,
+        )
+
+    def test_at_or_below_guard_forbids_further_approach(self) -> None:
+        self.assertEqual(self._allowed_displacement(0.08), 0.0)
+        self.assertEqual(self._allowed_displacement(0.04), 0.0)
+
+    def test_guard_must_be_inside_physical_joint_range(self) -> None:
+        setup = _setup("right")
+        elbow_qpos, elbow_dof = _elbow_joint_indices(setup, "right")
+        with self.assertRaisesRegex(ValueError, "physical joint range"):
+            LowerBoundBrakingLimit(
+                model=setup.model,
+                joint_qpos_index=elbow_qpos,
+                joint_dof_index=elbow_dof,
+                guard_position=-0.01,
+                max_deceleration=20.0,
+                max_velocity=3.14,
+            )
+
+    def test_solver_builds_one_limit_for_each_active_arm(self) -> None:
+        setup = _setup()
+        kinematics = Kinematics(
+            setup,
+            IKParams(
+                posture_cost=0.0,
+                nullspace_cost=0.0,
+                elbow_braking_guard_angle=0.08,
+                elbow_braking_acceleration=20.0,
+            ),
+        )
+        solver = kinematics._ik
+        assert solver is not None
+
+        self.assertEqual(set(solver._elbow_braking_limits), {"left", "right"})
+        self.assertEqual(len(solver._limits), 3)
+        for side, limit in solver._elbow_braking_limits.items():
+            expected_qpos, expected_dof = _elbow_joint_indices(setup, side)
+            self.assertEqual(limit.joint_qpos_index, expected_qpos)
+            self.assertEqual(limit.joint_dof_index, expected_dof)
+
+    def test_outward_reach_brakes_before_elbow_guard(self) -> None:
+        setup = _setup("right")
+        velocity_limits = {
+            f"openarm_{side}_joint{index + 1}": float(cap)
+            for side in ("left", "right")
+            for index, cap in enumerate(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
+        }
+        kinematics = Kinematics(
+            setup,
+            IKParams(
+                position_cost=10.0,
+                orientation_cost=1.0,
+                lm_damping=0.02,
+                damping=0.1,
+                posture_cost=0.0,
+                dt=0.004,
+                max_iters=10,
+                velocity_limits=velocity_limits,
+                joint_limit_recovery_velocity_scale=1.0,
+                nullspace_cost=10.0,
+                nullspace_return_rate=0.8,
+                nullspace_max_speed=0.8,
+                nullspace_singularity_low=0.02,
+                nullspace_singularity_high=0.05,
+                nullspace_characteristic_length=0.3,
+                elbow_braking_guard_angle=0.08,
+                elbow_braking_acceleration=20.0,
+            ),
+        )
+        initial_right = np.array([1.224145, 0.0, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0])
+        left_home, _ = setup.joint_resolver.get_driver(setup.data.qpos, "left")
+        initial_pose = kinematics.fk("right", initial_right)
+        kinematics.sync(
+            np.concatenate([initial_right, left_home, np.zeros(1)]).astype(np.float32)
+        )
+
+        commands: list[np.ndarray] = []
+        for step in range(230):
+            target = initial_pose.copy()
+            target[0] += 0.05 * 0.004 * (step + 1)
+            kinematics.set_target("right", target)
+            result = kinematics.solve()
+            self.assertIsNotNone(result)
+            assert result is not None
+            commands.append(result[:7].astype(np.float64))
+
+        command_array = np.asarray(commands)
+        elbow_position = command_array[:, 3]
+        elbow_velocity = (
+            np.diff(np.concatenate([[initial_right[3]], elbow_position])) / 0.004
+        )
+        elbow_acceleration = np.diff(np.concatenate([[0.0], elbow_velocity])) / 0.004
+        braking_region = elbow_position < 0.2
+
+        self.assertGreaterEqual(float(np.min(elbow_position)), 0.08 - 1e-4)
+        self.assertLess(
+            float(np.max(np.abs(elbow_acceleration[braking_region]))),
+            25.0,
+        )
+
+
 class SolverTimingTest(unittest.TestCase):
     """Verify that ten substeps represent exactly one outer control period."""
 
@@ -168,6 +380,16 @@ class SolverTimingTest(unittest.TestCase):
                 "--limit-velocity",
                 "--joint-limit-recovery-velocity-scale",
                 "1.2",
+                "--elbow-soft-limit-cost",
+                "2.0",
+                "--elbow-soft-limit-angle",
+                "0.08",
+                "--elbow-soft-limit-max-speed",
+                "0.2",
+                "--elbow-braking-guard-angle",
+                "0.08",
+                "--elbow-braking-acceleration",
+                "20.0",
             ]
         )
 
@@ -175,6 +397,11 @@ class SolverTimingTest(unittest.TestCase):
 
         self.assertAlmostEqual(params.dt, 0.004)
         self.assertEqual(params.joint_limit_recovery_velocity_scale, 1.2)
+        self.assertEqual(params.elbow_soft_limit_cost, 2.0)
+        self.assertEqual(params.elbow_soft_limit_angle, 0.08)
+        self.assertEqual(params.elbow_soft_limit_max_speed, 0.2)
+        self.assertEqual(params.elbow_braking_guard_angle, 0.08)
+        self.assertEqual(params.elbow_braking_acceleration, 20.0)
         assert params.velocity_limits is not None
         for side in ("left", "right"):
             for index, expected in enumerate(ARM_JOINT_VELOCITY_LIMITS_RAD_S):
@@ -194,9 +421,7 @@ class SolverTimingTest(unittest.TestCase):
             )
             parser = argparse.ArgumentParser()
             register_ik_args(parser)
-            args = parser.parse_args(
-                ["--limit-velocity", "--config", str(config_path)]
-            )
+            args = parser.parse_args(["--limit-velocity", "--config", str(config_path)])
 
             params = ik_params_from_args(args)
 
@@ -217,9 +442,7 @@ class SolverTimingTest(unittest.TestCase):
             )
             parser = argparse.ArgumentParser()
             register_ik_args(parser)
-            args = parser.parse_args(
-                ["--limit-velocity", "--config", str(config_path)]
-            )
+            args = parser.parse_args(["--limit-velocity", "--config", str(config_path)])
 
             with self.assertRaisesRegex(ValueError, "arm_velocity_limits"):
                 ik_params_from_args(args)
@@ -320,14 +543,10 @@ class RecoverableConfigurationLimitTest(unittest.TestCase):
         assert solver is not None
         row = 0
         q = solver._config.q
-        q[limit.qpos_indices[row]] = 0.5 * (
-            limit.lower[row] + limit.upper[row]
-        )
+        q[limit.qpos_indices[row]] = 0.5 * (limit.lower[row] + limit.upper[row])
         solver._config.update(q=q)
 
-        inequalities = limit.compute_qp_inequalities(
-            solver._config, solver._substep_dt
-        )
+        inequalities = limit.compute_qp_inequalities(solver._config, solver._substep_dt)
         assert inequalities.h is not None
         count = limit.indices.size
         step_lower = -inequalities.h[count:]
@@ -344,9 +563,7 @@ class RecoverableConfigurationLimitTest(unittest.TestCase):
         row = 0
         qpos_index = limit.qpos_indices[row]
         recovery_step = (
-            limit.limit[row]
-            * solver._substep_dt
-            * limit.recovery_velocity_scale
+            limit.limit[row] * solver._substep_dt * limit.recovery_velocity_scale
         )
 
         for q_value, expected_step in (

@@ -40,11 +40,13 @@ import numpy as np
 import yaml
 
 from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S, ArmSetup
+from openarm_control.lower_bound_braking_limit import LowerBoundBrakingLimit
 from openarm_control.nullspace_posture_task import NullspacePostureTask
 from openarm_control.poses import pose_to_se3
 from openarm_control.recoverable_configuration_limit import (
     RecoverableConfigurationLimit,
 )
+from openarm_control.soft_limit_task import SoftLimitTask
 
 
 @dataclass
@@ -68,6 +70,11 @@ class IKParams:
     nullspace_singularity_low: float = 0.02
     nullspace_singularity_high: float = 0.05
     nullspace_characteristic_length: float = 0.3
+    elbow_soft_limit_cost: float = 0.0
+    elbow_soft_limit_angle: float = 0.08
+    elbow_soft_limit_max_speed: float = 0.2
+    elbow_braking_guard_angle: float = 0.08
+    elbow_braking_acceleration: float = 0.0
 
 
 class Kinematics:
@@ -199,6 +206,29 @@ class _IKSolver:
         else:
             self._limits = [_configuration_limit_for_qpos(setup.model, active_qpos)]
 
+        self._elbow_braking_limits: dict[str, LowerBoundBrakingLimit] = {}
+        if params.elbow_braking_acceleration < 0.0:
+            raise ValueError("Elbow braking acceleration must be non-negative.")
+        if params.elbow_braking_acceleration > 0.0:
+            for side in setup.sides:
+                elbow_qpos, elbow_dof = _elbow_joint_indices(setup, side)
+                joint_name = f"openarm_{side}_joint4"
+                max_velocity = _joint_velocity_cap(
+                    params.velocity_limits,
+                    joint_name,
+                    ARM_JOINT_VELOCITY_LIMITS_RAD_S[3],
+                )
+                braking_limit = LowerBoundBrakingLimit(
+                    model=setup.model,
+                    joint_qpos_index=elbow_qpos,
+                    joint_dof_index=elbow_dof,
+                    guard_position=params.elbow_braking_guard_angle,
+                    max_deceleration=params.elbow_braking_acceleration,
+                    max_velocity=max_velocity,
+                )
+                self._elbow_braking_limits[side] = braking_limit
+                self._limits.append(braking_limit)
+
         self._posture_task = mink.PostureTask(setup.model, cost=params.posture_cost)
         self._posture_task.set_target(home_qpos)
 
@@ -218,6 +248,20 @@ class _IKSolver:
                     singularity_low=params.nullspace_singularity_low,
                     singularity_high=params.nullspace_singularity_high,
                     characteristic_length=params.nullspace_characteristic_length,
+                )
+
+        self._elbow_soft_limit_tasks: dict[str, SoftLimitTask] = {}
+        if params.elbow_soft_limit_cost > 0.0:
+            for side in setup.sides:
+                elbow_qpos, elbow_dof = _elbow_joint_indices(setup, side)
+                self._elbow_soft_limit_tasks[side] = SoftLimitTask(
+                    model=setup.model,
+                    joint_qpos_index=elbow_qpos,
+                    joint_dof_index=elbow_dof,
+                    cost=params.elbow_soft_limit_cost,
+                    dt=self._substep_dt,
+                    limit=params.elbow_soft_limit_angle,
+                    max_speed=params.elbow_soft_limit_max_speed,
                 )
 
         self._solver_params: dict = {"damping": params.damping}
@@ -251,6 +295,7 @@ class _IKSolver:
         if self._posture_cost > 0.0:
             tasks.append(self._posture_task)
         tasks.extend(self._nullspace_tasks.values())
+        tasks.extend(self._elbow_soft_limit_tasks.values())
         constraints = [self._freeze_task] if self._freeze_task else []
 
         q_before = self._config.q.copy()
@@ -328,6 +373,32 @@ def _dof_indices_for_qpos(
     return np.asarray(dof_indices, dtype=int)
 
 
+def _elbow_joint_indices(setup: ArmSetup, side: str) -> tuple[int, int]:
+    """Return the scalar qpos and DoF addresses for one arm's joint4."""
+    joint_name = f"openarm_{side}_joint4"
+    joint_id = mujoco.mj_name2id(setup.model, mujoco.mjtObj.mjOBJ_JOINT, joint_name)
+    if joint_id < 0:
+        raise ValueError(f"MuJoCo model has no joint named {joint_name!r}.")
+    return (
+        int(setup.model.jnt_qposadr[joint_id]),
+        int(setup.model.jnt_dofadr[joint_id]),
+    )
+
+
+def _joint_velocity_cap(
+    velocity_limits: dict[str, float] | None,
+    joint_name: str,
+    default: float,
+) -> float:
+    """Return a scalar configured joint velocity cap or its built-in default."""
+    if velocity_limits is None:
+        return default
+    value = np.asarray(velocity_limits[joint_name], dtype=np.float64)
+    if value.size != 1:
+        raise ValueError(f"Velocity limit for {joint_name!r} must be scalar.")
+    return float(value.reshape(-1)[0])
+
+
 def _configuration_limit_for_qpos(
     model: mujoco.MjModel, qpos_indices: set[int]
 ) -> mink.ConfigurationLimit:
@@ -362,9 +433,7 @@ def _load_velocity_caps(config_path: pathlib.Path | None) -> list[float]:
 
     key = "arm_velocity_limits"
     if key not in data:
-        raise ValueError(
-            f"Config file {config_path} has no top-level '{key}' list."
-        )
+        raise ValueError(f"Config file {config_path} has no top-level '{key}' list.")
 
     expected = len(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
     raw_caps = data[key]
@@ -495,6 +564,39 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         default=0.3,
         help="Length in meters used to normalize translational Jacobian rows.",
     )
+    parser.add_argument(
+        "--elbow-soft-limit-cost",
+        type=float,
+        default=0.0,
+        help="Joint4 lower soft-limit cost, 0=disabled (default: 0.0).",
+    )
+    parser.add_argument(
+        "--elbow-soft-limit-angle",
+        type=float,
+        default=0.08,
+        help="Joint4 lower soft limit in radians (default: 0.08).",
+    )
+    parser.add_argument(
+        "--elbow-soft-limit-max-speed",
+        type=float,
+        default=0.2,
+        help="Maximum joint4 soft-limit return speed in rad/s (default: 0.2).",
+    )
+    parser.add_argument(
+        "--elbow-braking-guard-angle",
+        type=float,
+        default=0.08,
+        help="Joint4 lower braking guard position in radians (default: 0.08).",
+    )
+    parser.add_argument(
+        "--elbow-braking-acceleration",
+        type=float,
+        default=0.0,
+        help=(
+            "Maximum joint4 deceleration toward its lower guard in rad/s^2; "
+            "0 disables the braking limit (default: 0.0)."
+        ),
+    )
 
 
 def ik_params_from_args(args: argparse.Namespace) -> IKParams:
@@ -525,13 +627,16 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         dt=control_dt,
         max_iters=args.max_iters,
         velocity_limits=velocity_limits,
-        joint_limit_recovery_velocity_scale=(
-            args.joint_limit_recovery_velocity_scale
-        ),
+        joint_limit_recovery_velocity_scale=(args.joint_limit_recovery_velocity_scale),
         nullspace_cost=args.nullspace_cost,
         nullspace_return_rate=args.nullspace_return_rate,
         nullspace_max_speed=args.nullspace_max_speed,
         nullspace_singularity_low=args.nullspace_singularity_low,
         nullspace_singularity_high=args.nullspace_singularity_high,
         nullspace_characteristic_length=args.nullspace_characteristic_length,
+        elbow_soft_limit_cost=args.elbow_soft_limit_cost,
+        elbow_soft_limit_angle=args.elbow_soft_limit_angle,
+        elbow_soft_limit_max_speed=args.elbow_soft_limit_max_speed,
+        elbow_braking_guard_angle=args.elbow_braking_guard_angle,
+        elbow_braking_acceleration=args.elbow_braking_acceleration,
     )
