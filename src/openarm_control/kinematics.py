@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import pathlib
+import time
 from dataclasses import dataclass
 
 import mink
@@ -40,6 +41,10 @@ import numpy as np
 import yaml
 
 from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S, ArmSetup
+from openarm_control.kinetic_energy_task import (
+    KineticEnergyRegularizationTask,
+)
+from openarm_control.joint_braking_limit import JointBrakingLimit
 from openarm_control.lower_bound_braking_limit import LowerBoundBrakingLimit
 from openarm_control.nullspace_posture_task import NullspacePostureTask
 from openarm_control.poses import pose_to_se3
@@ -47,6 +52,7 @@ from openarm_control.recoverable_configuration_limit import (
     RecoverableConfigurationLimit,
 )
 from openarm_control.soft_limit_task import SoftLimitTask
+from openarm_control.singularity_approach_limit import SingularityApproachLimit
 
 
 @dataclass
@@ -74,7 +80,23 @@ class IKParams:
     elbow_soft_limit_angle: float = 0.08
     elbow_soft_limit_max_speed: float = 0.2
     elbow_braking_guard_angle: float = 0.08
+    elbow_braking_profile: str = "acceleration"
     elbow_braking_acceleration: float = 0.0
+    elbow_braking_slowdown_distance: float = 0.5
+    joint_limit_braking: bool = False
+    joint_limit_braking_slowdown_distance: float = 0.5
+    joint_limit_braking_exponent: float = 2.0
+    joint_limit_braking_guard_margin: float = 0.0
+    joint_limit_braking_reaction_time: float = 0.0
+    joint_limit_braking_distance_buffer: float = 0.0
+    singularity_approach_limit: bool = False
+    singularity_ratio_stop: float = 0.01
+    singularity_ratio_slow: float = 0.05
+    singularity_max_approach_rate: float = 0.5
+    singularity_braking_exponent: float = 2.0
+    singularity_gradient_epsilon: float = 1e-4
+    measured_state_timeout: float = 0.1
+    kinetic_energy_cost: float = 0.0
 
 
 class Kinematics:
@@ -118,6 +140,24 @@ class Kinematics:
         """Sync IK internal config from float32[16] driver state (right[8]+left[8])."""
         self._require_ik().sync(values16)
 
+    def update_measured_state(
+        self,
+        qpos16: np.ndarray,
+        qvel16: np.ndarray,
+        *,
+        timestamp: float | None = None,
+    ) -> None:
+        """Update measured q/dq used by safety limits without syncing IK state."""
+        self._require_ik().update_measured_state(
+            qpos16,
+            qvel16,
+            timestamp=timestamp,
+        )
+
+    def clear_measured_state(self) -> None:
+        """Make state-aware limits fall back to command configuration only."""
+        self._require_ik().clear_measured_state()
+
     def ready(self) -> bool:
         """Return True once all active arms have received at least one target this cycle."""
         return self._require_ik().ready()
@@ -152,9 +192,26 @@ class _IKSolver:
         self._sides = setup.sides
         self._solver_name = params.solver
         self._posture_cost = params.posture_cost
+        self._model = setup.model
         self._joint_resolver = setup.joint_resolver
+        self._arm_qpos_by_side = {
+            side: _arm_qpos_indices(setup, side) for side in setup.sides
+        }
+        self._arm_dofs_by_side = {
+            side: _dof_indices_for_qpos(
+                setup.model,
+                self._arm_qpos_by_side[side],
+            )
+            for side in setup.sides
+        }
         self._substep_dt = params.dt / params.max_iters
         self._max_iters = params.max_iters
+        if not np.isfinite(params.measured_state_timeout) or (
+            params.measured_state_timeout <= 0.0
+        ):
+            raise ValueError("Measured state timeout must be finite and positive.")
+        self._measured_state_timeout = params.measured_state_timeout
+        self._last_measured_state_time: float | None = None
 
         self._config = mink.Configuration(setup.model)
         self._config.update(q=setup.data.qpos.copy())
@@ -174,9 +231,11 @@ class _IKSolver:
             for side in setup.sides
         }
 
-        active_qpos: set[int] = set(
-            setup.joint_resolver._right.arm_qpos.tolist()
-        ) | set(setup.joint_resolver._left.arm_qpos.tolist())
+        active_qpos = {
+            int(qpos_index)
+            for side in self._sides
+            for qpos_index in self._arm_qpos_by_side[side]
+        }
         freeze_dofs = [
             int(setup.model.jnt_dofadr[j])
             for j in range(setup.model.njnt)
@@ -206,10 +265,47 @@ class _IKSolver:
         else:
             self._limits = [_configuration_limit_for_qpos(setup.model, active_qpos)]
 
+        arm_velocity_limits = _arm_velocity_limit_mapping(
+            setup,
+            params.velocity_limits,
+        )
+        self._joint_braking_limit: JointBrakingLimit | None = None
+        if params.joint_limit_braking:
+            lower_overrides = {
+                f"openarm_{side}_joint4": params.elbow_braking_guard_angle
+                for side in setup.sides
+            }
+            self._joint_braking_limit = JointBrakingLimit(
+                model=setup.model,
+                qpos_indices=active_qpos,
+                velocities=arm_velocity_limits,
+                slowdown_distance=params.joint_limit_braking_slowdown_distance,
+                exponent=params.joint_limit_braking_exponent,
+                guard_margin=params.joint_limit_braking_guard_margin,
+                lower_guard_overrides=lower_overrides,
+                reaction_time=params.joint_limit_braking_reaction_time,
+                distance_buffer=params.joint_limit_braking_distance_buffer,
+            )
+            self._limits.append(self._joint_braking_limit)
+
         self._elbow_braking_limits: dict[str, LowerBoundBrakingLimit] = {}
+        if params.elbow_braking_profile not in {"acceleration", "distance"}:
+            raise ValueError(
+                "Elbow braking profile must be 'acceleration' or 'distance'."
+            )
         if params.elbow_braking_acceleration < 0.0:
             raise ValueError("Elbow braking acceleration must be non-negative.")
-        if params.elbow_braking_acceleration > 0.0:
+        if (
+            params.elbow_braking_profile == "distance"
+            and params.elbow_braking_slowdown_distance <= 0.0
+        ):
+            raise ValueError("Elbow braking slowdown distance must be positive.")
+        braking_enabled = (
+            params.elbow_braking_acceleration > 0.0
+            if params.elbow_braking_profile == "acceleration"
+            else True
+        )
+        if braking_enabled and not params.joint_limit_braking:
             for side in setup.sides:
                 elbow_qpos, elbow_dof = _elbow_joint_indices(setup, side)
                 joint_name = f"openarm_{side}_joint4"
@@ -223,14 +319,45 @@ class _IKSolver:
                     joint_qpos_index=elbow_qpos,
                     joint_dof_index=elbow_dof,
                     guard_position=params.elbow_braking_guard_angle,
-                    max_deceleration=params.elbow_braking_acceleration,
                     max_velocity=max_velocity,
+                    profile=params.elbow_braking_profile,
+                    max_deceleration=params.elbow_braking_acceleration,
+                    slowdown_distance=params.elbow_braking_slowdown_distance,
                 )
                 self._elbow_braking_limits[side] = braking_limit
                 self._limits.append(braking_limit)
 
+        self._singularity_limits: dict[str, SingularityApproachLimit] = {}
+        if params.singularity_approach_limit:
+            for side in setup.sides:
+                singularity_limit = SingularityApproachLimit(
+                    model=setup.model,
+                    frame_task=self._tasks[side],
+                    dof_indices=_dof_indices_for_qpos(
+                        setup.model,
+                        _arm_qpos_indices(setup, side),
+                    ),
+                    characteristic_length=params.nullspace_characteristic_length,
+                    ratio_stop=params.singularity_ratio_stop,
+                    ratio_slow=params.singularity_ratio_slow,
+                    max_approach_rate=params.singularity_max_approach_rate,
+                    exponent=params.singularity_braking_exponent,
+                    gradient_epsilon=params.singularity_gradient_epsilon,
+                )
+                self._singularity_limits[side] = singularity_limit
+                self._limits.append(singularity_limit)
+
         self._posture_task = mink.PostureTask(setup.model, cost=params.posture_cost)
         self._posture_task.set_target(home_qpos)
+
+        self._kinetic_energy_task: KineticEnergyRegularizationTask | None = None
+        if params.kinetic_energy_cost < 0.0:
+            raise ValueError("Kinetic energy cost must be non-negative.")
+        if params.kinetic_energy_cost > 0.0:
+            self._kinetic_energy_task = KineticEnergyRegularizationTask(
+                cost=params.kinetic_energy_cost
+            )
+            self._kinetic_energy_task.set_dt(self._substep_dt)
 
         self._nullspace_tasks: dict[str, NullspacePostureTask] = {}
         if params.nullspace_cost > 0.0:
@@ -287,18 +414,71 @@ class _IKSolver:
         # commanded gripper to flicker between the real motor position and
         # the trigger-commanded value depending on event arrival order.
 
+    def update_measured_state(
+        self,
+        qpos16: np.ndarray,
+        qvel16: np.ndarray,
+        *,
+        timestamp: float | None = None,
+    ) -> None:
+        """Update state-aware limits without changing the IK configuration."""
+        qpos16 = np.asarray(qpos16, dtype=np.float64)
+        qvel16 = np.asarray(qvel16, dtype=np.float64)
+        if qpos16.shape != (16,) or qvel16.shape != (16,):
+            raise ValueError("Measured bimanual qpos and qvel must have shape (16,).")
+        if not np.all(np.isfinite(qpos16)) or not np.all(np.isfinite(qvel16)):
+            raise ValueError("Measured bimanual state must be finite.")
+        measured_at = time.monotonic() if timestamp is None else float(timestamp)
+        if not np.isfinite(measured_at):
+            raise ValueError("Measured state timestamp must be finite.")
+
+        measured_qpos = self._config.q.copy()
+        measured_qvel = np.zeros(self._model.nv, dtype=np.float64)
+        offsets = {"right": 0, "left": 8}
+        for side in self._sides:
+            offset = offsets[side]
+            self._joint_resolver.set_qpos(
+                measured_qpos,
+                qpos16[offset : offset + 8],
+                side,
+            )
+            arm_dofs = self._arm_dofs_by_side[side]
+            measured_qvel[arm_dofs] = qvel16[offset : offset + 7]
+
+        if self._joint_braking_limit is not None:
+            self._joint_braking_limit.update_measured_state(
+                measured_qpos,
+                measured_qvel,
+            )
+        for limit in self._singularity_limits.values():
+            limit.update_measured_configuration(measured_qpos)
+        self._last_measured_state_time = measured_at
+
+    def clear_measured_state(self) -> None:
+        """Clear measured state from every state-aware limit."""
+        if self._joint_braking_limit is not None:
+            self._joint_braking_limit.clear_measured_state()
+        for limit in self._singularity_limits.values():
+            limit.clear_measured_configuration()
+        self._last_measured_state_time = None
+
     def ready(self) -> bool:
         return len(self._pending) == 0
 
     def solve(self) -> np.ndarray | None:
+        self._expire_stale_measured_state()
         tasks = list(self._tasks.values())
         if self._posture_cost > 0.0:
             tasks.append(self._posture_task)
+        if self._kinetic_energy_task is not None:
+            tasks.append(self._kinetic_energy_task)
         tasks.extend(self._nullspace_tasks.values())
         tasks.extend(self._elbow_soft_limit_tasks.values())
         constraints = [self._freeze_task] if self._freeze_task else []
 
         q_before = self._config.q.copy()
+        for limit in self._singularity_limits.values():
+            limit.prepare(self._config)
         # This solve attempt consumes the current target pair. Even on failure,
         # wait for a fresh target from every active side before trying again.
         self._pending = set(self._sides)
@@ -332,6 +512,14 @@ class _IKSolver:
                 np.append(left_joints, self._gripper[1]),
             ]
         ).astype(np.float32)
+
+    def _expire_stale_measured_state(self) -> None:
+        if self._last_measured_state_time is None:
+            return
+        if time.monotonic() - self._last_measured_state_time > (
+            self._measured_state_timeout
+        ):
+            self.clear_measured_state()
 
 
 def _frame_name(setup: ArmSetup, side: str) -> str:
@@ -367,7 +555,7 @@ def _dof_indices_for_qpos(
         joint_type = model.jnt_type[joint_id]
         if joint_type not in (mujoco.mjtJoint.mjJNT_HINGE, mujoco.mjtJoint.mjJNT_SLIDE):
             raise ValueError(
-                "Nullspace arm joints must be scalar hinge or slide joints."
+                "IK arm joints must be scalar hinge or slide joints."
             )
         dof_indices.append(int(model.jnt_dofadr[joint_id]))
     return np.asarray(dof_indices, dtype=int)
@@ -397,6 +585,22 @@ def _joint_velocity_cap(
     if value.size != 1:
         raise ValueError(f"Velocity limit for {joint_name!r} must be scalar.")
     return float(value.reshape(-1)[0])
+
+
+def _arm_velocity_limit_mapping(
+    setup: ArmSetup,
+    velocity_limits: dict[str, float] | None,
+) -> dict[str, float]:
+    """Return configured or built-in scalar velocity caps for active arms."""
+    return {
+        f"openarm_{side}_joint{index + 1}": _joint_velocity_cap(
+            velocity_limits,
+            f"openarm_{side}_joint{index + 1}",
+            default,
+        )
+        for side in setup.sides
+        for index, default in enumerate(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
+    }
 
 
 def _configuration_limit_for_qpos(
@@ -589,12 +793,122 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         help="Joint4 lower braking guard position in radians (default: 0.08).",
     )
     parser.add_argument(
+        "--elbow-braking-profile",
+        choices=("acceleration", "distance"),
+        default="acceleration",
+        help=(
+            "Joint4 approach-speed profile: acceleration uses sqrt(2*a*margin); "
+            "distance uses a smoothstep over --elbow-braking-slowdown-distance "
+            "(default: acceleration)."
+        ),
+    )
+    parser.add_argument(
         "--elbow-braking-acceleration",
         type=float,
         default=0.0,
         help=(
             "Maximum joint4 deceleration toward its lower guard in rad/s^2; "
             "0 disables the braking limit (default: 0.0)."
+        ),
+    )
+    parser.add_argument(
+        "--elbow-braking-slowdown-distance",
+        type=float,
+        default=0.5,
+        help=(
+            "Joint4 margin in radians over which the distance profile rises "
+            "smoothly from zero to the joint velocity cap (default: 0.5)."
+        ),
+    )
+    parser.add_argument(
+        "--joint-limit-braking",
+        action="store_true",
+        help=(
+            "Enable state-aware distance velocity envelopes near both limits "
+            "of every active arm joint."
+        ),
+    )
+    parser.add_argument(
+        "--joint-limit-braking-slowdown-distance",
+        type=float,
+        default=0.5,
+        help="Distance in radians over which every joint-limit envelope activates.",
+    )
+    parser.add_argument(
+        "--joint-limit-braking-exponent",
+        type=float,
+        default=2.0,
+        help="Power applied to the joint-limit smoothstep envelope (default: 2).",
+    )
+    parser.add_argument(
+        "--joint-limit-braking-guard-margin",
+        type=float,
+        default=0.0,
+        help="Guard margin inside every physical joint range in radians.",
+    )
+    parser.add_argument(
+        "--joint-limit-braking-reaction-time",
+        type=float,
+        default=0.0,
+        help=(
+            "Prediction time applied to measured velocity when estimating "
+            "remaining joint-limit distance."
+        ),
+    )
+    parser.add_argument(
+        "--joint-limit-braking-distance-buffer",
+        type=float,
+        default=0.0,
+        help="Additional measured-state joint-limit distance buffer in radians.",
+    )
+    parser.add_argument(
+        "--singularity-approach-limit",
+        action="store_true",
+        help="Limit only the QP displacement component that decreases rho.",
+    )
+    parser.add_argument(
+        "--singularity-ratio-stop",
+        type=float,
+        default=0.01,
+        help="Singularity ratio where maximum approach rate reaches zero.",
+    )
+    parser.add_argument(
+        "--singularity-ratio-slow",
+        type=float,
+        default=0.05,
+        help="Singularity ratio where approach-rate braking starts.",
+    )
+    parser.add_argument(
+        "--singularity-max-approach-rate",
+        type=float,
+        default=0.5,
+        help="Maximum allowed decrease of rho per second outside the slow zone.",
+    )
+    parser.add_argument(
+        "--singularity-braking-exponent",
+        type=float,
+        default=2.0,
+        help="Power applied to the singularity approach smoothstep envelope.",
+    )
+    parser.add_argument(
+        "--singularity-gradient-epsilon",
+        type=float,
+        default=1e-4,
+        help="Central finite-difference step in radians for grad(rho).",
+    )
+    parser.add_argument(
+        "--measured-state-timeout",
+        type=float,
+        default=0.1,
+        help="Seconds before state-aware limits discard a measured q/dq sample.",
+    )
+    parser.add_argument(
+        "--kinetic-energy-cost",
+        type=float,
+        default=0.0,
+        help=(
+            "Mink inertia-weighted velocity regularization cost; "
+            "0 disables it (default: 0.0)."
         ),
     )
 
@@ -638,5 +952,27 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         elbow_soft_limit_angle=args.elbow_soft_limit_angle,
         elbow_soft_limit_max_speed=args.elbow_soft_limit_max_speed,
         elbow_braking_guard_angle=args.elbow_braking_guard_angle,
+        elbow_braking_profile=args.elbow_braking_profile,
         elbow_braking_acceleration=args.elbow_braking_acceleration,
+        elbow_braking_slowdown_distance=args.elbow_braking_slowdown_distance,
+        joint_limit_braking=args.joint_limit_braking,
+        joint_limit_braking_slowdown_distance=(
+            args.joint_limit_braking_slowdown_distance
+        ),
+        joint_limit_braking_exponent=args.joint_limit_braking_exponent,
+        joint_limit_braking_guard_margin=args.joint_limit_braking_guard_margin,
+        joint_limit_braking_reaction_time=(
+            args.joint_limit_braking_reaction_time
+        ),
+        joint_limit_braking_distance_buffer=(
+            args.joint_limit_braking_distance_buffer
+        ),
+        singularity_approach_limit=args.singularity_approach_limit,
+        singularity_ratio_stop=args.singularity_ratio_stop,
+        singularity_ratio_slow=args.singularity_ratio_slow,
+        singularity_max_approach_rate=args.singularity_max_approach_rate,
+        singularity_braking_exponent=args.singularity_braking_exponent,
+        singularity_gradient_epsilon=args.singularity_gradient_epsilon,
+        measured_state_timeout=args.measured_state_timeout,
+        kinetic_energy_cost=args.kinetic_energy_cost,
     )

@@ -22,14 +22,15 @@ import numpy as np
 
 
 class LowerBoundBrakingLimit(mink.Limit):
-    """Apply a stopping-distance velocity envelope above a lower joint guard.
+    """Apply a velocity envelope above a lower joint guard.
 
-    For margin ``m = q - guard_position``, the maximum velocity toward the
-    guard is ``sqrt(2 * max_deceleration * max(m, 0))``. The QP inequality is
-    expressed in configuration displacement because that is Mink's decision
-    variable:
+    Two profiles are supported for margin ``m = q - guard_position``:
 
-    ``delta_q >= -min(max_velocity, sqrt(2 * a * m)) * dt``.
+    - ``acceleration``: ``min(v_max, sqrt(2 * a * max(m, 0)))``.
+    - ``distance``: ``v_max * smoothstep(clamp(m / m_slow, 0, 1))``.
+
+    The QP inequality is expressed in configuration displacement because that
+    is Mink's decision variable: ``delta_q >= -v_approach * dt``.
     """
 
     def __init__(
@@ -39,8 +40,10 @@ class LowerBoundBrakingLimit(mink.Limit):
         joint_dof_index: int,
         *,
         guard_position: float,
-        max_deceleration: float,
         max_velocity: float,
+        profile: str = "acceleration",
+        max_deceleration: float | None = None,
+        slowdown_distance: float | None = None,
     ) -> None:
         """Initialize the lower-bound braking limit for one scalar joint."""
         joint_ids = np.flatnonzero(model.jnt_qposadr == joint_qpos_index)
@@ -66,17 +69,43 @@ class LowerBoundBrakingLimit(mink.Limit):
                 raise ValueError(
                     "Guard position must lie within the physical joint range."
                 )
-        if not np.isfinite(max_deceleration) or max_deceleration <= 0.0:
-            raise ValueError("Maximum deceleration must be finite and positive.")
         if not np.isfinite(max_velocity) or max_velocity <= 0.0:
             raise ValueError("Maximum velocity must be finite and positive.")
+        if profile not in {"acceleration", "distance"}:
+            raise ValueError(
+                "Braking profile must be either 'acceleration' or 'distance'."
+            )
+        if profile == "acceleration" and (
+            max_deceleration is None
+            or not np.isfinite(max_deceleration)
+            or max_deceleration <= 0.0
+        ):
+            raise ValueError(
+                "Maximum deceleration must be finite and positive for the "
+                "acceleration profile."
+            )
+        if profile == "distance" and (
+            slowdown_distance is None
+            or not np.isfinite(slowdown_distance)
+            or slowdown_distance <= 0.0
+        ):
+            raise ValueError(
+                "Slowdown distance must be finite and positive for the "
+                "distance profile."
+            )
 
         self.model = model
         self.joint_qpos_index = joint_qpos_index
         self.joint_dof_index = joint_dof_index
         self.guard_position = float(guard_position)
-        self.max_deceleration = float(max_deceleration)
         self.max_velocity = float(max_velocity)
+        self.profile = profile
+        self.max_deceleration = (
+            float(max_deceleration) if max_deceleration is not None else None
+        )
+        self.slowdown_distance = (
+            float(slowdown_distance) if slowdown_distance is not None else None
+        )
         self._G = np.zeros((1, model.nv), dtype=np.float64)
         self._G[0, joint_dof_index] = -1.0
 
@@ -85,14 +114,21 @@ class LowerBoundBrakingLimit(mink.Limit):
         configuration: mink.Configuration,
         dt: float,
     ) -> mink.Constraint:
-        """Return the one-sided stopping-distance displacement inequality."""
+        """Return the one-sided approach displacement inequality."""
         if dt <= 0.0:
             raise ValueError("dt must be positive.")
 
         position = float(configuration.q[self.joint_qpos_index])
         margin = max(position - self.guard_position, 0.0)
-        braking_velocity = np.sqrt(2.0 * self.max_deceleration * margin)
-        approach_velocity = min(self.max_velocity, braking_velocity)
+        if self.profile == "acceleration":
+            assert self.max_deceleration is not None
+            braking_velocity = np.sqrt(2.0 * self.max_deceleration * margin)
+            approach_velocity = min(self.max_velocity, braking_velocity)
+        else:
+            assert self.slowdown_distance is not None
+            u = np.clip(margin / self.slowdown_distance, 0.0, 1.0)
+            activation = u * u * (3.0 - 2.0 * u)
+            approach_velocity = self.max_velocity * activation
         return mink.Constraint(
             G=self._G,
             h=np.array([dt * approach_velocity], dtype=np.float64),

@@ -21,11 +21,13 @@ from .kinematics import (
     register_ik_args,
     ik_params_from_args,
 )
+from .joint_braking_limit import JointBrakingLimit
 from .lower_bound_braking_limit import LowerBoundBrakingLimit
 from .nullspace_posture_task import NullspacePostureTask
 from .poses import read_ee_pose, pose_to_se3, se3_to_pose
 from .recoverable_configuration_limit import RecoverableConfigurationLimit
 from .soft_limit_task import SoftLimitTask
+from .singularity_approach_limit import SingularityApproachLimit
 
 __all__ = [
     # context
@@ -33,10 +35,12 @@ __all__ = [
     # high-level interface
     "Kinematics",
     "IKParams",
+    "JointBrakingLimit",
     "LowerBoundBrakingLimit",
     "SoftLimitTask",
     "NullspacePostureTask",
     "RecoverableConfigurationLimit",
+    "SingularityApproachLimit",
     # CLI helpers
     "register_common_args",
     "register_ik_args",

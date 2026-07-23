@@ -16,9 +16,11 @@ import openarm_mujoco.v2 as openarm_mujoco
 from openarm_control import (
     ArmSetup,
     IKParams,
+    JointBrakingLimit,
     Kinematics,
     LowerBoundBrakingLimit,
     RecoverableConfigurationLimit,
+    SingularityApproachLimit,
     ik_params_from_args,
     read_ee_pose,
     register_ik_args,
@@ -223,10 +225,13 @@ class SoftLimitTaskTest(unittest.TestCase):
 
 
 class LowerBoundBrakingLimitTest(unittest.TestCase):
-    """Exercise the preventive joint4 stopping-distance constraint."""
+    """Exercise the preventive joint4 approach-speed constraint."""
 
     def _limit_and_configuration(
         self,
+        *,
+        profile: str = "acceleration",
+        slowdown_distance: float | None = None,
     ) -> tuple[LowerBoundBrakingLimit, mink.Configuration]:
         setup = _setup("right")
         configuration = mink.Configuration(setup.model, q=setup.data.qpos.copy())
@@ -238,11 +243,22 @@ class LowerBoundBrakingLimitTest(unittest.TestCase):
             guard_position=0.08,
             max_deceleration=20.0,
             max_velocity=3.14,
+            profile=profile,
+            slowdown_distance=slowdown_distance,
         )
         return limit, configuration
 
-    def _allowed_displacement(self, position: float) -> float:
-        limit, configuration = self._limit_and_configuration()
+    def _allowed_displacement(
+        self,
+        position: float,
+        *,
+        profile: str = "acceleration",
+        slowdown_distance: float | None = None,
+    ) -> float:
+        limit, configuration = self._limit_and_configuration(
+            profile=profile,
+            slowdown_distance=slowdown_distance,
+        )
         q = configuration.q
         q[limit.joint_qpos_index] = position
         configuration.update(q=q)
@@ -272,6 +288,28 @@ class LowerBoundBrakingLimitTest(unittest.TestCase):
         self.assertEqual(self._allowed_displacement(0.08), 0.0)
         self.assertEqual(self._allowed_displacement(0.04), 0.0)
 
+    def test_distance_profile_uses_smoothstep_velocity_envelope(self) -> None:
+        dt = 0.0004
+        slowdown_distance = 0.2
+        kwargs = {
+            "profile": "distance",
+            "slowdown_distance": slowdown_distance,
+        }
+
+        self.assertEqual(self._allowed_displacement(0.08, **kwargs), 0.0)
+        self.assertAlmostEqual(
+            self._allowed_displacement(0.08 + 0.5 * slowdown_distance, **kwargs),
+            0.5 * 3.14 * dt,
+        )
+        self.assertAlmostEqual(
+            self._allowed_displacement(0.08 + slowdown_distance, **kwargs),
+            3.14 * dt,
+        )
+        self.assertAlmostEqual(
+            self._allowed_displacement(0.08 + 2.0 * slowdown_distance, **kwargs),
+            3.14 * dt,
+        )
+
     def test_guard_must_be_inside_physical_joint_range(self) -> None:
         setup = _setup("right")
         elbow_qpos, elbow_dof = _elbow_joint_indices(setup, "right")
@@ -293,7 +331,9 @@ class LowerBoundBrakingLimitTest(unittest.TestCase):
                 posture_cost=0.0,
                 nullspace_cost=0.0,
                 elbow_braking_guard_angle=0.08,
+                elbow_braking_profile="distance",
                 elbow_braking_acceleration=20.0,
+                elbow_braking_slowdown_distance=0.5,
             ),
         )
         solver = kinematics._ik
@@ -305,6 +345,285 @@ class LowerBoundBrakingLimitTest(unittest.TestCase):
             expected_qpos, expected_dof = _elbow_joint_indices(setup, side)
             self.assertEqual(limit.joint_qpos_index, expected_qpos)
             self.assertEqual(limit.joint_dof_index, expected_dof)
+            self.assertEqual(limit.profile, "distance")
+            self.assertEqual(limit.slowdown_distance, 0.5)
+
+
+class JointBrakingLimitTest(unittest.TestCase):
+    """Exercise bidirectional braking for every active arm joint."""
+
+    def _limit_and_configuration(
+        self,
+        *,
+        reaction_time: float = 0.0,
+        distance_buffer: float = 0.0,
+    ) -> tuple[JointBrakingLimit, mink.Configuration]:
+        setup = _setup("right")
+        qpos_indices = _arm_qpos_indices(setup, "right")
+        velocities = {
+            f"openarm_right_joint{i + 1}": value
+            for i, value in enumerate(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
+        }
+        limit = JointBrakingLimit(
+            setup.model,
+            qpos_indices,
+            velocities,
+            slowdown_distance=0.4,
+            exponent=2.0,
+            lower_guard_overrides={"openarm_right_joint4": 0.08},
+            reaction_time=reaction_time,
+            distance_buffer=distance_buffer,
+        )
+        configuration = mink.Configuration(
+            setup.model,
+            q=setup.data.qpos.copy(),
+        )
+        return limit, configuration
+
+    def test_half_slowdown_distance_allows_quarter_velocity(self) -> None:
+        limit, configuration = self._limit_and_configuration()
+        index = limit.joint_names.index("openarm_right_joint1")
+        q = configuration.q
+        q[limit.qpos_indices[index]] = limit.lower_guard[index] + 0.2
+        configuration.update(q=q)
+
+        constraint = limit.compute_qp_inequalities(configuration, dt=0.01)
+        assert constraint.h is not None
+        count = len(limit.joint_names)
+        lower_displacement = constraint.h[count + index]
+
+        self.assertAlmostEqual(
+            lower_displacement,
+            0.25 * limit.max_velocity[index] * 0.01,
+        )
+
+    def test_upper_guard_uses_the_same_envelope_and_leaves_escape_free(self) -> None:
+        limit, configuration = self._limit_and_configuration()
+        index = limit.joint_names.index("openarm_right_joint1")
+        q = configuration.q
+        q[limit.qpos_indices[index]] = limit.upper_guard[index] - 0.2
+        configuration.update(q=q)
+
+        constraint = limit.compute_qp_inequalities(configuration, dt=0.01)
+        assert constraint.h is not None
+        count = len(limit.joint_names)
+        upper_displacement = constraint.h[index]
+        lower_displacement = constraint.h[count + index]
+
+        self.assertAlmostEqual(
+            upper_displacement,
+            0.25 * limit.max_velocity[index] * 0.01,
+        )
+        self.assertAlmostEqual(
+            lower_displacement,
+            limit.max_velocity[index] * 0.01,
+        )
+
+    def test_measured_motion_reduces_effective_guard_distance(self) -> None:
+        limit, configuration = self._limit_and_configuration(
+            reaction_time=0.05,
+            distance_buffer=0.01,
+        )
+        index = limit.joint_names.index("openarm_right_joint1")
+        qpos_index = limit.qpos_indices[index]
+        dof_index = limit.dof_indices[index]
+        q = configuration.q
+        q[qpos_index] = limit.lower_guard[index] + 0.3
+        configuration.update(q=q)
+
+        measured_q = configuration.q
+        measured_q[qpos_index] = limit.lower_guard[index] + 0.1
+        measured_dq = np.zeros(configuration.model.nv)
+        measured_dq[dof_index] = -1.0
+        limit.update_measured_state(measured_q, measured_dq)
+        limit.compute_qp_inequalities(configuration, dt=0.01)
+
+        state = limit.last_state
+        self.assertIsNotNone(state)
+        assert state is not None
+        self.assertAlmostEqual(state.lower_distance[index], 0.04)
+        self.assertLess(
+            state.lower_approach_velocity[index],
+            0.01 * limit.max_velocity[index],
+        )
+
+    def test_solver_replaces_legacy_elbow_limit_when_enabled(self) -> None:
+        setup = _setup()
+        kinematics = Kinematics(
+            setup,
+            IKParams(
+                posture_cost=0.0,
+                nullspace_cost=0.0,
+                joint_limit_braking=True,
+            ),
+        )
+        solver = kinematics._ik
+        assert solver is not None
+        limit = solver._joint_braking_limit
+        self.assertIsNotNone(limit)
+        assert limit is not None
+        self.assertEqual(len(limit.joint_names), 14)
+        self.assertEqual(solver._elbow_braking_limits, {})
+        for side in ("left", "right"):
+            index = limit.joint_names.index(f"openarm_{side}_joint4")
+            self.assertAlmostEqual(limit.lower_guard[index], 0.08)
+
+    def test_measured_state_does_not_sync_the_command_configuration(self) -> None:
+        setup = _setup()
+        kinematics = Kinematics(
+            setup,
+            IKParams(
+                posture_cost=0.0,
+                nullspace_cost=0.0,
+                joint_limit_braking=True,
+                singularity_approach_limit=True,
+            ),
+        )
+        solver = kinematics._ik
+        assert solver is not None
+        command_before = solver._config.q.copy()
+        right, right_gripper = setup.joint_resolver.get_driver(
+            setup.data.qpos,
+            "right",
+        )
+        left, left_gripper = setup.joint_resolver.get_driver(
+            setup.data.qpos,
+            "left",
+        )
+        measured_qpos = np.concatenate(
+            [
+                np.append(right, right_gripper),
+                np.append(left, left_gripper),
+            ]
+        )
+        measured_qpos[0] += 0.1
+
+        kinematics.update_measured_state(
+            measured_qpos,
+            np.zeros(16),
+            timestamp=10.0,
+        )
+
+        np.testing.assert_array_equal(solver._config.q, command_before)
+        self.assertIsNotNone(solver._joint_braking_limit)
+        assert solver._joint_braking_limit is not None
+        self.assertIsNotNone(solver._joint_braking_limit._measured_qpos)
+
+
+class SingularityApproachLimitTest(unittest.TestCase):
+    """Exercise the one-sided singularity-ratio decrease constraint."""
+
+    def _limit_and_configuration(
+        self,
+    ) -> tuple[
+        ArmSetup,
+        SingularityApproachLimit,
+        mink.Configuration,
+    ]:
+        setup = _setup("right")
+        configuration = mink.Configuration(
+            setup.model,
+            q=setup.data.qpos.copy(),
+        )
+        frame_task = mink.FrameTask(
+            frame_name="right_ee_control_point",
+            frame_type="site",
+            position_cost=10.0,
+            orientation_cost=1.0,
+        )
+        frame_task.set_target_from_configuration(configuration)
+        limit = SingularityApproachLimit(
+            setup.model,
+            frame_task,
+            _dof_indices_for_qpos(
+                setup.model,
+                _arm_qpos_indices(setup, "right"),
+            ),
+            characteristic_length=0.3,
+            ratio_stop=0.01,
+            ratio_slow=0.05,
+            max_approach_rate=0.5,
+            exponent=2.0,
+        )
+        return setup, limit, configuration
+
+    def test_constraint_only_bounds_the_approaching_gradient_component(self) -> None:
+        _, limit, configuration = self._limit_and_configuration()
+        limit.prepare(configuration)
+        constraint = limit.compute_qp_inequalities(configuration, dt=0.004)
+        state = limit.last_state
+        self.assertIsNotNone(state)
+        assert state is not None
+        assert constraint.G is not None
+        assert constraint.h is not None
+
+        approach = np.zeros(configuration.model.nv)
+        approach[limit.dof_indices] = -state.gradient
+        away = -approach
+        self.assertGreater(float((constraint.G @ approach)[0]), 0.0)
+        self.assertLess(float((constraint.G @ away)[0]), 0.0)
+        self.assertAlmostEqual(
+            float(constraint.h[0]),
+            state.max_approach_rate * 0.004,
+        )
+
+    def test_measured_straight_arm_closes_the_approach_envelope(self) -> None:
+        setup, limit, configuration = self._limit_and_configuration()
+        measured = configuration.q
+        setup.joint_resolver.set_qpos(
+            measured,
+            np.array([1.224145, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+            "right",
+        )
+        limit.update_measured_configuration(measured)
+        limit.prepare(configuration)
+
+        state = limit.last_state
+        self.assertIsNotNone(state)
+        assert state is not None
+        self.assertIsNotNone(state.measured_ratio)
+        self.assertLessEqual(state.effective_ratio, state.command_ratio)
+        self.assertEqual(state.max_approach_rate, 0.0)
+
+    def test_singularity_ratio_does_not_depend_on_frame_task_target(self) -> None:
+        setup, targeted_limit, configuration = self._limit_and_configuration()
+        untargeted_task = mink.FrameTask(
+            frame_name="right_ee_control_point",
+            frame_type="site",
+            position_cost=10.0,
+            orientation_cost=1.0,
+        )
+        untargeted_limit = SingularityApproachLimit(
+            setup.model,
+            untargeted_task,
+            _dof_indices_for_qpos(
+                setup.model,
+                _arm_qpos_indices(setup, "right"),
+            ),
+            characteristic_length=0.3,
+            ratio_stop=0.01,
+            ratio_slow=0.05,
+            max_approach_rate=0.5,
+        )
+
+        targeted_limit.prepare(configuration)
+        untargeted_limit.prepare(configuration)
+
+        assert targeted_limit.last_state is not None
+        assert untargeted_limit.last_state is not None
+        self.assertAlmostEqual(
+            targeted_limit.last_state.command_ratio,
+            untargeted_limit.last_state.command_ratio,
+        )
+        np.testing.assert_allclose(
+            targeted_limit.last_state.gradient,
+            untargeted_limit.last_state.gradient,
+            atol=1e-12,
+        )
+
+
+class ReachBrakingIntegrationTest(unittest.TestCase):
+    """Exercise the legacy elbow envelope in an outward reach."""
 
     def test_outward_reach_brakes_before_elbow_guard(self) -> None:
         setup = _setup("right")
@@ -388,8 +707,34 @@ class SolverTimingTest(unittest.TestCase):
                 "0.2",
                 "--elbow-braking-guard-angle",
                 "0.08",
+                "--elbow-braking-profile",
+                "distance",
                 "--elbow-braking-acceleration",
                 "20.0",
+                "--elbow-braking-slowdown-distance",
+                "0.5",
+                "--joint-limit-braking",
+                "--joint-limit-braking-slowdown-distance",
+                "0.5",
+                "--joint-limit-braking-exponent",
+                "2",
+                "--joint-limit-braking-reaction-time",
+                "0.04",
+                "--joint-limit-braking-distance-buffer",
+                "0.01",
+                "--singularity-approach-limit",
+                "--singularity-ratio-stop",
+                "0.02",
+                "--singularity-ratio-slow",
+                "0.08",
+                "--singularity-max-approach-rate",
+                "0.25",
+                "--singularity-braking-exponent",
+                "2",
+                "--measured-state-timeout",
+                "0.1",
+                "--kinetic-energy-cost",
+                "3e-5",
             ]
         )
 
@@ -401,7 +746,21 @@ class SolverTimingTest(unittest.TestCase):
         self.assertEqual(params.elbow_soft_limit_angle, 0.08)
         self.assertEqual(params.elbow_soft_limit_max_speed, 0.2)
         self.assertEqual(params.elbow_braking_guard_angle, 0.08)
+        self.assertEqual(params.elbow_braking_profile, "distance")
         self.assertEqual(params.elbow_braking_acceleration, 20.0)
+        self.assertEqual(params.elbow_braking_slowdown_distance, 0.5)
+        self.assertTrue(params.joint_limit_braking)
+        self.assertEqual(params.joint_limit_braking_slowdown_distance, 0.5)
+        self.assertEqual(params.joint_limit_braking_exponent, 2.0)
+        self.assertEqual(params.joint_limit_braking_reaction_time, 0.04)
+        self.assertEqual(params.joint_limit_braking_distance_buffer, 0.01)
+        self.assertTrue(params.singularity_approach_limit)
+        self.assertEqual(params.singularity_ratio_stop, 0.02)
+        self.assertEqual(params.singularity_ratio_slow, 0.08)
+        self.assertEqual(params.singularity_max_approach_rate, 0.25)
+        self.assertEqual(params.singularity_braking_exponent, 2.0)
+        self.assertEqual(params.measured_state_timeout, 0.1)
+        self.assertEqual(params.kinetic_energy_cost, 3e-5)
         assert params.velocity_limits is not None
         for side in ("left", "right"):
             for index, expected in enumerate(ARM_JOINT_VELOCITY_LIMITS_RAD_S):
@@ -409,6 +768,30 @@ class SolverTimingTest(unittest.TestCase):
                     params.velocity_limits[f"openarm_{side}_joint{index + 1}"],
                     expected,
                 )
+
+    def test_kinetic_energy_task_uses_current_mujoco_inertia_api(self) -> None:
+        setup = _setup("right")
+        kinematics = Kinematics(
+            setup,
+            IKParams(
+                posture_cost=0.0,
+                nullspace_cost=0.0,
+                kinetic_energy_cost=1e-7,
+            ),
+        )
+        solver = kinematics._ik
+        assert solver is not None
+        task = solver._kinetic_energy_task
+        self.assertIsNotNone(task)
+        assert task is not None
+
+        objective = task.compute_qp_objective(solver._config)
+
+        self.assertEqual(objective.H.shape, (setup.model.nv, setup.model.nv))
+        self.assertTrue(np.all(np.isfinite(objective.H)))
+        np.testing.assert_allclose(objective.H, objective.H.T, atol=1e-12)
+        self.assertGreaterEqual(float(np.min(np.linalg.eigvalsh(objective.H))), -1e-9)
+        np.testing.assert_array_equal(objective.c, np.zeros(setup.model.nv))
 
     def test_custom_arm_velocity_limits_override_defaults(self) -> None:
         custom_caps = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]

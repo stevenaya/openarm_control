@@ -1,0 +1,59 @@
+{
+  "profiles": [
+    {
+      "name": "none",
+      "braking_profile": "acceleration",
+      "braking_acceleration": 0.0,
+      "slowdown_distance": 0.5,
+      "kinetic_energy_cost": 0.0
+    },
+    {
+      "name": "acceleration_20",
+      "braking_profile": "acceleration",
+      "braking_acceleration": 20.0,
+      "slowdown_distance": 0.5,
+      "kinetic_energy_cost": 0.0
+    },
+    {
+      "name": "distance_0p50",
+      "braking_profile": "distance",
+      "braking_acceleration": 20.0,
+      "slowdown_distance": 0.5,
+      "kinetic_energy_cost": 0.0
+    },
+    {
+      "name": "distance_0p70",
+      "braking_profile": "distance",
+      "braking_acceleration": 20.0,
+      "slowdown_distance": 0.7,
+      "kinetic_energy_cost": 0.0
+    },
+    {
+      "name": "distance_1p00",
+      "braking_profile": "distance",
+      "braking_acceleration": 20.0,
+      "slowdown_distance": 1.0,
+      "kinetic_energy_cost": 0.0
+    }
+  ],
+  "speeds": [
+    0.05,
+    0.1,
+    0.2
+  ],
+  "ramp_distance": 0.25,
+  "settle_duration": 2.0,
+  "pre_hold_duration": 1.0,
+  "post_hold_duration": 1.5,
+  "control_dt": 0.004,
+  "initial_right": [
+    1.224145,
+    0.0,
+    0.0,
+    0.7,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}
