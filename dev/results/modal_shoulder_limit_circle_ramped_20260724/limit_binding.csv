@@ -1,0 +1,6 @@
+speed_m_s,j2_braking_bind_fraction,any_joint_braking_bind_fraction,singularity_bind_fraction,min_singularity_allowed_rate_s,baseline_elbow_lateral_range_m,no_speed_elbow_lateral_range_m
+0.1,0.283,0.283,0.338,0.00326,0.0567,0.0677
+0.2,0.352,0.352,0.231,0.00966,0.0569,0.0681
+0.4,0.424,0.424,0.225,0.02262,0.0596,0.0725
+0.6,0.459,0.459,0.229,0.02590,0.0669,0.0769
+0.8,0.466,0.466,0.229,0.02418,0.0766,0.0939

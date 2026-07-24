@@ -23,6 +23,8 @@ import mujoco
 import numpy as np
 import numpy.typing as npt
 
+from .singularity import normalized_arm_jacobian
+
 
 @dataclass(frozen=True)
 class NullspaceState:
@@ -133,10 +135,12 @@ class NullspacePostureTask(mink.Task):
     def _compute_terms(
         self, configuration: mink.Configuration
     ) -> tuple[np.ndarray, np.ndarray]:
-        frame_jacobian = self._frame_task.compute_jacobian(configuration)
-        arm_jacobian = frame_jacobian[:, self._dof_indices]
-        normalized_jacobian = arm_jacobian.copy()
-        normalized_jacobian[:3] /= self._characteristic_length
+        normalized_jacobian = normalized_arm_jacobian(
+            self._frame_task,
+            configuration,
+            self._dof_indices,
+            self._characteristic_length,
+        )
 
         direction, singular_values = structural_nullspace_direction(
             normalized_jacobian, self._previous_direction
@@ -182,7 +186,9 @@ class NullspacePostureTask(mink.Task):
             posture_error=posture_error,
             return_speed=return_speed,
             displacement=displacement,
-            jacobian_residual=float(np.linalg.norm(arm_jacobian @ direction)),
+            jacobian_residual=float(
+                np.linalg.norm(normalized_jacobian @ direction)
+            ),
         )
         return error, jacobian
 

@@ -1,0 +1,18 @@
+{
+  "run_dir": "/hdd_data/rollout/pillow_0702_history_with_visual_from_flatten_hist_base_30k_0711_window_20_80k",
+  "episode": 202,
+  "side": "left",
+  "control_dt": 0.004,
+  "posture_costs": [
+    0.0
+  ],
+  "nullspace_return_rate": 0.8,
+  "nullspace_max_speed": 0.8,
+  "near_nullspace_cost": 10.0,
+  "near_nullspace_return_rate": 0.8,
+  "near_nullspace_max_speed": 0.8,
+  "segments": [
+    13
+  ],
+  "source_limitation": "Targets are FK of recorded IK commands because raw VR poses were not stored in the intervention episode."
+}

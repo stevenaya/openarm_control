@@ -77,6 +77,77 @@ class NullspaceMathTest(unittest.TestCase):
 class NullspaceTaskTest(unittest.TestCase):
     """Exercise the task against the actual OpenArm MuJoCo model."""
 
+    def test_geometry_and_activation_do_not_depend_on_frame_target(self) -> None:
+        setup = _setup("right")
+        qpos = setup.data.qpos.copy()
+        arm_joints, gripper = setup.joint_resolver.get_driver(qpos, "right")
+        arm_joints[3] = 0.3
+        setup.joint_resolver.set_qpos(
+            qpos,
+            np.append(arm_joints, gripper),
+            "right",
+        )
+        configuration = mink.Configuration(setup.model, q=qpos)
+        frame_task = mink.FrameTask(
+            frame_name="right_ee_control_point",
+            frame_type="site",
+            position_cost=10.0,
+            orientation_cost=1.0,
+        )
+        frame_task.set_target_from_configuration(configuration)
+        task = NullspacePostureTask(
+            model=setup.model,
+            frame_task=frame_task,
+            dof_indices=_dof_indices_for_qpos(
+                setup.model,
+                _arm_qpos_indices(setup, "right"),
+            ),
+            home_qpos=configuration.q,
+            cost=0.3,
+            dt=0.0004,
+            return_rate=1.0,
+            max_speed=0.5,
+            singularity_low=0.02,
+            singularity_high=0.05,
+            characteristic_length=0.3,
+        )
+
+        task.compute_qp_objective(configuration)
+        baseline = task.last_state
+        self.assertIsNotNone(baseline)
+        assert baseline is not None
+
+        current_pose = configuration.get_transform_frame_to_world(
+            "right_ee_control_point",
+            "site",
+        )
+        frame_task.set_target(
+            current_pose.plus(np.array([0.2, 0.1, -0.1, 0.4, -0.3, 0.2]))
+        )
+        task.compute_qp_objective(configuration)
+        displaced_target = task.last_state
+        self.assertIsNotNone(displaced_target)
+        assert displaced_target is not None
+
+        np.testing.assert_allclose(
+            displaced_target.singular_values,
+            baseline.singular_values,
+            atol=1e-12,
+        )
+        np.testing.assert_allclose(
+            displaced_target.direction,
+            baseline.direction,
+            atol=1e-12,
+        )
+        self.assertAlmostEqual(
+            displaced_target.singularity_ratio,
+            baseline.singularity_ratio,
+        )
+        self.assertAlmostEqual(
+            displaced_target.activation,
+            baseline.activation,
+        )
+
     def test_task_is_nullspace_only_and_caps_home_return_speed(self) -> None:
         setup = _setup("right")
         configuration = mink.Configuration(setup.model, q=setup.data.qpos.copy())
