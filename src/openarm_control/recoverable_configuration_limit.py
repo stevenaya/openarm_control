@@ -50,6 +50,7 @@ class RecoverableConfigurationLimit(mink.Limit):
 
         selected_qpos = {int(index) for index in qpos_indices}
         joint_ids: list[int] = []
+        joint_names: list[str] = []
         qpos_list: list[int] = []
         dof_list: list[int] = []
         lower: list[float] = []
@@ -88,6 +89,7 @@ class RecoverableConfigurationLimit(mink.Limit):
                 )
 
             joint_ids.append(joint_id)
+            joint_names.append(joint_name)
             qpos_list.append(qpos_index)
             dof_list.append(int(model.jnt_dofadr[joint_id]))
             lower.append(float(model.jnt_range[joint_id, 0]))
@@ -95,6 +97,7 @@ class RecoverableConfigurationLimit(mink.Limit):
             velocity_limits.append(max_velocity_value)
 
         self.model = model
+        self.joint_names = tuple(joint_names)
         self.joint_ids = _readonly_int_array(joint_ids)
         self.qpos_indices = _readonly_int_array(qpos_list)
         self.indices = _readonly_int_array(dof_list)
@@ -106,6 +109,29 @@ class RecoverableConfigurationLimit(mink.Limit):
         self.projection_matrix = (
             np.eye(model.nv)[self.indices] if self.indices.size else None
         )
+
+    def update_velocity_limits(
+        self,
+        velocities: Mapping[str, npt.ArrayLike],
+    ) -> None:
+        """Replace selected velocity caps while preserving joint ordering."""
+        updated = self.limit.copy()
+        for index, joint_name in enumerate(self.joint_names):
+            if joint_name not in velocities:
+                continue
+            value = np.asarray(velocities[joint_name], dtype=np.float64)
+            if value.size != 1:
+                raise ValueError(
+                    f"Velocity limit for scalar joint {joint_name!r} must have "
+                    "exactly one value."
+                )
+            scalar = float(value.reshape(-1)[0])
+            if not np.isfinite(scalar) or scalar <= 0.0:
+                raise ValueError(
+                    f"Velocity limit for joint {joint_name!r} must be positive."
+                )
+            updated[index] = scalar
+        self.limit = _readonly_float_array(updated)
 
     def compute_qp_inequalities(
         self,

@@ -51,6 +51,7 @@ from openarm_control.poses import pose_to_se3
 from openarm_control.recoverable_configuration_limit import (
     RecoverableConfigurationLimit,
 )
+from openarm_control.retract_velocity_governor import RetractVelocityGovernor
 from openarm_control.soft_limit_task import SoftLimitTask
 from openarm_control.singularity_approach_limit import SingularityApproachLimit
 
@@ -70,6 +71,12 @@ class IKParams:
     max_iters: int = 10
     velocity_limits: dict[str, float] | None = None
     joint_limit_recovery_velocity_scale: float = 1.1
+    dynamic_retract_velocity_limit: bool = False
+    retract_joint1_high_speed: float = 5.0
+    retract_joint4_high_speed: float = 4.4
+    retract_velocity_deadband: float = 0.02
+    retract_velocity_full_speed: float = 0.15
+    retract_velocity_cap_slew_rate: float = 10.0
     nullspace_cost: float = 0.3
     nullspace_return_rate: float = 0.5
     nullspace_max_speed: float = 0.5
@@ -157,6 +164,10 @@ class Kinematics:
     def clear_measured_state(self) -> None:
         """Make state-aware limits fall back to command configuration only."""
         self._require_ik().clear_measured_state()
+
+    def reset_motion_state(self) -> None:
+        """Reset state derived from prior target motion."""
+        self._require_ik().reset_motion_state()
 
     def ready(self) -> bool:
         """Return True once all active arms have received at least one target this cycle."""
@@ -251,17 +262,19 @@ class _IKSolver:
         # gripper and lifter may be valid in driver space but outside the MuJoCo
         # model range; constraining and freezing them at the same time makes the
         # QP infeasible.
+        self._configuration_velocity_limit: (
+            RecoverableConfigurationLimit | None
+        ) = None
         if params.velocity_limits is not None:
-            self._limits = [
-                RecoverableConfigurationLimit(
-                    model=setup.model,
-                    qpos_indices=active_qpos,
-                    velocities=params.velocity_limits,
-                    recovery_velocity_scale=(
-                        params.joint_limit_recovery_velocity_scale
-                    ),
-                )
-            ]
+            self._configuration_velocity_limit = RecoverableConfigurationLimit(
+                model=setup.model,
+                qpos_indices=active_qpos,
+                velocities=params.velocity_limits,
+                recovery_velocity_scale=(
+                    params.joint_limit_recovery_velocity_scale
+                ),
+            )
+            self._limits = [self._configuration_velocity_limit]
         else:
             self._limits = [_configuration_limit_for_qpos(setup.model, active_qpos)]
 
@@ -347,6 +360,28 @@ class _IKSolver:
                 self._singularity_limits[side] = singularity_limit
                 self._limits.append(singularity_limit)
 
+        self._retract_velocity_governors: dict[str, RetractVelocityGovernor] = {}
+        if params.dynamic_retract_velocity_limit:
+            if params.velocity_limits is None:
+                raise ValueError(
+                    "Dynamic retract velocity limits require velocity limits."
+                )
+            for side in setup.sides:
+                joint1_name = f"openarm_{side}_joint1"
+                joint4_name = f"openarm_{side}_joint4"
+                self._retract_velocity_governors[side] = RetractVelocityGovernor(
+                    model=setup.model,
+                    side=side,
+                    dt=params.dt,
+                    joint1_base_speed=float(params.velocity_limits[joint1_name]),
+                    joint4_base_speed=float(params.velocity_limits[joint4_name]),
+                    joint1_high_speed=params.retract_joint1_high_speed,
+                    joint4_high_speed=params.retract_joint4_high_speed,
+                    deadband=params.retract_velocity_deadband,
+                    full_speed=params.retract_velocity_full_speed,
+                    cap_slew_rate=params.retract_velocity_cap_slew_rate,
+                )
+
         self._posture_task = mink.PostureTask(setup.model, cost=params.posture_cost)
         self._posture_task.set_target(home_qpos)
 
@@ -396,10 +431,13 @@ class _IKSolver:
             self._solver_params["diag_reg"] = params.diag_reg
 
         self._pending: set[str] = set(setup.sides)
+        self._target_positions: dict[str, np.ndarray] = {}
         self._gripper = np.zeros(2, dtype=np.float32)
 
     def set_target(self, side: str, pose: np.ndarray) -> None:
-        self._tasks[side].set_target(pose_to_se3(pose))
+        pose_array = np.asarray(pose, dtype=np.float64)
+        self._tasks[side].set_target(pose_to_se3(pose_array))
+        self._target_positions[side] = pose_array[:3].copy()
         self._pending.discard(side)
 
     def sync(self, values16: np.ndarray) -> None:
@@ -462,6 +500,16 @@ class _IKSolver:
             limit.clear_measured_configuration()
         self._last_measured_state_time = None
 
+    def reset_motion_state(self) -> None:
+        """Reset target-motion governors without changing IK configuration."""
+        velocity_limits: dict[str, float] = {}
+        for governor in self._retract_velocity_governors.values():
+            governor.reset()
+            velocity_limits.update(governor.velocity_limits)
+        self._target_positions.clear()
+        self._pending = set(self._sides)
+        self._apply_dynamic_velocity_limits(velocity_limits)
+
     def ready(self) -> bool:
         return len(self._pending) == 0
 
@@ -476,6 +524,7 @@ class _IKSolver:
         tasks.extend(self._elbow_soft_limit_tasks.values())
         constraints = [self._freeze_task] if self._freeze_task else []
 
+        self._update_retract_velocity_limits()
         q_before = self._config.q.copy()
         for limit in self._singularity_limits.values():
             limit.prepare(self._config)
@@ -520,6 +569,30 @@ class _IKSolver:
             self._measured_state_timeout
         ):
             self.clear_measured_state()
+
+    def _update_retract_velocity_limits(self) -> None:
+        velocity_limits: dict[str, float] = {}
+        for side, governor in self._retract_velocity_governors.items():
+            target_position = self._target_positions.get(side)
+            if target_position is None:
+                continue
+            velocity_limits.update(governor.update(self._config, target_position))
+        self._apply_dynamic_velocity_limits(velocity_limits)
+
+    def _apply_dynamic_velocity_limits(
+        self,
+        velocity_limits: dict[str, float],
+    ) -> None:
+        if not velocity_limits:
+            return
+        if self._configuration_velocity_limit is not None:
+            self._configuration_velocity_limit.update_velocity_limits(velocity_limits)
+        if self._joint_braking_limit is not None:
+            self._joint_braking_limit.update_velocity_limits(velocity_limits)
+        for side, braking_limit in self._elbow_braking_limits.items():
+            joint_name = f"openarm_{side}_joint4"
+            if joint_name in velocity_limits:
+                braking_limit.update_max_velocity(velocity_limits[joint_name])
 
 
 def _frame_name(setup: ArmSetup, side: str) -> str:
@@ -713,6 +786,44 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
             "Velocity-limit multiplier used only while a joint is outside its "
             "position range (default: 1.1)."
         ),
+    )
+    parser.add_argument(
+        "--dynamic-retract-velocity-limit",
+        action="store_true",
+        help=(
+            "Temporarily raise J1/J4 IK velocity caps while the hand target "
+            "retracts both toward the shoulder and toward the J1 axis."
+        ),
+    )
+    parser.add_argument(
+        "--retract-joint1-high-speed",
+        type=float,
+        default=5.0,
+        help="Maximum retraction-gated J1 speed in rad/s (default: 5.0).",
+    )
+    parser.add_argument(
+        "--retract-joint4-high-speed",
+        type=float,
+        default=4.4,
+        help="Maximum retraction-gated J4 speed in rad/s (default: 4.4).",
+    )
+    parser.add_argument(
+        "--retract-velocity-deadband",
+        type=float,
+        default=0.02,
+        help="Retraction speed below which cap relaxation is off (default: 0.02 m/s).",
+    )
+    parser.add_argument(
+        "--retract-velocity-full-speed",
+        type=float,
+        default=0.15,
+        help="Retraction speed for full cap relaxation (default: 0.15 m/s).",
+    )
+    parser.add_argument(
+        "--retract-velocity-cap-slew-rate",
+        type=float,
+        default=10.0,
+        help="Maximum J1/J4 cap change rate in rad/s^2 (default: 10.0).",
     )
     parser.add_argument(
         "--config",
@@ -942,6 +1053,12 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         max_iters=args.max_iters,
         velocity_limits=velocity_limits,
         joint_limit_recovery_velocity_scale=(args.joint_limit_recovery_velocity_scale),
+        dynamic_retract_velocity_limit=args.dynamic_retract_velocity_limit,
+        retract_joint1_high_speed=args.retract_joint1_high_speed,
+        retract_joint4_high_speed=args.retract_joint4_high_speed,
+        retract_velocity_deadband=args.retract_velocity_deadband,
+        retract_velocity_full_speed=args.retract_velocity_full_speed,
+        retract_velocity_cap_slew_rate=args.retract_velocity_cap_slew_rate,
         nullspace_cost=args.nullspace_cost,
         nullspace_return_rate=args.nullspace_return_rate,
         nullspace_max_speed=args.nullspace_max_speed,

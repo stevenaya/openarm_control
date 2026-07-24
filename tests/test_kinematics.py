@@ -20,6 +20,7 @@ from openarm_control import (
     Kinematics,
     LowerBoundBrakingLimit,
     RecoverableConfigurationLimit,
+    RetractVelocityGovernor,
     SingularityApproachLimit,
     ik_params_from_args,
     read_ee_pose,
@@ -72,6 +73,93 @@ class NullspaceMathTest(unittest.TestCase):
         self.assertAlmostEqual(smoothstep_activation(0.035, 0.02, 0.05), 0.5)
         self.assertEqual(smoothstep_activation(0.05, 0.02, 0.05), 1.0)
         self.assertEqual(smoothstep_activation(1.0, 0.02, 0.05), 1.0)
+
+
+class RetractVelocityGovernorTest(unittest.TestCase):
+    """Exercise the dual-geometry gate without running the QP."""
+
+    def _governor_geometry(
+        self,
+    ) -> tuple[
+        RetractVelocityGovernor,
+        mink.Configuration,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+    ]:
+        setup = _setup("right")
+        configuration = mink.Configuration(
+            setup.model,
+            q=setup.data.qpos.copy(),
+        )
+        joint_id = setup.model.joint("openarm_right_joint1").id
+        axis = configuration.data.xaxis[joint_id].copy()
+        axis /= np.linalg.norm(axis)
+        shoulder = configuration.data.xanchor[joint_id].copy()
+        candidate = np.array([1.0, 0.0, 0.0])
+        if abs(float(candidate @ axis)) > 0.9:
+            candidate = np.array([0.0, 1.0, 0.0])
+        perpendicular = candidate - axis * float(candidate @ axis)
+        perpendicular /= np.linalg.norm(perpendicular)
+        governor = RetractVelocityGovernor(
+            setup.model,
+            "right",
+            dt=0.004,
+            joint1_base_speed=2.0,
+            joint4_base_speed=3.8,
+            joint1_high_speed=5.0,
+            joint4_high_speed=4.4,
+            deadband=0.02,
+            full_speed=0.15,
+            cap_slew_rate=10.0,
+        )
+        return governor, configuration, shoulder, axis, perpendicular
+
+    def test_requires_both_perpendicular_and_reach_retraction(self) -> None:
+        governor, configuration, shoulder, axis, perpendicular = (
+            self._governor_geometry()
+        )
+        initial = shoulder + 0.5 * perpendicular + 0.2 * axis
+        governor.update(configuration, initial)
+
+        constant_reach = float(np.linalg.norm(initial - shoulder))
+        smaller_radius = 0.499
+        adjusted_axis_distance = np.sqrt(constant_reach**2 - smaller_radius**2)
+        perpendicular_only = (
+            shoulder + smaller_radius * perpendicular + adjusted_axis_distance * axis
+        )
+        limits = governor.update(configuration, perpendicular_only)
+
+        assert governor.last_state is not None
+        self.assertEqual(governor.last_state.activation, 0.0)
+        self.assertAlmostEqual(limits["openarm_right_joint1"], 2.0)
+        self.assertAlmostEqual(limits["openarm_right_joint4"], 3.8)
+
+    def test_retraction_relaxes_caps_with_slew_and_reset_restores_base(self) -> None:
+        governor, configuration, shoulder, axis, perpendicular = (
+            self._governor_geometry()
+        )
+        initial = shoulder + 0.5 * perpendicular + 0.2 * axis
+        governor.update(configuration, initial)
+        limits = governor.update(
+            configuration,
+            shoulder + 0.99 * (initial - shoulder),
+        )
+
+        assert governor.last_state is not None
+        self.assertEqual(governor.last_state.activation, 1.0)
+        self.assertAlmostEqual(limits["openarm_right_joint1"], 2.04)
+        self.assertAlmostEqual(limits["openarm_right_joint4"], 3.84)
+
+        governor.reset()
+        self.assertIsNone(governor.last_state)
+        self.assertEqual(
+            governor.velocity_limits,
+            {
+                "openarm_right_joint1": 2.0,
+                "openarm_right_joint4": 3.8,
+            },
+        )
 
 
 class NullspaceTaskTest(unittest.TestCase):
@@ -770,6 +858,17 @@ class SolverTimingTest(unittest.TestCase):
                 "--limit-velocity",
                 "--joint-limit-recovery-velocity-scale",
                 "1.2",
+                "--dynamic-retract-velocity-limit",
+                "--retract-joint1-high-speed",
+                "5.0",
+                "--retract-joint4-high-speed",
+                "4.4",
+                "--retract-velocity-deadband",
+                "0.02",
+                "--retract-velocity-full-speed",
+                "0.15",
+                "--retract-velocity-cap-slew-rate",
+                "10.0",
                 "--elbow-soft-limit-cost",
                 "2.0",
                 "--elbow-soft-limit-angle",
@@ -813,6 +912,12 @@ class SolverTimingTest(unittest.TestCase):
 
         self.assertAlmostEqual(params.dt, 0.004)
         self.assertEqual(params.joint_limit_recovery_velocity_scale, 1.2)
+        self.assertTrue(params.dynamic_retract_velocity_limit)
+        self.assertEqual(params.retract_joint1_high_speed, 5.0)
+        self.assertEqual(params.retract_joint4_high_speed, 4.4)
+        self.assertEqual(params.retract_velocity_deadband, 0.02)
+        self.assertEqual(params.retract_velocity_full_speed, 0.15)
+        self.assertEqual(params.retract_velocity_cap_slew_rate, 10.0)
         self.assertEqual(params.elbow_soft_limit_cost, 2.0)
         self.assertEqual(params.elbow_soft_limit_angle, 0.08)
         self.assertEqual(params.elbow_soft_limit_max_speed, 0.2)
@@ -958,6 +1063,102 @@ class SolverTimingTest(unittest.TestCase):
             expected_delta,
             atol=1e-12,
         )
+
+
+class DynamicRetractVelocityIntegrationTest(unittest.TestCase):
+    """Verify one dynamic cap reaches every active velocity constraint."""
+
+    def test_dynamic_governor_requires_hard_velocity_limits(self) -> None:
+        with self.assertRaisesRegex(ValueError, "require velocity limits"):
+            Kinematics(
+                _setup("right"),
+                IKParams(
+                    dynamic_retract_velocity_limit=True,
+                    posture_cost=0.0,
+                    nullspace_cost=0.0,
+                ),
+            )
+
+    def test_solver_updates_both_limits_and_reset_restores_base_caps(self) -> None:
+        setup = _setup()
+        velocity_limits = {
+            f"openarm_{side}_joint{index + 1}": float(cap)
+            for side in ("left", "right")
+            for index, cap in enumerate(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
+        }
+        kinematics = Kinematics(
+            setup,
+            IKParams(
+                dt=0.004,
+                max_iters=1,
+                posture_cost=0.0,
+                nullspace_cost=0.0,
+                velocity_limits=velocity_limits,
+                dynamic_retract_velocity_limit=True,
+                retract_joint1_high_speed=5.0,
+                retract_joint4_high_speed=4.4,
+                retract_velocity_deadband=0.02,
+                retract_velocity_full_speed=0.15,
+                retract_velocity_cap_slew_rate=10.0,
+                joint_limit_braking=True,
+                joint_limit_braking_slowdown_distance=0.5,
+            ),
+        )
+        solver = kinematics._ik
+        assert solver is not None
+        configuration_limit = solver._configuration_velocity_limit
+        braking_limit = solver._joint_braking_limit
+        assert configuration_limit is not None
+        assert braking_limit is not None
+
+        targets = {
+            side: setup.read_ee_pose(side).astype(np.float64) for side in setup.sides
+        }
+        for side, target in targets.items():
+            kinematics.set_target(side, target)
+        with mock.patch(
+            "openarm_control.kinematics.mink.solve_ik",
+            return_value=np.zeros(setup.model.nv),
+        ):
+            self.assertIsNotNone(kinematics.solve())
+
+            for side, target in targets.items():
+                joint_id = setup.model.joint(f"openarm_{side}_joint1").id
+                shoulder = solver._config.data.xanchor[joint_id]
+                retracted = target.copy()
+                retracted[:3] = shoulder + 0.99 * (target[:3] - shoulder)
+                kinematics.set_target(side, retracted)
+            self.assertIsNotNone(kinematics.solve())
+
+        for side in setup.sides:
+            for joint_index, expected in ((1, 2.04), (4, 3.84)):
+                joint_name = f"openarm_{side}_joint{joint_index}"
+                configuration_row = configuration_limit.joint_names.index(joint_name)
+                braking_row = braking_limit.joint_names.index(joint_name)
+                self.assertAlmostEqual(
+                    configuration_limit.limit[configuration_row],
+                    expected,
+                )
+                self.assertAlmostEqual(
+                    braking_limit.max_velocity[braking_row],
+                    expected,
+                )
+
+        kinematics.reset_motion_state()
+        self.assertFalse(kinematics.ready())
+        for side in setup.sides:
+            for joint_index, expected in ((1, 2.0), (4, 3.8)):
+                joint_name = f"openarm_{side}_joint{joint_index}"
+                configuration_row = configuration_limit.joint_names.index(joint_name)
+                braking_row = braking_limit.joint_names.index(joint_name)
+                self.assertAlmostEqual(
+                    configuration_limit.limit[configuration_row],
+                    expected,
+                )
+                self.assertAlmostEqual(
+                    braking_limit.max_velocity[braking_row],
+                    expected,
+                )
 
 
 class RecoverableConfigurationLimitTest(unittest.TestCase):

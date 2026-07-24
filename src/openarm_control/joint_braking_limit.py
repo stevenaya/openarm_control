@@ -151,6 +151,29 @@ class JointBrakingLimit(mink.Limit):
         self._measured_qvel: np.ndarray | None = None
         self.last_state: JointBrakingState | None = None
 
+    def update_velocity_limits(
+        self,
+        velocities: Mapping[str, npt.ArrayLike],
+    ) -> None:
+        """Replace selected braking-envelope caps while preserving joint order."""
+        updated = self.max_velocity.copy()
+        for index, joint_name in enumerate(self.joint_names):
+            if joint_name not in velocities:
+                continue
+            value = np.asarray(velocities[joint_name], dtype=np.float64)
+            if value.size != 1:
+                raise ValueError(
+                    f"Velocity limit for scalar joint {joint_name!r} must contain "
+                    "one value."
+                )
+            scalar = float(value.reshape(-1)[0])
+            if not np.isfinite(scalar) or scalar <= 0.0:
+                raise ValueError(
+                    f"Velocity limit for joint {joint_name!r} must be positive."
+                )
+            updated[index] = scalar
+        self.max_velocity = _readonly_array(updated)
+
     def update_measured_state(
         self,
         qpos: npt.ArrayLike,

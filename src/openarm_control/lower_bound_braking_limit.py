@@ -133,3 +133,9 @@ class LowerBoundBrakingLimit(mink.Limit):
             G=self._G,
             h=np.array([dt * approach_velocity], dtype=np.float64),
         )
+
+    def update_max_velocity(self, max_velocity: float) -> None:
+        """Update the approach-speed cap used by the braking profile."""
+        if not np.isfinite(max_velocity) or max_velocity <= 0.0:
+            raise ValueError("max_velocity must be finite and positive.")
+        self.max_velocity = float(max_velocity)
