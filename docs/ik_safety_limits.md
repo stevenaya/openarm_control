@@ -217,15 +217,17 @@ g(q) = grad_q rho_geo(q)
 
 and not a gradient of target error.
 
-This does not mean `FrameTask.compute_jacobian()` should be removed elsewhere.
-The frame tracking objective must use `J_task`. The nullspace posture task also
-uses the same task linearization so that its selected direction is numerically
-consistent with the primary QP objective. The API choice is therefore:
+This does not mean `FrameTask.compute_jacobian()` should be removed from the
+tracking objective. Frame tracking must use `J_task`. The structural nullspace
+task, however, uses `J_geo`: while a nonsingular `JLog` leaves the exact
+nullspace unchanged, it changes the singular values used to activate the
+home-return objective. Using `J_geo` keeps both its direction and activation
+independent of how far away the target is. The API choice is therefore:
 
 | Use | Jacobian |
 | --- | --- |
 | Frame pose-error objective | `FrameTask.compute_jacobian()` |
-| Nullspace relative to that objective | `FrameTask.compute_jacobian()` |
+| Structural nullspace direction and activation | `Configuration.get_frame_jacobian()` |
 | Robot geometric singularity and `rho` | `Configuration.get_frame_jacobian()` |
 
 A regression test also constructs an untargeted `FrameTask` and verifies that
@@ -374,6 +376,116 @@ where Mink linearizes and solves its QP. The measured ratio only chooses the
 conservative allowed rate. This preserves a coherent QP tangent point while
 reacting earlier when the physical arm is already less well conditioned than
 the command model suggests.
+
+## Speed-scheduled home corridor
+
+The optional speed-scheduled elbow QP changes secondary behavior only while the
+incoming target is moving quickly. It does not replace the hard joint velocity,
+joint braking, collision, or singularity constraints.
+
+Until a Ruckig nominal twist is available, activation is calculated from
+consecutive limited VR targets:
+
+```text
+v_target = ||p_target,k - p_target,k-1|| / control_dt
+w_target = angle(q_target,k-1, q_target,k) / control_dt
+
+r_v = max(v_target / v_fast, w_target / w_fast)
+u = clip((r_v - r_slow) / (r_fast - r_slow), 0, 1)
+alpha_target = 3 u^2 - 2 u^3
+```
+
+`alpha` is rate-limited separately while rising and falling. Consequently, a
+single noisy target packet cannot instantly switch the QP between two
+priorities. At exactly `alpha = 0`, the implementation calls the original Mink
+path, so slow motion has the previous behavior without an approximate blend.
+
+### Error leak and task scale
+
+The full accumulated pose error is not injected into one QP substep. Its
+translation and rotation vectors are norm-limited:
+
+```text
+Delta x_leak =
+    [sat_norm(Delta p_error, position_error_leak),
+     sat_norm(Delta theta_error, orientation_error_leak)]
+```
+
+The active Cartesian residual is:
+
+```text
+delta_x = J_task Delta q - s Delta x_leak
+0 <= s <= 1
+```
+
+and the weighted objective contains:
+
+```text
+w_s (1 - s)^2
++ alpha w_x ||delta_x / sigma_x||^2
+```
+
+where `sigma_x` uses separate meter and radian scales. Large accumulated
+tracking error therefore cannot demand an arbitrarily large one-step velocity.
+If the leaked command is incompatible with the hard safety envelope, the QP can
+reduce `s` and tolerate a small Cartesian residual instead of changing the
+elbow branch to preserve the full command.
+
+The implementation does not keep six explicit `delta_x` variables. Because
+`delta_x` is unconstrained and only has a quadratic cost, substituting the
+definition above into the objective is mathematically exact and avoids six QP
+variables and six equalities per arm.
+
+### Home-referenced elbow coordinate
+
+Let `psi(q)` be the geometric elbow swivel about the shoulder-to-end-effector
+axis, with `psi = 0` at the model home pose. A finite-difference Jacobian gives:
+
+```text
+psi(q + Delta q) ~= psi(q) + J_psi Delta q
+```
+
+At high speed, the soft corridor is the interval between the current swivel and
+home, plus a scheduled margin:
+
+```text
+m(alpha) =
+    m_fast + (m_slow - m_fast) (1 - alpha)^p
+
+psi_lower = min(0, psi_anchor) - m(alpha)
+psi_upper = max(0, psi_anchor) + m(alpha)
+```
+
+The inequalities include a nonnegative slack `epsilon_psi`, so this is not a
+hard elbow limit:
+
+```text
+ psi + J_psi Delta q <= psi_upper + epsilon_psi
+-psi - J_psi Delta q <= -psi_lower + epsilon_psi
+epsilon_psi >= 0
+```
+
+Linear and quadratic costs on `epsilon_psi` make violations expensive without
+making a necessary branch change infeasible. A separate soft velocity residual
+pulls `psi` slowly toward home, and the existing exact-nullspace home cost is
+scaled upward with `alpha`.
+
+By default `psi_anchor` is refreshed from the current outer-cycle state. This
+is forgiving, but cumulative drift can gradually move the interval. The
+experimental `--speed-elbow-latch-fast-reference` option instead stores the
+last pre-fast swivel after activation crosses `latch_alpha`, then holds that
+anchor until activation falls below `release_alpha`. Replay tests showed that
+this reduces drift in some retractions but increases corridor slack and
+acceleration in other motions, so it is deliberately disabled by default.
+
+### Runtime cost
+
+With the current bimanual OpenArm model, DAQP, and ten nonlinear substeps, a
+synthetic high-speed benchmark takes about 6.5 ms per outer solve on the
+development machine, versus about 1.5 ms for the original Mink path. The
+low-speed path retains the original timing. This feature is therefore an
+experimental production option: real trials should record solve duration and
+missed 250 Hz deadlines before it becomes the default.
 
 ## Scope and limitations
 

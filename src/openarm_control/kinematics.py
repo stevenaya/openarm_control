@@ -53,6 +53,10 @@ from openarm_control.recoverable_configuration_limit import (
 )
 from openarm_control.retract_velocity_governor import RetractVelocityGovernor
 from openarm_control.soft_limit_task import SoftLimitTask
+from openarm_control.speed_scheduled_elbow_qp import (
+    SpeedScheduledElbowParams,
+    SpeedScheduledElbowQP,
+)
 from openarm_control.singularity_approach_limit import SingularityApproachLimit
 
 
@@ -77,6 +81,35 @@ class IKParams:
     retract_velocity_deadband: float = 0.02
     retract_velocity_full_speed: float = 0.15
     retract_velocity_cap_slew_rate: float = 10.0
+    speed_scheduled_elbow_qp: bool = False
+    speed_elbow_linear_fast: float = 0.6
+    speed_elbow_angular_fast: float = 4.0
+    speed_elbow_ratio_slow: float = 0.75
+    speed_elbow_ratio_fast: float = 1.0
+    speed_elbow_activation_rise_rate: float = 4.0
+    speed_elbow_activation_fall_rate: float = 2.0
+    speed_elbow_position_error_leak: float = 0.0003
+    speed_elbow_orientation_error_leak: float = 0.0024
+    speed_elbow_task_scale_weight: float = 10.0
+    speed_elbow_cartesian_position_slack_scale: float = 0.002
+    speed_elbow_cartesian_orientation_slack_scale: float = 0.01
+    speed_elbow_cartesian_slack_weight_fast: float = 1e6
+    speed_elbow_nullspace_cost_scale_fast: float = 1.5
+    speed_elbow_swivel_return_rate: float = 0.5
+    speed_elbow_swivel_return_max_speed: float = 0.1
+    speed_elbow_swivel_velocity_scale: float = 0.25
+    speed_elbow_swivel_velocity_weight_fast: float = 0.03
+    speed_elbow_corridor_margin_slow: float = np.pi
+    speed_elbow_corridor_margin_fast: float = 0.0
+    speed_elbow_corridor_margin_power: float = 2.0
+    speed_elbow_corridor_slack_scale: float = np.deg2rad(1.0)
+    speed_elbow_corridor_slack_linear_fast: float = 5.0
+    speed_elbow_corridor_slack_quadratic_fast: float = 50.0
+    speed_elbow_swivel_min_radius: float = 0.02
+    speed_elbow_swivel_fd_epsilon: float = 1e-5
+    speed_elbow_latch_fast_reference: bool = False
+    speed_elbow_latch_alpha: float = 0.8
+    speed_elbow_release_alpha: float = 0.05
     nullspace_cost: float = 0.3
     nullspace_return_rate: float = 0.5
     nullspace_max_speed: float = 0.5
@@ -262,17 +295,13 @@ class _IKSolver:
         # gripper and lifter may be valid in driver space but outside the MuJoCo
         # model range; constraining and freezing them at the same time makes the
         # QP infeasible.
-        self._configuration_velocity_limit: (
-            RecoverableConfigurationLimit | None
-        ) = None
+        self._configuration_velocity_limit: RecoverableConfigurationLimit | None = None
         if params.velocity_limits is not None:
             self._configuration_velocity_limit = RecoverableConfigurationLimit(
                 model=setup.model,
                 qpos_indices=active_qpos,
                 velocities=params.velocity_limits,
-                recovery_velocity_scale=(
-                    params.joint_limit_recovery_velocity_scale
-                ),
+                recovery_velocity_scale=(params.joint_limit_recovery_velocity_scale),
             )
             self._limits = [self._configuration_velocity_limit]
         else:
@@ -430,14 +459,95 @@ class _IKSolver:
         if params.diag_reg > 0.0:
             self._solver_params["diag_reg"] = params.diag_reg
 
+        self._speed_scheduled_elbow_qp: SpeedScheduledElbowQP | None = None
+        if params.speed_scheduled_elbow_qp:
+            if params.velocity_limits is None:
+                raise ValueError(
+                    "Speed-scheduled elbow QP requires hard velocity limits."
+                )
+            displacement_scale = np.full(
+                setup.model.nv,
+                self._substep_dt,
+                dtype=np.float64,
+            )
+            for side, dof_indices in self._arm_dofs_by_side.items():
+                caps = np.array(
+                    [
+                        _joint_velocity_cap(
+                            params.velocity_limits,
+                            f"openarm_{side}_joint{index + 1}",
+                            ARM_JOINT_VELOCITY_LIMITS_RAD_S[index],
+                        )
+                        for index in range(7)
+                    ],
+                    dtype=np.float64,
+                )
+                displacement_scale[dof_indices] = caps * self._substep_dt
+            speed_params = SpeedScheduledElbowParams(
+                control_dt=params.dt,
+                substep_dt=self._substep_dt,
+                linear_fast=params.speed_elbow_linear_fast,
+                angular_fast=params.speed_elbow_angular_fast,
+                speed_ratio_slow=params.speed_elbow_ratio_slow,
+                speed_ratio_fast=params.speed_elbow_ratio_fast,
+                activation_rise_rate=params.speed_elbow_activation_rise_rate,
+                activation_fall_rate=params.speed_elbow_activation_fall_rate,
+                position_error_leak=params.speed_elbow_position_error_leak,
+                orientation_error_leak=(params.speed_elbow_orientation_error_leak),
+                task_scale_weight=params.speed_elbow_task_scale_weight,
+                cartesian_position_slack_scale=(
+                    params.speed_elbow_cartesian_position_slack_scale
+                ),
+                cartesian_orientation_slack_scale=(
+                    params.speed_elbow_cartesian_orientation_slack_scale
+                ),
+                cartesian_slack_weight_fast=(
+                    params.speed_elbow_cartesian_slack_weight_fast
+                ),
+                nullspace_cost_scale_fast=(
+                    params.speed_elbow_nullspace_cost_scale_fast
+                ),
+                swivel_return_rate=params.speed_elbow_swivel_return_rate,
+                swivel_return_max_speed=(params.speed_elbow_swivel_return_max_speed),
+                swivel_velocity_scale=(params.speed_elbow_swivel_velocity_scale),
+                swivel_velocity_weight_fast=(
+                    params.speed_elbow_swivel_velocity_weight_fast
+                ),
+                corridor_margin_slow=(params.speed_elbow_corridor_margin_slow),
+                corridor_margin_fast=(params.speed_elbow_corridor_margin_fast),
+                corridor_margin_power=(params.speed_elbow_corridor_margin_power),
+                corridor_slack_scale=(params.speed_elbow_corridor_slack_scale),
+                corridor_slack_linear_fast=(
+                    params.speed_elbow_corridor_slack_linear_fast
+                ),
+                corridor_slack_quadratic_fast=(
+                    params.speed_elbow_corridor_slack_quadratic_fast
+                ),
+                swivel_min_radius=params.speed_elbow_swivel_min_radius,
+                swivel_fd_epsilon=params.speed_elbow_swivel_fd_epsilon,
+                latch_fast_reference=(params.speed_elbow_latch_fast_reference),
+                latch_alpha=params.speed_elbow_latch_alpha,
+                release_alpha=params.speed_elbow_release_alpha,
+            )
+            self._speed_scheduled_elbow_qp = SpeedScheduledElbowQP(
+                setup.model,
+                self._tasks,
+                self._arm_dofs_by_side,
+                home_qpos,
+                displacement_scale,
+                speed_params,
+            )
+
         self._pending: set[str] = set(setup.sides)
         self._target_positions: dict[str, np.ndarray] = {}
+        self._target_poses: dict[str, np.ndarray] = {}
         self._gripper = np.zeros(2, dtype=np.float32)
 
     def set_target(self, side: str, pose: np.ndarray) -> None:
         pose_array = np.asarray(pose, dtype=np.float64)
         self._tasks[side].set_target(pose_to_se3(pose_array))
         self._target_positions[side] = pose_array[:3].copy()
+        self._target_poses[side] = pose_array.copy()
         self._pending.discard(side)
 
     def sync(self, values16: np.ndarray) -> None:
@@ -506,7 +616,12 @@ class _IKSolver:
         for governor in self._retract_velocity_governors.values():
             governor.reset()
             velocity_limits.update(governor.velocity_limits)
+        if self._speed_scheduled_elbow_qp is not None:
+            self._speed_scheduled_elbow_qp.reset()
+        for task in self._nullspace_tasks.values():
+            task.set_cost_scale(1.0)
         self._target_positions.clear()
+        self._target_poses.clear()
         self._pending = set(self._sides)
         self._apply_dynamic_velocity_limits(velocity_limits)
 
@@ -515,16 +630,24 @@ class _IKSolver:
 
     def solve(self) -> np.ndarray | None:
         self._expire_stale_measured_state()
-        tasks = list(self._tasks.values())
+        secondary_tasks: list[mink.BaseTask] = []
         if self._posture_cost > 0.0:
-            tasks.append(self._posture_task)
+            secondary_tasks.append(self._posture_task)
         if self._kinetic_energy_task is not None:
-            tasks.append(self._kinetic_energy_task)
-        tasks.extend(self._nullspace_tasks.values())
-        tasks.extend(self._elbow_soft_limit_tasks.values())
+            secondary_tasks.append(self._kinetic_energy_task)
+        secondary_tasks.extend(self._nullspace_tasks.values())
+        secondary_tasks.extend(self._elbow_soft_limit_tasks.values())
+        tasks = [*self._tasks.values(), *secondary_tasks]
         constraints = [self._freeze_task] if self._freeze_task else []
 
         self._update_retract_velocity_limits()
+        if self._speed_scheduled_elbow_qp is not None:
+            nullspace_cost_scales = self._speed_scheduled_elbow_qp.prepare(
+                self._config,
+                self._target_poses,
+            )
+            for side, task in self._nullspace_tasks.items():
+                task.set_cost_scale(nullspace_cost_scales.get(side, 1.0))
         q_before = self._config.q.copy()
         for limit in self._singularity_limits.values():
             limit.prepare(self._config)
@@ -534,16 +657,35 @@ class _IKSolver:
 
         for _ in range(self._max_iters):
             try:
-                vel = mink.solve_ik(
-                    self._config,
-                    tasks,
-                    self._substep_dt,
-                    self._solver_name,
-                    limits=self._limits,
-                    constraints=constraints,
-                    safety_break=False,
-                    **self._solver_params,
-                )
+                if (
+                    self._speed_scheduled_elbow_qp is not None
+                    and self._speed_scheduled_elbow_qp.active()
+                ):
+                    vel = self._speed_scheduled_elbow_qp.solve(
+                        self._config,
+                        secondary_tasks,
+                        dt=self._substep_dt,
+                        solver=self._solver_name,
+                        damping=float(self._solver_params["damping"]),
+                        limits=self._limits,
+                        constraints=constraints,
+                        solver_kwargs={
+                            key: value
+                            for key, value in self._solver_params.items()
+                            if key != "damping"
+                        },
+                    )
+                else:
+                    vel = mink.solve_ik(
+                        self._config,
+                        tasks,
+                        self._substep_dt,
+                        self._solver_name,
+                        limits=self._limits,
+                        constraints=constraints,
+                        safety_break=False,
+                        **self._solver_params,
+                    )
             except mink.exceptions.NoSolutionFound:
                 # Earlier substeps may already have advanced the internal model,
                 # while no command from this failed solve reaches the real arm.
@@ -627,9 +769,7 @@ def _dof_indices_for_qpos(
         joint_id = int(joint_ids[0])
         joint_type = model.jnt_type[joint_id]
         if joint_type not in (mujoco.mjtJoint.mjJNT_HINGE, mujoco.mjtJoint.mjJNT_SLIDE):
-            raise ValueError(
-                "IK arm joints must be scalar hinge or slide joints."
-            )
+            raise ValueError("IK arm joints must be scalar hinge or slide joints.")
         dof_indices.append(int(model.jnt_dofadr[joint_id]))
     return np.asarray(dof_indices, dtype=int)
 
@@ -824,6 +964,184 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         type=float,
         default=10.0,
         help="Maximum J1/J4 cap change rate in rad/s^2 (default: 10.0).",
+    )
+    parser.add_argument(
+        "--speed-scheduled-elbow-qp",
+        action="store_true",
+        help=(
+            "Enable speed-scheduled task scaling, Cartesian slack, and a "
+            "home-referenced soft elbow corridor."
+        ),
+    )
+    parser.add_argument(
+        "--speed-elbow-linear-fast",
+        type=float,
+        default=0.6,
+        help="Target linear speed used as the fast reference in m/s.",
+    )
+    parser.add_argument(
+        "--speed-elbow-angular-fast",
+        type=float,
+        default=4.0,
+        help="Target angular speed used as the fast reference in rad/s.",
+    )
+    parser.add_argument(
+        "--speed-elbow-ratio-slow",
+        type=float,
+        default=0.75,
+        help="Normalized target speed where scheduling starts.",
+    )
+    parser.add_argument(
+        "--speed-elbow-ratio-fast",
+        type=float,
+        default=1.0,
+        help="Normalized target speed where scheduling is fully active.",
+    )
+    parser.add_argument(
+        "--speed-elbow-activation-rise-rate",
+        type=float,
+        default=4.0,
+        help="Maximum scheduling-activation rise rate in 1/s.",
+    )
+    parser.add_argument(
+        "--speed-elbow-activation-fall-rate",
+        type=float,
+        default=2.0,
+        help="Maximum scheduling-activation fall rate in 1/s.",
+    )
+    parser.add_argument(
+        "--speed-elbow-position-error-leak",
+        type=float,
+        default=0.0003,
+        help="Maximum position error entering each QP substep in meters.",
+    )
+    parser.add_argument(
+        "--speed-elbow-orientation-error-leak",
+        type=float,
+        default=0.0024,
+        help="Maximum orientation error entering each QP substep in radians.",
+    )
+    parser.add_argument(
+        "--speed-elbow-task-scale-weight",
+        type=float,
+        default=10.0,
+        help="Cost that keeps the augmented Cartesian task scale near one.",
+    )
+    parser.add_argument(
+        "--speed-elbow-cartesian-position-slack-scale",
+        type=float,
+        default=0.002,
+        help="Position slack normalization scale in meters.",
+    )
+    parser.add_argument(
+        "--speed-elbow-cartesian-orientation-slack-scale",
+        type=float,
+        default=0.01,
+        help="Orientation slack normalization scale in radians.",
+    )
+    parser.add_argument(
+        "--speed-elbow-cartesian-slack-weight-fast",
+        type=float,
+        default=1e6,
+        help="Cartesian slack cost at full speed activation.",
+    )
+    parser.add_argument(
+        "--speed-elbow-nullspace-cost-scale-fast",
+        type=float,
+        default=1.5,
+        help="Multiplier on the existing nullspace home cost at high speed.",
+    )
+    parser.add_argument(
+        "--speed-elbow-swivel-return-rate",
+        type=float,
+        default=0.5,
+        help="Home-referenced elbow-swivel return rate in 1/s.",
+    )
+    parser.add_argument(
+        "--speed-elbow-swivel-return-max-speed",
+        type=float,
+        default=0.1,
+        help="Maximum elbow-swivel home-return speed in rad/s.",
+    )
+    parser.add_argument(
+        "--speed-elbow-swivel-velocity-scale",
+        type=float,
+        default=0.25,
+        help="Normalization speed for the elbow-swivel objective in rad/s.",
+    )
+    parser.add_argument(
+        "--speed-elbow-swivel-velocity-weight-fast",
+        type=float,
+        default=0.03,
+        help="Elbow-swivel velocity objective cost at full activation.",
+    )
+    parser.add_argument(
+        "--speed-elbow-corridor-margin-slow",
+        type=float,
+        default=float(np.pi),
+        help="Home-interval corridor margin at low speed in radians.",
+    )
+    parser.add_argument(
+        "--speed-elbow-corridor-margin-fast",
+        type=float,
+        default=0.0,
+        help="Home-interval corridor margin at high speed in radians.",
+    )
+    parser.add_argument(
+        "--speed-elbow-corridor-margin-power",
+        type=float,
+        default=2.0,
+        help="Power used while shrinking the speed-scheduled corridor.",
+    )
+    parser.add_argument(
+        "--speed-elbow-corridor-slack-scale",
+        type=float,
+        default=float(np.deg2rad(1.0)),
+        help="Elbow corridor slack normalization scale in radians.",
+    )
+    parser.add_argument(
+        "--speed-elbow-corridor-slack-linear-fast",
+        type=float,
+        default=5.0,
+        help="Linear corridor slack cost at full activation.",
+    )
+    parser.add_argument(
+        "--speed-elbow-corridor-slack-quadratic-fast",
+        type=float,
+        default=50.0,
+        help="Quadratic corridor slack cost at full activation.",
+    )
+    parser.add_argument(
+        "--speed-elbow-swivel-min-radius",
+        type=float,
+        default=0.02,
+        help="Minimum elbow-swivel radius for corridor terms in meters.",
+    )
+    parser.add_argument(
+        "--speed-elbow-swivel-fd-epsilon",
+        type=float,
+        default=1e-5,
+        help="Finite-difference step for the elbow-swivel Jacobian in radians.",
+    )
+    parser.add_argument(
+        "--speed-elbow-latch-fast-reference",
+        action="store_true",
+        help=(
+            "Latch the pre-fast elbow swivel after activation crosses the "
+            "configured latch threshold."
+        ),
+    )
+    parser.add_argument(
+        "--speed-elbow-latch-alpha",
+        type=float,
+        default=0.8,
+        help="Activation at which the optional pre-fast reference is latched.",
+    )
+    parser.add_argument(
+        "--speed-elbow-release-alpha",
+        type=float,
+        default=0.05,
+        help="Activation below which the optional latched reference is released.",
     )
     parser.add_argument(
         "--config",
@@ -1059,6 +1377,49 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         retract_velocity_deadband=args.retract_velocity_deadband,
         retract_velocity_full_speed=args.retract_velocity_full_speed,
         retract_velocity_cap_slew_rate=args.retract_velocity_cap_slew_rate,
+        speed_scheduled_elbow_qp=args.speed_scheduled_elbow_qp,
+        speed_elbow_linear_fast=args.speed_elbow_linear_fast,
+        speed_elbow_angular_fast=args.speed_elbow_angular_fast,
+        speed_elbow_ratio_slow=args.speed_elbow_ratio_slow,
+        speed_elbow_ratio_fast=args.speed_elbow_ratio_fast,
+        speed_elbow_activation_rise_rate=(args.speed_elbow_activation_rise_rate),
+        speed_elbow_activation_fall_rate=(args.speed_elbow_activation_fall_rate),
+        speed_elbow_position_error_leak=(args.speed_elbow_position_error_leak),
+        speed_elbow_orientation_error_leak=(args.speed_elbow_orientation_error_leak),
+        speed_elbow_task_scale_weight=args.speed_elbow_task_scale_weight,
+        speed_elbow_cartesian_position_slack_scale=(
+            args.speed_elbow_cartesian_position_slack_scale
+        ),
+        speed_elbow_cartesian_orientation_slack_scale=(
+            args.speed_elbow_cartesian_orientation_slack_scale
+        ),
+        speed_elbow_cartesian_slack_weight_fast=(
+            args.speed_elbow_cartesian_slack_weight_fast
+        ),
+        speed_elbow_nullspace_cost_scale_fast=(
+            args.speed_elbow_nullspace_cost_scale_fast
+        ),
+        speed_elbow_swivel_return_rate=(args.speed_elbow_swivel_return_rate),
+        speed_elbow_swivel_return_max_speed=(args.speed_elbow_swivel_return_max_speed),
+        speed_elbow_swivel_velocity_scale=(args.speed_elbow_swivel_velocity_scale),
+        speed_elbow_swivel_velocity_weight_fast=(
+            args.speed_elbow_swivel_velocity_weight_fast
+        ),
+        speed_elbow_corridor_margin_slow=(args.speed_elbow_corridor_margin_slow),
+        speed_elbow_corridor_margin_fast=(args.speed_elbow_corridor_margin_fast),
+        speed_elbow_corridor_margin_power=(args.speed_elbow_corridor_margin_power),
+        speed_elbow_corridor_slack_scale=(args.speed_elbow_corridor_slack_scale),
+        speed_elbow_corridor_slack_linear_fast=(
+            args.speed_elbow_corridor_slack_linear_fast
+        ),
+        speed_elbow_corridor_slack_quadratic_fast=(
+            args.speed_elbow_corridor_slack_quadratic_fast
+        ),
+        speed_elbow_swivel_min_radius=args.speed_elbow_swivel_min_radius,
+        speed_elbow_swivel_fd_epsilon=args.speed_elbow_swivel_fd_epsilon,
+        speed_elbow_latch_fast_reference=(args.speed_elbow_latch_fast_reference),
+        speed_elbow_latch_alpha=args.speed_elbow_latch_alpha,
+        speed_elbow_release_alpha=args.speed_elbow_release_alpha,
         nullspace_cost=args.nullspace_cost,
         nullspace_return_rate=args.nullspace_return_rate,
         nullspace_max_speed=args.nullspace_max_speed,
@@ -1078,12 +1439,8 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         ),
         joint_limit_braking_exponent=args.joint_limit_braking_exponent,
         joint_limit_braking_guard_margin=args.joint_limit_braking_guard_margin,
-        joint_limit_braking_reaction_time=(
-            args.joint_limit_braking_reaction_time
-        ),
-        joint_limit_braking_distance_buffer=(
-            args.joint_limit_braking_distance_buffer
-        ),
+        joint_limit_braking_reaction_time=(args.joint_limit_braking_reaction_time),
+        joint_limit_braking_distance_buffer=(args.joint_limit_braking_distance_buffer),
         singularity_approach_limit=args.singularity_approach_limit,
         singularity_ratio_stop=args.singularity_ratio_stop,
         singularity_ratio_slow=args.singularity_ratio_slow,

@@ -15,6 +15,7 @@ import openarm_mujoco.v2 as openarm_mujoco
 
 from openarm_control import (
     ArmSetup,
+    ElbowSwivelCoordinate,
     IKParams,
     JointBrakingLimit,
     Kinematics,
@@ -159,6 +160,161 @@ class RetractVelocityGovernorTest(unittest.TestCase):
                 "openarm_right_joint1": 2.0,
                 "openarm_right_joint4": 3.8,
             },
+        )
+
+
+class SpeedScheduledElbowTest(unittest.TestCase):
+    """Exercise home swivel, activation, and augmented bimanual solves."""
+
+    @staticmethod
+    def _velocity_limits() -> dict[str, float]:
+        return {
+            f"openarm_{side}_joint{index + 1}": float(cap)
+            for side in ("left", "right")
+            for index, cap in enumerate(ARM_JOINT_VELOCITY_LIMITS_RAD_S)
+        }
+
+    def test_home_swivel_is_zero_and_has_a_finite_jacobian(self) -> None:
+        setup = _setup("right")
+        frame_task = mink.FrameTask(
+            frame_name="right_ee_control_point",
+            frame_type="site",
+            position_cost=1.0,
+            orientation_cost=1.0,
+        )
+        coordinate = ElbowSwivelCoordinate(
+            setup.model,
+            "right",
+            frame_task,
+            setup.data.qpos.copy(),
+            _dof_indices_for_qpos(
+                setup.model,
+                _arm_qpos_indices(setup, "right"),
+            ),
+            finite_difference_epsilon=1e-5,
+        )
+
+        swivel, jacobian, radius = coordinate.linearize(setup.data.qpos.copy())
+
+        self.assertAlmostEqual(swivel, 0.0, places=10)
+        self.assertGreater(radius, 0.02)
+        self.assertEqual(jacobian.shape, (setup.model.nv,))
+        self.assertTrue(np.all(np.isfinite(jacobian)))
+        self.assertGreater(float(np.linalg.norm(jacobian)), 0.0)
+
+    def test_augmented_qp_requires_hard_velocity_limits(self) -> None:
+        with self.assertRaisesRegex(ValueError, "requires hard velocity limits"):
+            Kinematics(
+                _setup("right"),
+                IKParams(
+                    speed_scheduled_elbow_qp=True,
+                    velocity_limits=None,
+                ),
+            )
+
+    def test_bimanual_fast_target_uses_augmented_qp(self) -> None:
+        setup = _setup()
+        kinematics = Kinematics(
+            setup,
+            IKParams(
+                dt=0.004,
+                max_iters=1,
+                position_cost=10.0,
+                orientation_cost=1.0,
+                posture_cost=0.0,
+                nullspace_cost=0.0,
+                velocity_limits=self._velocity_limits(),
+                speed_scheduled_elbow_qp=True,
+            ),
+        )
+        targets = {
+            side: setup.read_ee_pose(side).astype(np.float64) for side in setup.sides
+        }
+        for side, target in targets.items():
+            kinematics.set_target(side, target)
+        self.assertIsNotNone(kinematics.solve())
+        solver = kinematics._ik
+        assert solver is not None
+        q_before = solver._config.q.copy()
+
+        for side, target in targets.items():
+            fast_target = target.copy()
+            fast_target[0] += 0.004
+            targets[side] = fast_target
+            kinematics.set_target(side, fast_target)
+        result = kinematics.solve()
+
+        self.assertIsNotNone(result)
+        policy = solver._speed_scheduled_elbow_qp
+        assert policy is not None
+        for side in setup.sides:
+            state = policy.states[side]
+            qp_state = policy.qp_states[side]
+            assert state is not None
+            assert qp_state is not None
+            self.assertGreater(state.activation, 0.0)
+            self.assertGreaterEqual(qp_state.task_scale, -1e-8)
+            self.assertLessEqual(qp_state.task_scale, 1.0 + 1e-8)
+
+        command_velocity = (solver._config.q - q_before) / 0.004
+        for side in setup.sides:
+            dofs = solver._arm_dofs_by_side[side]
+            np.testing.assert_array_less(
+                np.abs(command_velocity[dofs]),
+                np.asarray(ARM_JOINT_VELOCITY_LIMITS_RAD_S) + 1e-6,
+            )
+
+    def test_optional_fast_reference_stays_latched(self) -> None:
+        setup = _setup("right")
+        target = setup.read_ee_pose("right").astype(np.float64)
+        kinematics = Kinematics(
+            setup,
+            IKParams(
+                dt=0.004,
+                max_iters=1,
+                posture_cost=0.0,
+                nullspace_cost=0.0,
+                velocity_limits=self._velocity_limits(),
+                speed_scheduled_elbow_qp=True,
+                speed_elbow_activation_rise_rate=1000.0,
+                speed_elbow_activation_fall_rate=1000.0,
+                speed_elbow_latch_fast_reference=True,
+                speed_elbow_latch_alpha=0.8,
+                speed_elbow_release_alpha=0.05,
+            ),
+        )
+        solver = kinematics._ik
+        assert solver is not None
+        policy = solver._speed_scheduled_elbow_qp
+        assert policy is not None
+        policy.prepare(solver._config, {"right": target})
+
+        fast_target = target.copy()
+        fast_target[0] += 0.004
+        policy.prepare(solver._config, {"right": fast_target})
+        first_state = policy.states["right"]
+        assert first_state is not None
+        self.assertTrue(first_state.reference_latched)
+
+        scheduler = policy._schedulers["right"]
+        _, swivel_jacobian, _ = scheduler.coordinate.linearize(solver._config.q)
+        tangent = swivel_jacobian / np.linalg.norm(swivel_jacobian)
+        solver._config.integrate_inplace(tangent, 0.05)
+        next_target = fast_target.copy()
+        next_target[0] += 0.004
+        policy.prepare(solver._config, {"right": next_target})
+        second_state = policy.states["right"]
+        assert second_state is not None
+
+        self.assertTrue(second_state.reference_latched)
+        self.assertAlmostEqual(
+            second_state.anchor_swivel,
+            first_state.anchor_swivel,
+            places=10,
+        )
+        self.assertGreater(
+            abs(second_state.swivel - first_state.swivel),
+            1e-3,
         )
 
 
@@ -869,6 +1025,12 @@ class SolverTimingTest(unittest.TestCase):
                 "0.15",
                 "--retract-velocity-cap-slew-rate",
                 "10.0",
+                "--speed-scheduled-elbow-qp",
+                "--speed-elbow-position-error-leak",
+                "0.0004",
+                "--speed-elbow-nullspace-cost-scale-fast",
+                "1.7",
+                "--speed-elbow-latch-fast-reference",
                 "--elbow-soft-limit-cost",
                 "2.0",
                 "--elbow-soft-limit-angle",
@@ -918,6 +1080,10 @@ class SolverTimingTest(unittest.TestCase):
         self.assertEqual(params.retract_velocity_deadband, 0.02)
         self.assertEqual(params.retract_velocity_full_speed, 0.15)
         self.assertEqual(params.retract_velocity_cap_slew_rate, 10.0)
+        self.assertTrue(params.speed_scheduled_elbow_qp)
+        self.assertEqual(params.speed_elbow_position_error_leak, 0.0004)
+        self.assertEqual(params.speed_elbow_nullspace_cost_scale_fast, 1.7)
+        self.assertTrue(params.speed_elbow_latch_fast_reference)
         self.assertEqual(params.elbow_soft_limit_cost, 2.0)
         self.assertEqual(params.elbow_soft_limit_angle, 0.08)
         self.assertEqual(params.elbow_soft_limit_max_speed, 0.2)

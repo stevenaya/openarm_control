@@ -118,6 +118,7 @@ class NullspacePostureTask(mink.Task):
             )
 
         super().__init__(cost=np.array([cost], dtype=np.float64))
+        self._nominal_cost = cost
         self._base_cost = cost
         self._model = model
         self._frame_task = frame_task
@@ -131,6 +132,12 @@ class NullspacePostureTask(mink.Task):
         self._characteristic_length = characteristic_length
         self._previous_direction: np.ndarray | None = None
         self.last_state: NullspaceState | None = None
+
+    def set_cost_scale(self, scale: float) -> None:
+        """Scale the nominal home-return cost without changing its target."""
+        if not np.isfinite(scale) or scale < 0.0:
+            raise ValueError("Nullspace cost scale must be finite and non-negative.")
+        self._base_cost = self._nominal_cost * float(scale)
 
     def _compute_terms(
         self, configuration: mink.Configuration
@@ -186,9 +193,7 @@ class NullspacePostureTask(mink.Task):
             posture_error=posture_error,
             return_speed=return_speed,
             displacement=displacement,
-            jacobian_residual=float(
-                np.linalg.norm(normalized_jacobian @ direction)
-            ),
+            jacobian_residual=float(np.linalg.norm(normalized_jacobian @ direction)),
         )
         return error, jacobian
 

@@ -28,6 +28,11 @@ from .poses import read_ee_pose, pose_to_se3, se3_to_pose
 from .recoverable_configuration_limit import RecoverableConfigurationLimit
 from .retract_velocity_governor import RetractVelocityGovernor
 from .soft_limit_task import SoftLimitTask
+from .speed_scheduled_elbow_qp import (
+    ElbowSwivelCoordinate,
+    SpeedScheduledElbowParams,
+    SpeedScheduledElbowQP,
+)
 from .singularity_approach_limit import SingularityApproachLimit
 
 __all__ = [
@@ -42,6 +47,9 @@ __all__ = [
     "NullspacePostureTask",
     "RecoverableConfigurationLimit",
     "RetractVelocityGovernor",
+    "ElbowSwivelCoordinate",
+    "SpeedScheduledElbowParams",
+    "SpeedScheduledElbowQP",
     "SingularityApproachLimit",
     # CLI helpers
     "register_common_args",
