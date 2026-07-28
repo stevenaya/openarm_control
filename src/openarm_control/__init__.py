@@ -15,6 +15,7 @@
 """Kinematics and control utilities for OpenArm."""
 
 from .config import ArmSetup, register_common_args, setup_from_args
+from .error_limited_frame_task import ErrorLimitedFrameTask
 from .kinematics import (
     IKParams,
     Kinematics,
@@ -35,6 +36,7 @@ __all__ = [
     # high-level interface
     "Kinematics",
     "IKParams",
+    "ErrorLimitedFrameTask",
     "JointBrakingLimit",
     "LowerBoundBrakingLimit",
     "SoftLimitTask",

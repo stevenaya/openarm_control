@@ -15,6 +15,7 @@ import openarm_mujoco.v2 as openarm_mujoco
 
 from openarm_control import (
     ArmSetup,
+    ErrorLimitedFrameTask,
     IKParams,
     JointBrakingLimit,
     Kinematics,
@@ -22,6 +23,7 @@ from openarm_control import (
     RecoverableConfigurationLimit,
     SingularityApproachLimit,
     ik_params_from_args,
+    pose_to_se3,
     read_ee_pose,
     register_ik_args,
 )
@@ -158,6 +160,167 @@ class NullspaceTaskTest(unittest.TestCase):
         np.testing.assert_array_equal(solver._posture_task.target_q, posture_home)
         for side, task in solver._nullspace_tasks.items():
             np.testing.assert_array_equal(task._home_qpos, nullspace_homes[side])
+
+    def test_target_error_does_not_change_geometric_nullspace(self) -> None:
+        setup = _setup("right")
+        configuration = mink.Configuration(setup.model, q=setup.data.qpos.copy())
+        frame_task = mink.FrameTask(
+            frame_name="right_ee_control_point",
+            frame_type="site",
+            position_cost=10.0,
+            orientation_cost=1.0,
+        )
+        frame_task.set_target_from_configuration(configuration)
+        task = NullspacePostureTask(
+            model=setup.model,
+            frame_task=frame_task,
+            dof_indices=_dof_indices_for_qpos(
+                setup.model,
+                _arm_qpos_indices(setup, "right"),
+            ),
+            home_qpos=configuration.q,
+            cost=0.3,
+            dt=0.0004,
+            return_rate=0.5,
+            max_speed=0.5,
+            singularity_low=0.02,
+            singularity_high=0.05,
+            characteristic_length=0.3,
+        )
+
+        task.compute_qp_objective(configuration)
+        initial_state = task.last_state
+        assert initial_state is not None
+
+        target = setup.read_ee_pose("right").astype(np.float64)
+        target[:3] += np.array([0.2, -0.1, 0.15])
+        frame_task.set_target(pose_to_se3(target))
+        task.compute_qp_objective(configuration)
+        shifted_state = task.last_state
+        assert shifted_state is not None
+
+        np.testing.assert_allclose(
+            shifted_state.singular_values,
+            initial_state.singular_values,
+            atol=1e-12,
+        )
+        self.assertAlmostEqual(
+            abs(float(shifted_state.direction @ initial_state.direction)),
+            1.0,
+        )
+        self.assertAlmostEqual(
+            shifted_state.singularity_ratio,
+            initial_state.singularity_ratio,
+        )
+        self.assertAlmostEqual(shifted_state.activation, initial_state.activation)
+
+
+class ErrorLimitedFrameTaskTest(unittest.TestCase):
+    """Exercise the non-augmented per-substep Cartesian error limit."""
+
+    def test_position_error_is_limited_without_changing_stored_target(self) -> None:
+        setup = _setup("right")
+        configuration = mink.Configuration(setup.model, q=setup.data.qpos.copy())
+        task = ErrorLimitedFrameTask(
+            frame_name="right_ee_control_point",
+            frame_type="site",
+            position_cost=10.0,
+            orientation_cost=1.0,
+            position_error_limit=0.001,
+            orientation_error_limit=0.0,
+        )
+        target = setup.read_ee_pose("right").astype(np.float64)
+        target[0] += 0.1
+        task.set_target(pose_to_se3(target))
+
+        full_error = mink.FrameTask.compute_error(task, configuration)
+        limited_error = task.compute_limited_error(configuration)
+
+        self.assertGreater(float(np.linalg.norm(full_error[:3])), 0.09)
+        self.assertAlmostEqual(float(np.linalg.norm(limited_error[:3])), 0.001)
+        np.testing.assert_array_equal(limited_error[3:], full_error[3:])
+        self.assertIsNotNone(task.transform_target_to_world)
+
+    def test_zero_limits_match_native_frame_task_objective(self) -> None:
+        setup = _setup("right")
+        configuration = mink.Configuration(setup.model, q=setup.data.qpos.copy())
+        native = mink.FrameTask(
+            frame_name="right_ee_control_point",
+            frame_type="site",
+            position_cost=10.0,
+            orientation_cost=1.0,
+            lm_damping=0.01,
+        )
+        limited = ErrorLimitedFrameTask(
+            frame_name="right_ee_control_point",
+            frame_type="site",
+            position_cost=10.0,
+            orientation_cost=1.0,
+            position_error_limit=0.0,
+            orientation_error_limit=0.0,
+            lm_damping=0.01,
+        )
+        target = setup.read_ee_pose("right").astype(np.float64)
+        target[:3] += np.array([0.03, -0.02, 0.01])
+        target_se3 = pose_to_se3(target)
+        native.set_target(target_se3)
+        limited.set_target(target_se3)
+
+        native_objective = native.compute_qp_objective(configuration)
+        limited_objective = limited.compute_qp_objective(configuration)
+
+        np.testing.assert_array_equal(limited_objective.H, native_objective.H)
+        np.testing.assert_array_equal(limited_objective.c, native_objective.c)
+
+    def test_solver_schedule_ignores_pure_target_rotation(self) -> None:
+        setup = _setup("right")
+        kinematics = Kinematics(
+            setup,
+            IKParams(
+                frame_position_error_limit=0.003,
+                frame_error_limit_linear_slow=0.2,
+                frame_error_limit_linear_fast=0.5,
+                dt=0.004,
+                max_iters=5,
+            ),
+        )
+        pose = setup.read_ee_pose("right").astype(np.float64)
+        kinematics.set_target("right", pose)
+        rotated = pose.copy()
+        rotated[3:] = np.array([0.0, 1.0, 0.0, 0.0])
+        kinematics.set_target("right", rotated)
+
+        solver = kinematics._ik
+        assert solver is not None
+        task = solver._tasks["right"]
+        self.assertIsInstance(task, ErrorLimitedFrameTask)
+        assert isinstance(task, ErrorLimitedFrameTask)
+        self.assertEqual(task.limit_activation, 0.0)
+
+    def test_solver_schedule_rises_on_fast_target_translation(self) -> None:
+        setup = _setup("right")
+        kinematics = Kinematics(
+            setup,
+            IKParams(
+                frame_position_error_limit=0.003,
+                frame_error_limit_linear_slow=0.2,
+                frame_error_limit_linear_fast=0.5,
+                frame_error_limit_activation_rise_rate=4.0,
+                dt=0.004,
+                max_iters=5,
+            ),
+        )
+        pose = setup.read_ee_pose("right").astype(np.float64)
+        kinematics.set_target("right", pose)
+        translated = pose.copy()
+        translated[0] += 0.004
+        kinematics.set_target("right", translated)
+
+        solver = kinematics._ik
+        assert solver is not None
+        task = solver._tasks["right"]
+        assert isinstance(task, ErrorLimitedFrameTask)
+        self.assertAlmostEqual(task.limit_activation, 4.0 * 0.004)
 
 
 class SoftLimitTaskTest(unittest.TestCase):
@@ -697,6 +860,18 @@ class SolverTimingTest(unittest.TestCase):
                 "--tick-hz",
                 "250",
                 "--limit-velocity",
+                "--frame-position-error-limit",
+                "0.0003",
+                "--frame-orientation-error-limit",
+                "0.0048",
+                "--frame-error-limit-linear-slow",
+                "0.25",
+                "--frame-error-limit-linear-fast",
+                "0.55",
+                "--frame-error-limit-activation-rise-rate",
+                "5.0",
+                "--frame-error-limit-activation-fall-rate",
+                "1.5",
                 "--joint-limit-recovery-velocity-scale",
                 "1.2",
                 "--elbow-soft-limit-cost",
@@ -741,6 +916,12 @@ class SolverTimingTest(unittest.TestCase):
         params = ik_params_from_args(args)
 
         self.assertAlmostEqual(params.dt, 0.004)
+        self.assertEqual(params.frame_position_error_limit, 0.0003)
+        self.assertEqual(params.frame_orientation_error_limit, 0.0048)
+        self.assertEqual(params.frame_error_limit_linear_slow, 0.25)
+        self.assertEqual(params.frame_error_limit_linear_fast, 0.55)
+        self.assertEqual(params.frame_error_limit_activation_rise_rate, 5.0)
+        self.assertEqual(params.frame_error_limit_activation_fall_rate, 1.5)
         self.assertEqual(params.joint_limit_recovery_velocity_scale, 1.2)
         self.assertEqual(params.elbow_soft_limit_cost, 2.0)
         self.assertEqual(params.elbow_soft_limit_angle, 0.08)

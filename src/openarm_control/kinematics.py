@@ -41,6 +41,7 @@ import numpy as np
 import yaml
 
 from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S, ArmSetup
+from openarm_control.error_limited_frame_task import ErrorLimitedFrameTask
 from openarm_control.kinetic_energy_task import (
     KineticEnergyRegularizationTask,
 )
@@ -61,6 +62,12 @@ class IKParams:
 
     position_cost: float = 1.0
     orientation_cost: float = 1.0
+    frame_position_error_limit: float = 0.0
+    frame_orientation_error_limit: float = 0.0
+    frame_error_limit_linear_slow: float = 0.2
+    frame_error_limit_linear_fast: float = 0.5
+    frame_error_limit_activation_rise_rate: float = 4.0
+    frame_error_limit_activation_fall_rate: float = 2.0
     lm_damping: float = 0.01
     damping: float = 0.25
     solver: str = "daqp"
@@ -204,6 +211,7 @@ class _IKSolver:
             )
             for side in setup.sides
         }
+        self._control_dt = params.dt
         self._substep_dt = params.dt / params.max_iters
         self._max_iters = params.max_iters
         if not np.isfinite(params.measured_state_timeout) or (
@@ -222,14 +230,68 @@ class _IKSolver:
             orientation_cost=params.orientation_cost,
             lm_damping=params.lm_damping,
         )
-        self._tasks: dict[str, mink.FrameTask] = {
-            side: mink.FrameTask(
-                frame_name=_frame_name(setup, side),
-                frame_type=setup.frame_types[side],
-                **task_kwargs,
-            )
-            for side in setup.sides
-        }
+        for name, value in (
+            ("frame_position_error_limit", params.frame_position_error_limit),
+            (
+                "frame_orientation_error_limit",
+                params.frame_orientation_error_limit,
+            ),
+        ):
+            if not np.isfinite(value) or value < 0.0:
+                raise ValueError(f"{name} must be finite and non-negative.")
+        frame_error_limit_enabled = params.frame_position_error_limit > 0.0 or (
+            params.frame_orientation_error_limit > 0.0
+        )
+        if frame_error_limit_enabled:
+            if (
+                not 0.0
+                <= params.frame_error_limit_linear_slow
+                < params.frame_error_limit_linear_fast
+            ):
+                raise ValueError(
+                    "Expected 0 <= frame_error_limit_linear_slow < "
+                    "frame_error_limit_linear_fast."
+                )
+            if params.frame_error_limit_activation_rise_rate <= 0.0 or (
+                params.frame_error_limit_activation_fall_rate <= 0.0
+            ):
+                raise ValueError("Frame error-limit activation rates must be positive.")
+        self._frame_error_limit_linear_slow = params.frame_error_limit_linear_slow
+        self._frame_error_limit_linear_fast = params.frame_error_limit_linear_fast
+        self._frame_error_limit_activation_rise_rate = (
+            params.frame_error_limit_activation_rise_rate
+        )
+        self._frame_error_limit_activation_fall_rate = (
+            params.frame_error_limit_activation_fall_rate
+        )
+        if frame_error_limit_enabled:
+            self._tasks: dict[str, mink.FrameTask] = {
+                side: ErrorLimitedFrameTask(
+                    frame_name=_frame_name(setup, side),
+                    frame_type=setup.frame_types[side],
+                    position_error_limit=params.frame_position_error_limit,
+                    orientation_error_limit=params.frame_orientation_error_limit,
+                    **task_kwargs,
+                )
+                for side in setup.sides
+            }
+        else:
+            self._tasks = {
+                side: mink.FrameTask(
+                    frame_name=_frame_name(setup, side),
+                    frame_type=setup.frame_types[side],
+                    **task_kwargs,
+                )
+                for side in setup.sides
+            }
+        self._frame_error_limit_activation = {side: 0.0 for side in setup.sides}
+        self._frame_error_limit_previous_target_position: dict[
+            str,
+            np.ndarray,
+        ] = {}
+        for task in self._tasks.values():
+            if isinstance(task, ErrorLimitedFrameTask):
+                task.set_limit_activation(0.0)
 
         active_qpos = {
             int(qpos_index)
@@ -399,8 +461,67 @@ class _IKSolver:
         self._gripper = np.zeros(2, dtype=np.float32)
 
     def set_target(self, side: str, pose: np.ndarray) -> None:
-        self._tasks[side].set_target(pose_to_se3(pose))
+        target_pose = np.asarray(pose, dtype=np.float64)
+        self._tasks[side].set_target(pose_to_se3(target_pose))
+        self._update_frame_error_limit_schedule(side, target_pose)
         self._pending.discard(side)
+
+    def _update_frame_error_limit_schedule(
+        self,
+        side: str,
+        target_pose: np.ndarray,
+    ) -> None:
+        """Activate bounded task error from desired translational speed only."""
+        task = self._tasks[side]
+        if not isinstance(task, ErrorLimitedFrameTask):
+            return
+
+        target_position = target_pose[:3]
+        previous = self._frame_error_limit_previous_target_position.get(side)
+        linear_speed = (
+            0.0
+            if previous is None
+            else float(np.linalg.norm(target_position - previous)) / self._control_dt
+        )
+        self._frame_error_limit_previous_target_position[side] = target_position.copy()
+
+        unit_speed = np.clip(
+            (linear_speed - self._frame_error_limit_linear_slow)
+            / (
+                self._frame_error_limit_linear_fast
+                - self._frame_error_limit_linear_slow
+            ),
+            0.0,
+            1.0,
+        )
+        target_activation = float(unit_speed * unit_speed * (3.0 - 2.0 * unit_speed))
+        current_activation = self._frame_error_limit_activation[side]
+
+        # Once translational motion has activated the limiter, do not release
+        # accumulated lag as one large FrameTask request. The latch clears only
+        # after the full positional error is close to the bounded request.
+        if current_activation > 0.0 and task.position_error_limit > 0.0:
+            full_error = mink.FrameTask.compute_error(task, self._config)
+            if float(np.linalg.norm(full_error[:3])) > (
+                2.0 * task.position_error_limit
+            ):
+                target_activation = max(target_activation, current_activation)
+
+        difference = target_activation - current_activation
+        activation_rate = (
+            self._frame_error_limit_activation_rise_rate
+            if difference > 0.0
+            else self._frame_error_limit_activation_fall_rate
+        )
+        current_activation += float(
+            np.clip(
+                difference,
+                -activation_rate * self._control_dt,
+                activation_rate * self._control_dt,
+            )
+        )
+        self._frame_error_limit_activation[side] = current_activation
+        task.set_limit_activation(current_activation)
 
     def sync(self, values16: np.ndarray) -> None:
         qpos = self._config.data.qpos.copy()
@@ -662,6 +783,53 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         type=float,
         default=1.0,
         help="Orientation task cost (default: 1.0)",
+    )
+    parser.add_argument(
+        "--frame-position-error-limit",
+        type=float,
+        default=0.0,
+        help=(
+            "Maximum translational FrameTask error used by each IK substep in "
+            "meters; 0 keeps the full error."
+        ),
+    )
+    parser.add_argument(
+        "--frame-orientation-error-limit",
+        type=float,
+        default=0.0,
+        help=(
+            "Maximum rotational FrameTask error used by each IK substep in "
+            "radians; 0 keeps the full error."
+        ),
+    )
+    parser.add_argument(
+        "--frame-error-limit-linear-slow",
+        type=float,
+        default=0.2,
+        help=(
+            "Desired translational speed where FrameTask error limiting starts in m/s."
+        ),
+    )
+    parser.add_argument(
+        "--frame-error-limit-linear-fast",
+        type=float,
+        default=0.5,
+        help=(
+            "Desired translational speed where FrameTask error limiting reaches "
+            "full strength in m/s."
+        ),
+    )
+    parser.add_argument(
+        "--frame-error-limit-activation-rise-rate",
+        type=float,
+        default=4.0,
+        help="Maximum FrameTask error-limit activation increase per second.",
+    )
+    parser.add_argument(
+        "--frame-error-limit-activation-fall-rate",
+        type=float,
+        default=2.0,
+        help="Maximum FrameTask error-limit activation decrease per second.",
     )
     parser.add_argument(
         "--lm-damping",
@@ -933,6 +1101,16 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
     return IKParams(
         position_cost=args.pos_cost,
         orientation_cost=args.ori_cost,
+        frame_position_error_limit=args.frame_position_error_limit,
+        frame_orientation_error_limit=args.frame_orientation_error_limit,
+        frame_error_limit_linear_slow=args.frame_error_limit_linear_slow,
+        frame_error_limit_linear_fast=args.frame_error_limit_linear_fast,
+        frame_error_limit_activation_rise_rate=(
+            args.frame_error_limit_activation_rise_rate
+        ),
+        frame_error_limit_activation_fall_rate=(
+            args.frame_error_limit_activation_fall_rate
+        ),
         lm_damping=args.lm_damping,
         damping=args.damping,
         solver=args.solver,
