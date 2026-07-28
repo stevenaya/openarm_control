@@ -37,18 +37,33 @@ Solver configuration passed to `Kinematics`. All fields have defaults.
 
 | Field | Default | Description |
 |---|---|---|
-| `position_cost` | `1.0` | Position task weight |
+| `position_cost` | `10.0` | Position task weight |
 | `orientation_cost` | `1.0` | Orientation task weight |
-| `lm_damping` | `0.01` | Per-task Levenberg-Marquardt damping |
-| `damping` | `0.25` | Global Tikhonov regularization |
+| `lm_damping` | `0.02` | Per-task Levenberg-Marquardt damping |
+| `damping` | `0.1` | Global Tikhonov regularization |
 | `solver` | `"daqp"` | QP backend |
-| `posture_cost` | `0.01` | Neutral posture task weight (0 = disabled) |
-| `diag_reg` | `0.0` | QP diagonal regularization |
-| `dt` | `0.1` | Integration timestep per iteration |
-| `max_iters` | `5` | IK iterations per solve |
+| `posture_cost` | `0.0` | Full home posture task weight (0 = disabled) |
+| `dt` | `0.1` | Outer control period, divided across IK iterations |
+| `max_iters` | `5` | IK sub-iterations per solve |
 | `velocity_limits` | `None` | Per-joint velocity limits (applied in rad/s from `config.py`); `None` = disabled |
+| `frame_position_error_limit` | `0.003` | Maximum position error requested per QP substep |
+| `nullspace_cost` | `12.0` | Fixed-home nullspace posture cost |
+| `nullspace_return_rate` | `1.6` | Nullspace return rate in s⁻¹ |
+| `joint_braking_distance` | `0.5` | Joint-limit braking distance in radians |
+| `singularity_max_approach_rate` | `0.25` | Maximum singularity-ratio approach rate |
+| `kinetic_energy_cost` | `3e-5` | Kinetic-energy regularization cost |
 
 Build from CLI args with `register_ik_args` + `ik_params_from_args`:
+
+```bash
+python your_ik_node.py --tick-hz 250 --limit-velocity
+```
+
+The remaining curve-shape and threshold parameters are regular `IKParams`
+fields but are intentionally not exposed as CLI flags. Call
+`update_measured_state()` with fresh driver state for state-aware limits; the
+caller owns freshness and should call `clear_measured_state()` when that state
+expires.
 
 ## Related links
 

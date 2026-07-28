@@ -1,0 +1,159 @@
+# Copyright 2026 Enactic, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Composition wrapper that bounds the error request of a Mink frame task."""
+
+from __future__ import annotations
+
+import mink
+import numpy as np
+
+
+class BoundedFrameTask(mink.Task):
+    """Bound a native frame task's first-order request without changing its target."""
+
+    def __init__(
+        self,
+        frame_task: mink.FrameTask | mink.RelativeFrameTask,
+        *,
+        position_error_limit: float,
+        orientation_error_limit: float = 0.0,
+        control_dt: float,
+        speed_slow: float,
+        speed_fast: float,
+        latch_multiplier: float,
+    ) -> None:
+        """Wrap either a world-frame or relative-frame Mink task."""
+        if not isinstance(frame_task, (mink.FrameTask, mink.RelativeFrameTask)):
+            raise TypeError("frame_task must be a Mink frame task.")
+        for name, value in (
+            ("position_error_limit", position_error_limit),
+            ("orientation_error_limit", orientation_error_limit),
+        ):
+            if not np.isfinite(value) or value < 0.0:
+                raise ValueError(f"{name} must be finite and non-negative.")
+        if not np.isfinite(control_dt) or control_dt <= 0.0:
+            raise ValueError("control_dt must be finite and positive.")
+        if not np.isfinite(speed_slow) or speed_slow < 0.0:
+            raise ValueError("speed_slow must be finite and non-negative.")
+        if not np.isfinite(speed_fast) or speed_fast <= speed_slow:
+            raise ValueError("speed_fast must be finite and greater than speed_slow.")
+        if not np.isfinite(latch_multiplier) or latch_multiplier <= 0.0:
+            raise ValueError("latch_multiplier must be finite and positive.")
+
+        super().__init__(
+            cost=frame_task.cost.copy(),
+            gain=frame_task.gain,
+            lm_damping=frame_task.lm_damping,
+        )
+        self.frame_task = frame_task
+        self.position_error_limit = float(position_error_limit)
+        self.orientation_error_limit = float(orientation_error_limit)
+        self._control_dt = float(control_dt)
+        self._speed_slow = float(speed_slow)
+        self._speed_fast = float(speed_fast)
+        self._latch_multiplier = float(latch_multiplier)
+        self._previous_target_position: np.ndarray | None = None
+        self.limit_activation = 1.0
+
+    def __getattr__(self, name: str) -> object:
+        """Expose native frame metadata such as frame and root names."""
+        return getattr(self.frame_task, name)
+
+    def set_target(self, transform: mink.SE3) -> None:
+        """Set the target on the wrapped native task."""
+        self.frame_task.set_target(transform)
+
+    def set_target_and_update_schedule(
+        self,
+        transform: mink.SE3,
+        configuration: mink.Configuration,
+    ) -> None:
+        """Set a target and schedule error limiting from speed and accumulated lag."""
+        self.set_target(transform)
+        position = transform.translation()
+        previous = self._previous_target_position
+        speed = (
+            0.0
+            if previous is None
+            else float(np.linalg.norm(position - previous)) / self._control_dt
+        )
+        self._previous_target_position = position.copy()
+
+        u = np.clip(
+            (speed - self._speed_slow) / (self._speed_fast - self._speed_slow),
+            0.0,
+            1.0,
+        )
+        activation = float(u * u * (3.0 - 2.0 * u))
+        if self.limit_activation > 0.0:
+            full_error = self.compute_full_error(configuration)
+            if float(np.linalg.norm(full_error[:3])) > (
+                self._latch_multiplier * self.position_error_limit
+            ):
+                activation = max(activation, self.limit_activation)
+        self.set_limit_activation(activation)
+
+    def set_target_from_configuration(self, configuration: mink.Configuration) -> None:
+        """Set the wrapped target from a configuration."""
+        self.frame_task.set_target_from_configuration(configuration)
+
+    def set_limit_activation(self, activation: float) -> None:
+        """Blend continuously between the full and bounded error requests."""
+        if not np.isfinite(activation) or not 0.0 <= activation <= 1.0:
+            raise ValueError("Frame error-limit activation must be in [0, 1].")
+        self.limit_activation = float(activation)
+
+    def compute_full_error(self, configuration: mink.Configuration) -> np.ndarray:
+        """Return the native task error."""
+        return self.frame_task.compute_error(configuration)
+
+    def compute_limited_error(self, configuration: mink.Configuration) -> np.ndarray:
+        """Return independently norm-limited position and orientation errors."""
+        error = self.compute_full_error(configuration).copy()
+        for part, limit in (
+            (slice(0, 3), self.position_error_limit),
+            (slice(3, 6), self.orientation_error_limit),
+        ):
+            norm = float(np.linalg.norm(error[part]))
+            if limit > 0.0 and norm > limit:
+                error[part] *= limit / norm
+        return error
+
+    def compute_error(self, configuration: mink.Configuration) -> np.ndarray:
+        """Return the full error, matching the wrapped Mink task API."""
+        return self.compute_full_error(configuration)
+
+    def compute_jacobian(self, configuration: mink.Configuration) -> np.ndarray:
+        """Return the wrapped task Jacobian."""
+        return self.frame_task.compute_jacobian(configuration)
+
+    def compute_qp_objective(
+        self,
+        configuration: mink.Configuration,
+    ) -> mink.Objective:
+        """Assemble the native objective with only its error request modulated."""
+        if self.limit_activation == 0.0 or (
+            self.position_error_limit == 0.0 and self.orientation_error_limit == 0.0
+        ):
+            return self.frame_task.compute_qp_objective(configuration)
+
+        full_error = self.compute_full_error(configuration)
+        limited_error = self.compute_limited_error(configuration)
+        error = full_error + self.limit_activation * (limited_error - full_error)
+        return self._assemble_qp(
+            error,
+            self.compute_jacobian(configuration),
+            configuration._eye_nv,
+        )
