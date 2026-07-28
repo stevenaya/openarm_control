@@ -15,6 +15,7 @@
 """Kinematics and control utilities for OpenArm."""
 
 from .config import ArmSetup, register_common_args, setup_from_args
+from .error_limited_frame_task import ErrorLimitedFrameTask
 from .kinematics import (
     IKParams,
     Kinematics,
@@ -27,6 +28,7 @@ from .nullspace_posture_task import NullspacePostureTask
 from .poses import read_ee_pose, pose_to_se3, se3_to_pose
 from .recoverable_configuration_limit import RecoverableConfigurationLimit
 from .soft_limit_task import SoftLimitTask
+from .speed_scheduled_elbow_task import SpeedScheduledElbowTask
 from .singularity_approach_limit import SingularityApproachLimit
 
 __all__ = [
@@ -35,9 +37,11 @@ __all__ = [
     # high-level interface
     "Kinematics",
     "IKParams",
+    "ErrorLimitedFrameTask",
     "JointBrakingLimit",
     "LowerBoundBrakingLimit",
     "SoftLimitTask",
+    "SpeedScheduledElbowTask",
     "NullspacePostureTask",
     "RecoverableConfigurationLimit",
     "SingularityApproachLimit",

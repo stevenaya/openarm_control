@@ -41,6 +41,7 @@ import numpy as np
 import yaml
 
 from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S, ArmSetup
+from openarm_control.error_limited_frame_task import ErrorLimitedFrameTask
 from openarm_control.kinetic_energy_task import (
     KineticEnergyRegularizationTask,
 )
@@ -52,6 +53,7 @@ from openarm_control.recoverable_configuration_limit import (
     RecoverableConfigurationLimit,
 )
 from openarm_control.soft_limit_task import SoftLimitTask
+from openarm_control.speed_scheduled_elbow_task import SpeedScheduledElbowTask
 from openarm_control.singularity_approach_limit import SingularityApproachLimit
 
 
@@ -61,6 +63,12 @@ class IKParams:
 
     position_cost: float = 1.0
     orientation_cost: float = 1.0
+    frame_position_error_limit: float = 0.0
+    frame_orientation_error_limit: float = 0.0
+    frame_error_limit_linear_slow: float = 0.2
+    frame_error_limit_linear_fast: float = 0.5
+    frame_error_limit_activation_rise_rate: float = 4.0
+    frame_error_limit_activation_fall_rate: float = 2.0
     lm_damping: float = 0.01
     damping: float = 0.25
     solver: str = "daqp"
@@ -76,6 +84,24 @@ class IKParams:
     nullspace_singularity_low: float = 0.02
     nullspace_singularity_high: float = 0.05
     nullspace_characteristic_length: float = 0.3
+    speed_scheduled_elbow: bool = False
+    speed_elbow_linear_slow: float = 0.45
+    speed_elbow_linear_fast: float = 0.6
+    speed_elbow_activation_rise_rate: float = 4.0
+    speed_elbow_activation_fall_rate: float = 2.0
+    speed_elbow_velocity_cost: float = 0.1
+    speed_elbow_velocity_scale: float = 0.25
+    speed_elbow_return_rate: float = 0.5
+    speed_elbow_max_return_speed: float = 0.1
+    speed_elbow_max_return_acceleration: float = 2.0
+    speed_elbow_corridor_cost: float = 0.0
+    speed_elbow_corridor_margin_slow: float = np.pi
+    speed_elbow_corridor_margin_fast: float = 0.0
+    speed_elbow_corridor_return_rate: float = 0.5
+    speed_elbow_corridor_max_speed: float = 0.1
+    speed_elbow_projection: str = "direct"
+    speed_elbow_min_swivel_radius: float = 0.02
+    speed_elbow_fd_epsilon: float = 1e-5
     elbow_soft_limit_cost: float = 0.0
     elbow_soft_limit_angle: float = 0.08
     elbow_soft_limit_max_speed: float = 0.2
@@ -204,6 +230,7 @@ class _IKSolver:
             )
             for side in setup.sides
         }
+        self._control_dt = params.dt
         self._substep_dt = params.dt / params.max_iters
         self._max_iters = params.max_iters
         if not np.isfinite(params.measured_state_timeout) or (
@@ -222,14 +249,68 @@ class _IKSolver:
             orientation_cost=params.orientation_cost,
             lm_damping=params.lm_damping,
         )
-        self._tasks: dict[str, mink.FrameTask] = {
-            side: mink.FrameTask(
-                frame_name=_frame_name(setup, side),
-                frame_type=setup.frame_types[side],
-                **task_kwargs,
-            )
-            for side in setup.sides
-        }
+        for name, value in (
+            ("frame_position_error_limit", params.frame_position_error_limit),
+            (
+                "frame_orientation_error_limit",
+                params.frame_orientation_error_limit,
+            ),
+        ):
+            if not np.isfinite(value) or value < 0.0:
+                raise ValueError(f"{name} must be finite and non-negative.")
+        frame_error_limit_enabled = params.frame_position_error_limit > 0.0 or (
+            params.frame_orientation_error_limit > 0.0
+        )
+        if frame_error_limit_enabled:
+            if (
+                not 0.0
+                <= params.frame_error_limit_linear_slow
+                < (params.frame_error_limit_linear_fast)
+            ):
+                raise ValueError(
+                    "Expected 0 <= frame_error_limit_linear_slow < "
+                    "frame_error_limit_linear_fast."
+                )
+            if params.frame_error_limit_activation_rise_rate <= 0.0 or (
+                params.frame_error_limit_activation_fall_rate <= 0.0
+            ):
+                raise ValueError("Frame error-limit activation rates must be positive.")
+        self._frame_error_limit_linear_slow = params.frame_error_limit_linear_slow
+        self._frame_error_limit_linear_fast = params.frame_error_limit_linear_fast
+        self._frame_error_limit_activation_rise_rate = (
+            params.frame_error_limit_activation_rise_rate
+        )
+        self._frame_error_limit_activation_fall_rate = (
+            params.frame_error_limit_activation_fall_rate
+        )
+        if frame_error_limit_enabled:
+            self._tasks: dict[str, mink.FrameTask] = {
+                side: ErrorLimitedFrameTask(
+                    frame_name=_frame_name(setup, side),
+                    frame_type=setup.frame_types[side],
+                    position_error_limit=params.frame_position_error_limit,
+                    orientation_error_limit=(params.frame_orientation_error_limit),
+                    **task_kwargs,
+                )
+                for side in setup.sides
+            }
+        else:
+            self._tasks = {
+                side: mink.FrameTask(
+                    frame_name=_frame_name(setup, side),
+                    frame_type=setup.frame_types[side],
+                    **task_kwargs,
+                )
+                for side in setup.sides
+            }
+        self._frame_error_limit_activation = {side: 0.0 for side in setup.sides}
+        self._frame_error_limit_previous_target_position: dict[
+            str,
+            np.ndarray,
+        ] = {}
+        for task in self._tasks.values():
+            if isinstance(task, ErrorLimitedFrameTask):
+                task.set_limit_activation(0.0)
 
         active_qpos = {
             int(qpos_index)
@@ -377,6 +458,39 @@ class _IKSolver:
                     characteristic_length=params.nullspace_characteristic_length,
                 )
 
+        self._speed_elbow_tasks: dict[str, SpeedScheduledElbowTask] = {}
+        if params.speed_scheduled_elbow:
+            for side in setup.sides:
+                self._speed_elbow_tasks[side] = SpeedScheduledElbowTask(
+                    model=setup.model,
+                    side=side,
+                    frame_task=self._tasks[side],
+                    dof_indices=self._arm_dofs_by_side[side],
+                    home_qpos=home_qpos,
+                    control_dt=params.dt,
+                    substep_dt=self._substep_dt,
+                    linear_speed_slow=params.speed_elbow_linear_slow,
+                    linear_speed_fast=params.speed_elbow_linear_fast,
+                    activation_rise_rate=(params.speed_elbow_activation_rise_rate),
+                    activation_fall_rate=(params.speed_elbow_activation_fall_rate),
+                    velocity_cost_fast=params.speed_elbow_velocity_cost,
+                    velocity_scale=params.speed_elbow_velocity_scale,
+                    return_rate=params.speed_elbow_return_rate,
+                    max_return_speed=params.speed_elbow_max_return_speed,
+                    max_return_acceleration=(
+                        params.speed_elbow_max_return_acceleration
+                    ),
+                    corridor_cost_fast=params.speed_elbow_corridor_cost,
+                    corridor_margin_slow=(params.speed_elbow_corridor_margin_slow),
+                    corridor_margin_fast=(params.speed_elbow_corridor_margin_fast),
+                    corridor_return_rate=(params.speed_elbow_corridor_return_rate),
+                    corridor_max_speed=(params.speed_elbow_corridor_max_speed),
+                    projection_mode=params.speed_elbow_projection,
+                    characteristic_length=(params.nullspace_characteristic_length),
+                    min_swivel_radius=(params.speed_elbow_min_swivel_radius),
+                    finite_difference_epsilon=(params.speed_elbow_fd_epsilon),
+                )
+
         self._elbow_soft_limit_tasks: dict[str, SoftLimitTask] = {}
         if params.elbow_soft_limit_cost > 0.0:
             for side in setup.sides:
@@ -396,11 +510,75 @@ class _IKSolver:
             self._solver_params["diag_reg"] = params.diag_reg
 
         self._pending: set[str] = set(setup.sides)
+        self._target_poses: dict[str, np.ndarray] = {}
         self._gripper = np.zeros(2, dtype=np.float32)
 
     def set_target(self, side: str, pose: np.ndarray) -> None:
-        self._tasks[side].set_target(pose_to_se3(pose))
+        target_pose = np.asarray(pose, dtype=np.float64)
+        self._tasks[side].set_target(pose_to_se3(target_pose))
+        self._update_frame_error_limit_schedule(side, target_pose)
+        self._target_poses[side] = target_pose.copy()
         self._pending.discard(side)
+
+    def _update_frame_error_limit_schedule(
+        self,
+        side: str,
+        target_pose: np.ndarray,
+    ) -> None:
+        """Activate bounded task error from desired translational speed only."""
+        task = self._tasks[side]
+        if not isinstance(task, ErrorLimitedFrameTask):
+            return
+
+        target_position = target_pose[:3]
+        previous = self._frame_error_limit_previous_target_position.get(side)
+        linear_speed = (
+            0.0
+            if previous is None
+            else float(np.linalg.norm(target_position - previous)) / self._control_dt
+        )
+        self._frame_error_limit_previous_target_position[side] = target_position.copy()
+
+        unit_speed = np.clip(
+            (linear_speed - self._frame_error_limit_linear_slow)
+            / (
+                self._frame_error_limit_linear_fast
+                - self._frame_error_limit_linear_slow
+            ),
+            0.0,
+            1.0,
+        )
+        target_activation = float(unit_speed * unit_speed * (3.0 - 2.0 * unit_speed))
+        current_activation = self._frame_error_limit_activation[side]
+
+        # Once translational motion has activated the limiter, do not release
+        # accumulated lag as one large FrameTask request. The latch clears only
+        # after the full positional error is close to the bounded request.
+        if current_activation > 0.0 and task.position_error_limit > 0.0:
+            full_error = mink.FrameTask.compute_error(task, self._config)
+            if float(np.linalg.norm(full_error[:3])) > (
+                2.0 * task.position_error_limit
+            ):
+                target_activation = max(
+                    target_activation,
+                    current_activation,
+                )
+
+        difference = target_activation - current_activation
+        activation_rate = (
+            self._frame_error_limit_activation_rise_rate
+            if difference > 0.0
+            else self._frame_error_limit_activation_fall_rate
+        )
+        current_activation += float(
+            np.clip(
+                difference,
+                -activation_rate * self._control_dt,
+                activation_rate * self._control_dt,
+            )
+        )
+        self._frame_error_limit_activation[side] = current_activation
+        task.set_limit_activation(current_activation)
 
     def sync(self, values16: np.ndarray) -> None:
         qpos = self._config.data.qpos.copy()
@@ -467,12 +645,18 @@ class _IKSolver:
 
     def solve(self) -> np.ndarray | None:
         self._expire_stale_measured_state()
+        for side, task in self._speed_elbow_tasks.items():
+            target_pose = self._target_poses.get(side)
+            if target_pose is not None:
+                task.prepare(self._config, target_pose)
+
         tasks = list(self._tasks.values())
         if self._posture_cost > 0.0:
             tasks.append(self._posture_task)
         if self._kinetic_energy_task is not None:
             tasks.append(self._kinetic_energy_task)
         tasks.extend(self._nullspace_tasks.values())
+        tasks.extend(self._speed_elbow_tasks.values())
         tasks.extend(self._elbow_soft_limit_tasks.values())
         constraints = [self._freeze_task] if self._freeze_task else []
 
@@ -554,9 +738,7 @@ def _dof_indices_for_qpos(
         joint_id = int(joint_ids[0])
         joint_type = model.jnt_type[joint_id]
         if joint_type not in (mujoco.mjtJoint.mjJNT_HINGE, mujoco.mjtJoint.mjJNT_SLIDE):
-            raise ValueError(
-                "IK arm joints must be scalar hinge or slide joints."
-            )
+            raise ValueError("IK arm joints must be scalar hinge or slide joints.")
         dof_indices.append(int(model.jnt_dofadr[joint_id]))
     return np.asarray(dof_indices, dtype=int)
 
@@ -664,6 +846,53 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         help="Orientation task cost (default: 1.0)",
     )
     parser.add_argument(
+        "--frame-position-error-limit",
+        type=float,
+        default=0.0,
+        help=(
+            "Maximum translational FrameTask error used by each IK substep in "
+            "meters; 0 keeps the full error."
+        ),
+    )
+    parser.add_argument(
+        "--frame-orientation-error-limit",
+        type=float,
+        default=0.0,
+        help=(
+            "Maximum rotational FrameTask error used by each IK substep in "
+            "radians; 0 keeps the full error."
+        ),
+    )
+    parser.add_argument(
+        "--frame-error-limit-linear-slow",
+        type=float,
+        default=0.2,
+        help=(
+            "Desired translational speed where FrameTask error limiting starts in m/s."
+        ),
+    )
+    parser.add_argument(
+        "--frame-error-limit-linear-fast",
+        type=float,
+        default=0.5,
+        help=(
+            "Desired translational speed where FrameTask error limiting reaches "
+            "full strength in m/s."
+        ),
+    )
+    parser.add_argument(
+        "--frame-error-limit-activation-rise-rate",
+        type=float,
+        default=4.0,
+        help="Maximum FrameTask error-limit activation increase per second.",
+    )
+    parser.add_argument(
+        "--frame-error-limit-activation-fall-rate",
+        type=float,
+        default=2.0,
+        help="Maximum FrameTask error-limit activation decrease per second.",
+    )
+    parser.add_argument(
         "--lm-damping",
         type=float,
         default=0.01,
@@ -767,6 +996,86 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         type=float,
         default=0.3,
         help="Length in meters used to normalize translational Jacobian rows.",
+    )
+    parser.add_argument(
+        "--speed-scheduled-elbow",
+        action="store_true",
+        help=(
+            "Enable translation-speed-scheduled spatial elbow regularization "
+            "without augmenting the Mink QP."
+        ),
+    )
+    parser.add_argument(
+        "--speed-elbow-linear-slow",
+        type=float,
+        default=0.45,
+        help="Target linear speed where elbow scheduling starts in m/s.",
+    )
+    parser.add_argument(
+        "--speed-elbow-linear-fast",
+        type=float,
+        default=0.6,
+        help="Target linear speed where elbow scheduling reaches full strength.",
+    )
+    parser.add_argument(
+        "--speed-elbow-activation-rise-rate",
+        type=float,
+        default=4.0,
+        help="Maximum elbow activation increase per second.",
+    )
+    parser.add_argument(
+        "--speed-elbow-activation-fall-rate",
+        type=float,
+        default=2.0,
+        help="Maximum elbow activation decrease per second.",
+    )
+    parser.add_argument(
+        "--speed-elbow-velocity-cost",
+        type=float,
+        default=0.1,
+        help="Full-speed normalized spatial-elbow velocity task cost.",
+    )
+    parser.add_argument(
+        "--speed-elbow-return-rate",
+        type=float,
+        default=0.5,
+        help="Full-speed spatial-elbow return rate toward home in 1/s.",
+    )
+    parser.add_argument(
+        "--speed-elbow-max-return-speed",
+        type=float,
+        default=0.1,
+        help="Maximum scheduled spatial-elbow return speed in rad/s.",
+    )
+    parser.add_argument(
+        "--speed-elbow-max-return-acceleration",
+        type=float,
+        default=2.0,
+        help="Maximum change of scheduled elbow return speed in rad/s^2.",
+    )
+    parser.add_argument(
+        "--speed-elbow-corridor-cost",
+        type=float,
+        default=0.0,
+        help=(
+            "Optional soft cost outside the latched fast-entry-to-home elbow "
+            "corridor; 0 disables the corridor."
+        ),
+    )
+    parser.add_argument(
+        "--speed-elbow-corridor-margin-fast",
+        type=float,
+        default=0.0,
+        help="Extra high-speed elbow corridor margin in radians.",
+    )
+    parser.add_argument(
+        "--speed-elbow-projection",
+        choices=("direct", "exact-nullspace"),
+        default="direct",
+        help=(
+            "Apply J_psi directly or project it into the structural exact "
+            "nullspace (default: direct)."
+        ),
     )
     parser.add_argument(
         "--elbow-soft-limit-cost",
@@ -933,6 +1242,16 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
     return IKParams(
         position_cost=args.pos_cost,
         orientation_cost=args.ori_cost,
+        frame_position_error_limit=args.frame_position_error_limit,
+        frame_orientation_error_limit=args.frame_orientation_error_limit,
+        frame_error_limit_linear_slow=args.frame_error_limit_linear_slow,
+        frame_error_limit_linear_fast=args.frame_error_limit_linear_fast,
+        frame_error_limit_activation_rise_rate=(
+            args.frame_error_limit_activation_rise_rate
+        ),
+        frame_error_limit_activation_fall_rate=(
+            args.frame_error_limit_activation_fall_rate
+        ),
         lm_damping=args.lm_damping,
         damping=args.damping,
         solver=args.solver,
@@ -948,6 +1267,18 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         nullspace_singularity_low=args.nullspace_singularity_low,
         nullspace_singularity_high=args.nullspace_singularity_high,
         nullspace_characteristic_length=args.nullspace_characteristic_length,
+        speed_scheduled_elbow=args.speed_scheduled_elbow,
+        speed_elbow_linear_slow=args.speed_elbow_linear_slow,
+        speed_elbow_linear_fast=args.speed_elbow_linear_fast,
+        speed_elbow_activation_rise_rate=(args.speed_elbow_activation_rise_rate),
+        speed_elbow_activation_fall_rate=(args.speed_elbow_activation_fall_rate),
+        speed_elbow_velocity_cost=args.speed_elbow_velocity_cost,
+        speed_elbow_return_rate=args.speed_elbow_return_rate,
+        speed_elbow_max_return_speed=args.speed_elbow_max_return_speed,
+        speed_elbow_max_return_acceleration=(args.speed_elbow_max_return_acceleration),
+        speed_elbow_corridor_cost=args.speed_elbow_corridor_cost,
+        speed_elbow_corridor_margin_fast=(args.speed_elbow_corridor_margin_fast),
+        speed_elbow_projection=args.speed_elbow_projection,
         elbow_soft_limit_cost=args.elbow_soft_limit_cost,
         elbow_soft_limit_angle=args.elbow_soft_limit_angle,
         elbow_soft_limit_max_speed=args.elbow_soft_limit_max_speed,
@@ -961,12 +1292,8 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         ),
         joint_limit_braking_exponent=args.joint_limit_braking_exponent,
         joint_limit_braking_guard_margin=args.joint_limit_braking_guard_margin,
-        joint_limit_braking_reaction_time=(
-            args.joint_limit_braking_reaction_time
-        ),
-        joint_limit_braking_distance_buffer=(
-            args.joint_limit_braking_distance_buffer
-        ),
+        joint_limit_braking_reaction_time=(args.joint_limit_braking_reaction_time),
+        joint_limit_braking_distance_buffer=(args.joint_limit_braking_distance_buffer),
         singularity_approach_limit=args.singularity_approach_limit,
         singularity_ratio_stop=args.singularity_ratio_stop,
         singularity_ratio_slow=args.singularity_ratio_slow,

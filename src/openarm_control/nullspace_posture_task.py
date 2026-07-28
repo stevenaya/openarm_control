@@ -23,6 +23,8 @@ import mujoco
 import numpy as np
 import numpy.typing as npt
 
+from .singularity import normalized_arm_jacobian
+
 
 @dataclass(frozen=True)
 class NullspaceState:
@@ -116,6 +118,7 @@ class NullspacePostureTask(mink.Task):
             )
 
         super().__init__(cost=np.array([cost], dtype=np.float64))
+        self._nominal_cost = cost
         self._base_cost = cost
         self._model = model
         self._frame_task = frame_task
@@ -130,13 +133,21 @@ class NullspacePostureTask(mink.Task):
         self._previous_direction: np.ndarray | None = None
         self.last_state: NullspaceState | None = None
 
+    def set_cost_scale(self, scale: float) -> None:
+        """Scale the fixed-home task cost without changing its target."""
+        if not np.isfinite(scale) or scale < 0.0:
+            raise ValueError("Nullspace cost scale must be finite and non-negative.")
+        self._base_cost = self._nominal_cost * float(scale)
+
     def _compute_terms(
         self, configuration: mink.Configuration
     ) -> tuple[np.ndarray, np.ndarray]:
-        frame_jacobian = self._frame_task.compute_jacobian(configuration)
-        arm_jacobian = frame_jacobian[:, self._dof_indices]
-        normalized_jacobian = arm_jacobian.copy()
-        normalized_jacobian[:3] /= self._characteristic_length
+        normalized_jacobian = normalized_arm_jacobian(
+            self._frame_task,
+            configuration,
+            self._dof_indices,
+            self._characteristic_length,
+        )
 
         direction, singular_values = structural_nullspace_direction(
             normalized_jacobian, self._previous_direction
@@ -182,7 +193,7 @@ class NullspacePostureTask(mink.Task):
             posture_error=posture_error,
             return_speed=return_speed,
             displacement=displacement,
-            jacobian_residual=float(np.linalg.norm(arm_jacobian @ direction)),
+            jacobian_residual=float(np.linalg.norm(normalized_jacobian @ direction)),
         )
         return error, jacobian
 
