@@ -1,0 +1,473 @@
+{
+  "profiles": [
+    {
+      "name": "current_latch_p0p003_r0",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.0
+    },
+    {
+      "name": "current_latch_p0p003_r0p02",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.02
+    },
+    {
+      "name": "current_latch_p0p003_r0p03",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_latch_p0p003_r0p04",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "current_latch_p0p003_r0p06",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.06
+    },
+    {
+      "name": "current_no_latch_p0p003_r0",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.0
+    },
+    {
+      "name": "current_no_latch_p0p003_r0p02",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.02
+    },
+    {
+      "name": "current_no_latch_p0p003_r0p03",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_no_latch_p0p003_r0p04",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "current_no_latch_p0p003_r0p06",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.06
+    },
+    {
+      "name": "historical_latch_p0p003_r0",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.0
+    },
+    {
+      "name": "historical_latch_p0p003_r0p02",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.02
+    },
+    {
+      "name": "historical_latch_p0p003_r0p03",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "historical_latch_p0p003_r0p04",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "historical_latch_p0p003_r0p06",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.06
+    },
+    {
+      "name": "historical_no_latch_p0p003_r0",
+      "position_mode": "historical_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.0
+    },
+    {
+      "name": "historical_no_latch_p0p003_r0p02",
+      "position_mode": "historical_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.02
+    },
+    {
+      "name": "historical_no_latch_p0p003_r0p03",
+      "position_mode": "historical_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "historical_no_latch_p0p003_r0p04",
+      "position_mode": "historical_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "historical_no_latch_p0p003_r0p06",
+      "position_mode": "historical_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.06
+    },
+    {
+      "name": "always_cap_p0p003_r0",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.0
+    },
+    {
+      "name": "always_cap_p0p003_r0p02",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.02
+    },
+    {
+      "name": "always_cap_p0p003_r0p03",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "always_cap_p0p003_r0p04",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "always_cap_p0p003_r0p06",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.06
+    },
+    {
+      "name": "position_off_p0_r0",
+      "position_mode": "position_off",
+      "position_limit_m": 0.0,
+      "orientation_limit_rad": 0.0
+    },
+    {
+      "name": "position_off_p0_r0p02",
+      "position_mode": "position_off",
+      "position_limit_m": 0.0,
+      "orientation_limit_rad": 0.02
+    },
+    {
+      "name": "position_off_p0_r0p03",
+      "position_mode": "position_off",
+      "position_limit_m": 0.0,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "position_off_p0_r0p04",
+      "position_mode": "position_off",
+      "position_limit_m": 0.0,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "position_off_p0_r0p06",
+      "position_mode": "position_off",
+      "position_limit_m": 0.0,
+      "orientation_limit_rad": 0.06
+    },
+    {
+      "name": "current_latch_p0p0015_r0p03",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.0015,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_latch_p0p002_r0p03",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.002,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_latch_p0p004_r0p03",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.004,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_latch_p0p006_r0p03",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.006,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_latch_p0p009_r0p03",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.009,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_latch_p0p012_r0p03",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.012,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_no_latch_p0p0015_r0p03",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.0015,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_no_latch_p0p002_r0p03",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.002,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_no_latch_p0p004_r0p03",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.004,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_no_latch_p0p006_r0p03",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.006,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_no_latch_p0p009_r0p03",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.009,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_no_latch_p0p012_r0p03",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.012,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "historical_latch_p0p0015_r0p03",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.0015,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "historical_latch_p0p002_r0p03",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.002,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "historical_latch_p0p004_r0p03",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.004,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "historical_latch_p0p006_r0p03",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.006,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "historical_latch_p0p009_r0p03",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.009,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "historical_latch_p0p012_r0p03",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.012,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "always_cap_p0p0015_r0p03",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.0015,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "always_cap_p0p002_r0p03",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.002,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "always_cap_p0p004_r0p03",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.004,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "always_cap_p0p006_r0p03",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.006,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "always_cap_p0p009_r0p03",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.009,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "always_cap_p0p012_r0p03",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.012,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_latch_p0p003_r0p01",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.01
+    },
+    {
+      "name": "current_latch_p0p003_r0p015",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.015
+    },
+    {
+      "name": "current_latch_p0p003_r0p025",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.025
+    },
+    {
+      "name": "current_latch_p0p003_r0p05",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.05
+    },
+    {
+      "name": "current_latch_p0p003_r0p08",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.08
+    },
+    {
+      "name": "current_latch_p0p003_r0p12",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.12
+    },
+    {
+      "name": "current_no_latch_p0p003_r0p01",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.01
+    },
+    {
+      "name": "current_no_latch_p0p003_r0p015",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.015
+    },
+    {
+      "name": "current_no_latch_p0p003_r0p025",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.025
+    },
+    {
+      "name": "current_no_latch_p0p003_r0p05",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.05
+    },
+    {
+      "name": "current_no_latch_p0p003_r0p08",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.08
+    },
+    {
+      "name": "current_no_latch_p0p003_r0p12",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.12
+    },
+    {
+      "name": "always_cap_p0p003_r0p01",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.01
+    },
+    {
+      "name": "always_cap_p0p003_r0p015",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.015
+    },
+    {
+      "name": "always_cap_p0p003_r0p025",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.025
+    },
+    {
+      "name": "always_cap_p0p003_r0p05",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.05
+    },
+    {
+      "name": "always_cap_p0p003_r0p08",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.08
+    },
+    {
+      "name": "always_cap_p0p003_r0p12",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.12
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "retract_m0p10_v0p8",
+      "kind": "fast_retract",
+      "speed": 0.8,
+      "lateral_m": -0.1
+    },
+    {
+      "name": "chest_flip_w8",
+      "kind": "chest_flip",
+      "speed": 8.0,
+      "lateral_m": -0.1
+    }
+  ],
+  "braking": true,
+  "control_dt": 0.004,
+  "velocity_caps": [
+    2.0,
+    2.0,
+    3.14,
+    3.14,
+    6.3,
+    6.3,
+    6.3
+  ],
+  "active_dataflow_values": {
+    "position_cost": 10.0,
+    "orientation_cost": 1.0,
+    "lm_damping": 0.02,
+    "damping": 0.1,
+    "max_iters": 5,
+    "joint_braking_distance": 0.2,
+    "nullspace_cost": 12.0,
+    "nullspace_return_rate": 1.6,
+    "singularity_max_approach_rate": 0.25,
+    "kinetic_energy_cost": 5e-05
+  }
+}

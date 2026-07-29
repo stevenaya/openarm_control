@@ -1,0 +1,816 @@
+{
+  "scenarios": [
+    {
+      "name": "chest_forced_z_4p5_v8",
+      "group": "chest_forced",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "angular_speed": 8.0,
+      "angle": 4.5,
+      "local_axis": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": 1.0
+    },
+    {
+      "name": "chest_natural_pre_x_z_4p5_v8",
+      "group": "chest_natural",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "angular_speed": 8.0,
+      "angle": 4.5,
+      "local_axis": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "pre_translation": [
+        0.05,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "chest_pure_z_4p5_v8",
+      "group": "chest_pure",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "angular_speed": 8.0,
+      "angle": 4.5,
+      "local_axis": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "chest_pure_y_pi_v4",
+      "group": "chest_pure",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "angular_speed": 4.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_pure_x_pi_v4",
+      "group": "normal_rotation",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 4.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_pure_x_pi_v8",
+      "group": "normal_rotation",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 8.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_pure_y_pi_v4",
+      "group": "normal_rotation",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 4.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_pure_y_pi_v8",
+      "group": "normal_rotation",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 8.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_pure_z_pi_v4",
+      "group": "normal_rotation",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 4.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_pure_z_pi_v8",
+      "group": "normal_rotation",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 8.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_speed_sweep_y_pi_v1p0",
+      "group": "speed_transition",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 1.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_speed_sweep_y_pi_v2p0",
+      "group": "speed_transition",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 2.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_speed_sweep_y_pi_v2p5",
+      "group": "speed_transition",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 2.5,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_speed_sweep_y_pi_v3p0",
+      "group": "speed_transition",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 3.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_speed_sweep_y_pi_v6p0",
+      "group": "speed_transition",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 6.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_speed_sweep_z_pi_v1p0",
+      "group": "speed_transition",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 1.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_speed_sweep_z_pi_v2p0",
+      "group": "speed_transition",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 2.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_speed_sweep_z_pi_v2p5",
+      "group": "speed_transition",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 2.5,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_speed_sweep_z_pi_v3p0",
+      "group": "speed_transition",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 3.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_speed_sweep_z_pi_v6p0",
+      "group": "speed_transition",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 6.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_pre_x_z_pi_v8",
+      "group": "normal_translated_rotation",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 8.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pre_translation": [
+        0.05,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_pre_z_x_pi_v8",
+      "group": "normal_translated_rotation",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 8.0,
+      "angle": 3.141592653589793,
+      "local_axis": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.05
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_translate_x_0p12_v1",
+      "group": "translation_only",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 8.0,
+      "angle": 0.0,
+      "local_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pre_translation": [
+        0.12,
+        0.0,
+        0.0
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    },
+    {
+      "name": "normal_translate_z_0p12_v1",
+      "group": "translation_only",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "angular_speed": 8.0,
+      "angle": 0.0,
+      "local_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pre_translation": [
+        0.0,
+        0.0,
+        0.12
+      ],
+      "pre_translation_speed": 1.0,
+      "forced_activation": null
+    }
+  ],
+  "strategies": [
+    {
+      "name": "current",
+      "orientation_error_limit": 0.0,
+      "angular_schedule": false,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": false
+    },
+    {
+      "name": "shared_only_0p02",
+      "orientation_error_limit": 0.02,
+      "angular_schedule": false,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": false
+    },
+    {
+      "name": "independent_0p01",
+      "orientation_error_limit": 0.01,
+      "angular_schedule": false,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": true
+    },
+    {
+      "name": "independent_0p02",
+      "orientation_error_limit": 0.02,
+      "angular_schedule": false,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": true
+    },
+    {
+      "name": "independent_0p03",
+      "orientation_error_limit": 0.03,
+      "angular_schedule": false,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": true
+    },
+    {
+      "name": "independent_0p04",
+      "orientation_error_limit": 0.04,
+      "angular_schedule": false,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": true
+    },
+    {
+      "name": "independent_0p06",
+      "orientation_error_limit": 0.06,
+      "angular_schedule": false,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": true
+    },
+    {
+      "name": "independent_0p08",
+      "orientation_error_limit": 0.08,
+      "angular_schedule": false,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": true
+    },
+    {
+      "name": "angular_0p01",
+      "orientation_error_limit": 0.01,
+      "angular_schedule": true,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": false
+    },
+    {
+      "name": "angular_0p02",
+      "orientation_error_limit": 0.02,
+      "angular_schedule": true,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": false
+    },
+    {
+      "name": "angular_0p03",
+      "orientation_error_limit": 0.03,
+      "angular_schedule": true,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": false
+    },
+    {
+      "name": "angular_0p04",
+      "orientation_error_limit": 0.04,
+      "angular_schedule": true,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": false
+    },
+    {
+      "name": "angular_0p06",
+      "orientation_error_limit": 0.06,
+      "angular_schedule": true,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": false
+    },
+    {
+      "name": "angular_0p08",
+      "orientation_error_limit": 0.08,
+      "angular_schedule": true,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": false
+    },
+    {
+      "name": "angular_0p1",
+      "orientation_error_limit": 0.1,
+      "angular_schedule": true,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": false
+    },
+    {
+      "name": "angular_0p02_slow_4_6",
+      "orientation_error_limit": 0.02,
+      "angular_schedule": true,
+      "angular_speed_slow": 4.0,
+      "angular_speed_fast": 6.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": false
+    },
+    {
+      "name": "angular_0p04_slow_4_6",
+      "orientation_error_limit": 0.04,
+      "angular_schedule": true,
+      "angular_speed_slow": 4.0,
+      "angular_speed_fast": 6.0,
+      "orientation_latch": true,
+      "independent_orientation_limit": false
+    },
+    {
+      "name": "angular_0p03_no_latch",
+      "orientation_error_limit": 0.03,
+      "angular_schedule": true,
+      "angular_speed_slow": 2.0,
+      "angular_speed_fast": 3.0,
+      "orientation_latch": false,
+      "independent_orientation_limit": false
+    }
+  ]
+}

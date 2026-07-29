@@ -1,0 +1,99 @@
+{
+  "profiles": [
+    {
+      "name": "current_baseline",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.0,
+      "activation_low_m_s": 0.6,
+      "activation_high_m_s": 0.9
+    },
+    {
+      "name": "current_p3_r3",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.03,
+      "activation_low_m_s": 0.6,
+      "activation_high_m_s": 0.9
+    },
+    {
+      "name": "current_p3_r4",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04,
+      "activation_low_m_s": 0.6,
+      "activation_high_m_s": 0.9
+    },
+    {
+      "name": "current_p3_r5",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.05,
+      "activation_low_m_s": 0.6,
+      "activation_high_m_s": 0.9
+    },
+    {
+      "name": "current_p3_r6",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.06,
+      "activation_low_m_s": 0.6,
+      "activation_high_m_s": 0.9
+    },
+    {
+      "name": "current_no_latch_p3_r4",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04,
+      "activation_low_m_s": 0.6,
+      "activation_high_m_s": 0.9
+    },
+    {
+      "name": "historical_p3_r4",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04,
+      "activation_low_m_s": 0.6,
+      "activation_high_m_s": 0.9
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "chest_flip_w8_hold3",
+      "kind": "chest_flip",
+      "speed": 8.0,
+      "lateral_m": -0.1,
+      "post_hold_s": 3.0
+    },
+    {
+      "name": "chest_flip_w10_hold3",
+      "kind": "chest_flip",
+      "speed": 10.0,
+      "lateral_m": -0.1,
+      "post_hold_s": 3.0
+    }
+  ],
+  "braking": false,
+  "control_dt": 0.004,
+  "velocity_caps": [
+    2.0,
+    2.0,
+    3.14,
+    3.14,
+    6.3,
+    6.3,
+    6.3
+  ],
+  "active_dataflow_values": {
+    "position_cost": 10.0,
+    "orientation_cost": 1.0,
+    "lm_damping": 0.02,
+    "damping": 0.1,
+    "max_iters": 5,
+    "joint_braking_distance": 0.2,
+    "nullspace_cost": 12.0,
+    "nullspace_return_rate": 1.6,
+    "singularity_max_approach_rate": 0.25,
+    "kinetic_energy_cost": 5e-05
+  }
+}

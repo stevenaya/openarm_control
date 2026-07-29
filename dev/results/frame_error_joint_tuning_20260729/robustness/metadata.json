@@ -1,0 +1,167 @@
+{
+  "profiles": [
+    {
+      "name": "current_baseline",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.0
+    },
+    {
+      "name": "current_p3_r3",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.03
+    },
+    {
+      "name": "current_p2_r4",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.002,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "current_p3_r4",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "current_p3_r5",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.05
+    },
+    {
+      "name": "current_p3_r6",
+      "position_mode": "current_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.06
+    },
+    {
+      "name": "current_no_latch_p3_r4",
+      "position_mode": "current_no_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "historical_p3_r4",
+      "position_mode": "historical_latch",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "always_p3_r4",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.003,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "always_p6_r4",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.006,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "always_p9_r4",
+      "position_mode": "always_cap",
+      "position_limit_m": 0.009,
+      "orientation_limit_rad": 0.04
+    },
+    {
+      "name": "position_off_r4",
+      "position_mode": "position_off",
+      "position_limit_m": 0.0,
+      "orientation_limit_rad": 0.04
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "retract_m0p10_v0p4",
+      "kind": "fast_retract",
+      "speed": 0.4,
+      "lateral_m": -0.1
+    },
+    {
+      "name": "retract_m0p10_v0p8",
+      "kind": "fast_retract",
+      "speed": 0.8,
+      "lateral_m": -0.1
+    },
+    {
+      "name": "retract_m0p10_v1",
+      "kind": "fast_retract",
+      "speed": 1.0,
+      "lateral_m": -0.1
+    },
+    {
+      "name": "retract_p0p10_v0p4",
+      "kind": "fast_retract",
+      "speed": 0.4,
+      "lateral_m": 0.1
+    },
+    {
+      "name": "retract_p0p10_v0p8",
+      "kind": "fast_retract",
+      "speed": 0.8,
+      "lateral_m": 0.1
+    },
+    {
+      "name": "retract_p0p10_v1",
+      "kind": "fast_retract",
+      "speed": 1.0,
+      "lateral_m": 0.1
+    },
+    {
+      "name": "chest_flip_w2",
+      "kind": "chest_flip",
+      "speed": 2.0,
+      "lateral_m": -0.1
+    },
+    {
+      "name": "chest_flip_w4",
+      "kind": "chest_flip",
+      "speed": 4.0,
+      "lateral_m": -0.1
+    },
+    {
+      "name": "chest_flip_w6",
+      "kind": "chest_flip",
+      "speed": 6.0,
+      "lateral_m": -0.1
+    },
+    {
+      "name": "chest_flip_w8",
+      "kind": "chest_flip",
+      "speed": 8.0,
+      "lateral_m": -0.1
+    },
+    {
+      "name": "chest_flip_w10",
+      "kind": "chest_flip",
+      "speed": 10.0,
+      "lateral_m": -0.1
+    }
+  ],
+  "braking": true,
+  "control_dt": 0.004,
+  "velocity_caps": [
+    2.0,
+    2.0,
+    3.14,
+    3.14,
+    6.3,
+    6.3,
+    6.3
+  ],
+  "active_dataflow_values": {
+    "position_cost": 10.0,
+    "orientation_cost": 1.0,
+    "lm_damping": 0.02,
+    "damping": 0.1,
+    "max_iters": 5,
+    "joint_braking_distance": 0.2,
+    "nullspace_cost": 12.0,
+    "nullspace_return_rate": 1.6,
+    "singularity_max_approach_rate": 0.25,
+    "kinetic_energy_cost": 5e-05
+  }
+}

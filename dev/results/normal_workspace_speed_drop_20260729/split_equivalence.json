@@ -1,0 +1,38 @@
+{
+  "left_line_z_v0p8": {
+    "actual_pose": 0.0,
+    "actual_q": 0.0,
+    "command_pose": 0.0,
+    "command_q": 0.0
+  },
+  "left_line_z_v1p0": {
+    "actual_pose": 0.0,
+    "actual_q": 0.0,
+    "command_pose": 0.0,
+    "command_q": 0.0
+  },
+  "left_xy_v1p0": {
+    "actual_pose": 0.0,
+    "actual_q": 0.0,
+    "command_pose": 0.0,
+    "command_q": 0.0
+  },
+  "left_xz_v1p0": {
+    "actual_pose": 0.0,
+    "actual_q": 0.0,
+    "command_pose": 0.0,
+    "command_q": 0.0
+  },
+  "left_yz_v1p0": {
+    "actual_pose": 0.0,
+    "actual_q": 0.0,
+    "command_pose": 0.0,
+    "command_q": 0.0
+  },
+  "right_line_z_v0p8": {
+    "actual_pose": 0.0,
+    "actual_q": 0.0,
+    "command_pose": 0.0,
+    "command_q": 0.0
+  }
+}
