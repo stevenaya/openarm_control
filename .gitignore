@@ -38,6 +38,10 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
+# Local experiments
+dev/*.py
+dev/results/
+
 # Editor / OS
 .vscode/
 .idea/
