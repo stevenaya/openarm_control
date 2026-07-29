@@ -12,30 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Recoverable position/velocity bounds with optional state-aware braking."""
+"""Recoverable position/velocity bounds with optional measured-position braking."""
 
 from __future__ import annotations
 
 from collections.abc import Collection, Mapping
-from dataclasses import dataclass
 
 import mink
 import mujoco
 import numpy as np
 import numpy.typing as npt
-
-
-@dataclass(frozen=True)
-class ArmJointLimitState:
-    """Diagnostics from the most recently assembled joint inequalities."""
-
-    command_position: np.ndarray
-    measured_position: np.ndarray | None
-    measured_velocity: np.ndarray | None
-    lower_distance: np.ndarray | None
-    upper_distance: np.ndarray | None
-    lower_step: np.ndarray
-    upper_step: np.ndarray
 
 
 class ArmConfigurationLimit(mink.ConfigurationLimit):
@@ -84,7 +70,6 @@ class ArmJointLimit(mink.Limit):
         position_gain: float,
         braking_distance: float | None = None,
         braking_exponent: float,
-        braking_reaction_time: float,
         braking_distance_buffer: float,
     ) -> None:
         """Scan selected scalar joints once and build their shared projection."""
@@ -96,13 +81,10 @@ class ArmJointLimit(mink.Limit):
             raise ValueError("braking_distance must be finite and positive.")
         if not np.isfinite(braking_exponent) or braking_exponent <= 0.0:
             raise ValueError("braking_exponent must be finite and positive.")
-        if not np.isfinite(braking_reaction_time) or braking_reaction_time < 0.0:
-            raise ValueError("braking_reaction_time must be finite and non-negative.")
         if not np.isfinite(braking_distance_buffer) or braking_distance_buffer < 0.0:
             raise ValueError("braking_distance_buffer must be finite and non-negative.")
 
         selected_qpos = {int(index) for index in qpos_indices}
-        names: list[str] = []
         qpos: list[int] = []
         dofs: list[int] = []
         lower: list[float] = []
@@ -129,7 +111,6 @@ class ArmJointLimit(mink.Limit):
             if not np.isfinite(velocity_value) or velocity_value <= 0.0:
                 raise ValueError(f"Velocity limit for {name!r} must be positive.")
 
-            names.append(name)
             qpos.append(qpos_index)
             dofs.append(int(model.jnt_dofadr[joint_id]))
             lower.append(float(model.jnt_range[joint_id, 0]))
@@ -137,18 +118,15 @@ class ArmJointLimit(mink.Limit):
             max_velocity.append(velocity_value)
 
         self.model = model
-        self.joint_names = tuple(names)
         self.qpos_indices = _readonly(qpos, dtype=int)
         self.dof_indices = _readonly(dofs, dtype=int)
         self.indices = self.dof_indices
         self.lower = _readonly(lower)
         self.upper = _readonly(upper)
         self.max_velocity = _readonly(max_velocity)
-        self.limit = self.max_velocity
         self.position_gain = float(position_gain)
         self.braking_distance = braking_distance
         self.braking_exponent = float(braking_exponent)
-        self.braking_reaction_time = float(braking_reaction_time)
         self.braking_distance_buffer = float(braking_distance_buffer)
         self.projection_matrix = (
             np.eye(model.nv, dtype=np.float64)[self.dof_indices]
@@ -156,30 +134,19 @@ class ArmJointLimit(mink.Limit):
             else None
         )
         self._measured_qpos: np.ndarray | None = None
-        self._measured_qvel: np.ndarray | None = None
-        self.last_state: ArmJointLimitState | None = None
 
-    def update_measured_state(
-        self,
-        qpos: npt.ArrayLike,
-        qvel: npt.ArrayLike,
-    ) -> None:
-        """Update measured q/dq used by the preventive braking envelope."""
+    def update_measured_state(self, qpos: npt.ArrayLike) -> None:
+        """Update measured position used by the preventive braking envelope."""
         qpos_array = np.asarray(qpos, dtype=np.float64)
-        qvel_array = np.asarray(qvel, dtype=np.float64)
         if qpos_array.shape != (self.model.nq,):
             raise ValueError(f"Expected measured qpos shape ({self.model.nq},).")
-        if qvel_array.shape != (self.model.nv,):
-            raise ValueError(f"Expected measured qvel shape ({self.model.nv},).")
-        if not np.all(np.isfinite(qpos_array)) or not np.all(np.isfinite(qvel_array)):
-            raise ValueError("Measured joint state must be finite.")
+        if not np.all(np.isfinite(qpos_array)):
+            raise ValueError("Measured joint positions must be finite.")
         self._measured_qpos = qpos_array.copy()
-        self._measured_qvel = qvel_array.copy()
 
     def clear_measured_state(self) -> None:
         """Fall back to command-state braking until a fresh sample is supplied."""
         self._measured_qpos = None
-        self._measured_qvel = None
 
     def compute_qp_inequalities(
         self,
@@ -200,27 +167,15 @@ class ArmJointLimit(mink.Limit):
         upper_step = np.clip(position_upper, -max_step, max_step)
 
         measured_q: np.ndarray | None = None
-        measured_dq: np.ndarray | None = None
         lower_distance: np.ndarray | None = None
         upper_distance: np.ndarray | None = None
         if self.braking_distance is not None:
             lower_distance = command_q - self.lower
             upper_distance = self.upper - command_q
-            if self._measured_qpos is not None and self._measured_qvel is not None:
+            if self._measured_qpos is not None:
                 measured_q = self._measured_qpos[self.qpos_indices]
-                measured_dq = self._measured_qvel[self.dof_indices]
-                measured_lower = (
-                    measured_q
-                    - self.lower
-                    - self.braking_reaction_time * np.maximum(-measured_dq, 0.0)
-                    - self.braking_distance_buffer
-                )
-                measured_upper = (
-                    self.upper
-                    - measured_q
-                    - self.braking_reaction_time * np.maximum(measured_dq, 0.0)
-                    - self.braking_distance_buffer
-                )
+                measured_lower = measured_q - self.lower - self.braking_distance_buffer
+                measured_upper = self.upper - measured_q - self.braking_distance_buffer
                 lower_distance = np.minimum(lower_distance, measured_lower)
                 upper_distance = np.minimum(upper_distance, measured_upper)
 
@@ -239,15 +194,6 @@ class ArmJointLimit(mink.Limit):
             lower_step = np.maximum(lower_step, -dt * lower_velocity)
             upper_step = np.minimum(upper_step, dt * upper_velocity)
 
-        self.last_state = ArmJointLimitState(
-            command_position=command_q.copy(),
-            measured_position=None if measured_q is None else measured_q.copy(),
-            measured_velocity=None if measured_dq is None else measured_dq.copy(),
-            lower_distance=None if lower_distance is None else lower_distance.copy(),
-            upper_distance=None if upper_distance is None else upper_distance.copy(),
-            lower_step=lower_step.copy(),
-            upper_step=upper_step.copy(),
-        )
         return mink.Constraint(
             G=np.vstack([self.projection_matrix, -self.projection_matrix]),
             h=np.hstack([upper_step, -lower_step]),

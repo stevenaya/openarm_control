@@ -99,13 +99,12 @@ class Kinematics:
     def update_measured_state(
         self,
         qpos16: np.ndarray,
-        qvel16: np.ndarray,
     ) -> None:
-        """Update measured q/dq used by state-aware limits."""
-        self._require_ik().update_measured_state(qpos16, qvel16)
+        """Update measured qpos used by state-aware limits."""
+        self._require_ik().update_measured_state(qpos16)
 
     def clear_measured_state(self) -> None:
-        """Discard measured q/dq from state-aware limits."""
+        """Discard measured qpos from state-aware limits."""
         self._require_ik().clear_measured_state()
 
     def ready(self) -> bool:
@@ -185,15 +184,20 @@ class _IKSolver:
                 for side in setup.sides
             }
 
-        if params.frame_position_error_limit > 0.0:
+        if (
+            params.frame_position_error_limit > 0.0
+            or params.frame_orientation_error_limit > 0.0
+        ):
             bounded_tasks = {
                 side: BoundedFrameTask(
                     task,
                     position_error_limit=params.frame_position_error_limit,
+                    orientation_error_limit=params.frame_orientation_error_limit,
                     control_dt=params.dt,
+                    substeps=params.max_iters,
                     speed_slow=params.frame_error_speed_slow,
                     speed_fast=params.frame_error_speed_fast,
-                    latch_multiplier=params.frame_error_latch_multiplier,
+                    position_latch_threshold=params.frame_error_latch_threshold,
                 )
                 for side, task in self._tasks.items()
             }
@@ -229,7 +233,6 @@ class _IKSolver:
                     params.joint_braking_distance if params.joint_braking else None
                 ),
                 braking_exponent=params.joint_braking_exponent,
-                braking_reaction_time=params.joint_braking_reaction_time,
                 braking_distance_buffer=params.joint_braking_distance_buffer,
             )
             self._limits: list[mink.Limit] = [self._joint_limit]
@@ -313,20 +316,15 @@ class _IKSolver:
     def update_measured_state(
         self,
         qpos16: np.ndarray,
-        qvel16: np.ndarray,
     ) -> None:
         """Update measured state without changing the IK command configuration."""
-        measured_qpos, measured_qvel = self._setup.driver_state_to_mujoco(
+        measured_qpos = self._setup.driver_qpos_to_mujoco(
             qpos16,
-            qvel16,
             base_qpos=self._config.q,
         )
 
         if self._joint_limit is not None:
-            self._joint_limit.update_measured_state(
-                measured_qpos,
-                measured_qvel,
-            )
+            self._joint_limit.update_measured_state(measured_qpos)
         for limit in self._singularity_limits.values():
             limit.update_measured_configuration(measured_qpos)
 

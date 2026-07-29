@@ -40,16 +40,16 @@ class IKParams:
     max_iters: int = 5
     velocity_limits: dict[str, float] | None = None
 
-    frame_position_error_limit: float = 0.003
+    frame_position_error_limit: float = 0.015
+    frame_orientation_error_limit: float = 0.20
     frame_error_speed_slow: float = 0.6
     frame_error_speed_fast: float = 0.9
-    frame_error_latch_multiplier: float = 2.0
+    frame_error_latch_threshold: float = 0.006
 
     joint_limit_gain: float = 0.95
     joint_braking: bool = True
-    joint_braking_distance: float = 0.5
+    joint_braking_distance: float = 0.2
     joint_braking_exponent: float = 2.0
-    joint_braking_reaction_time: float = 0.04
     joint_braking_distance_buffer: float = 0.01
 
     jacobian_characteristic_length: float = 0.3
@@ -81,8 +81,8 @@ def validate_ik_params(params: IKParams) -> None:
         ("damping", params.damping),
         ("posture_cost", params.posture_cost),
         ("frame_position_error_limit", params.frame_position_error_limit),
+        ("frame_orientation_error_limit", params.frame_orientation_error_limit),
         ("frame_error_speed_slow", params.frame_error_speed_slow),
-        ("joint_braking_reaction_time", params.joint_braking_reaction_time),
         ("joint_braking_distance_buffer", params.joint_braking_distance_buffer),
         ("nullspace_cost", params.nullspace_cost),
         ("nullspace_return_rate", params.nullspace_return_rate),
@@ -99,7 +99,7 @@ def validate_ik_params(params: IKParams) -> None:
 
     positive = (
         ("frame_error_speed_fast", params.frame_error_speed_fast),
-        ("frame_error_latch_multiplier", params.frame_error_latch_multiplier),
+        ("frame_error_latch_threshold", params.frame_error_latch_threshold),
         ("joint_braking_distance", params.joint_braking_distance),
         ("joint_braking_exponent", params.joint_braking_exponent),
         (
@@ -214,7 +214,18 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         help="Nominal target/control rate used when --dt is omitted (default: 500.0).",
     )
 
-    parser.add_argument("--frame-position-error-limit", type=float, default=0.003)
+    parser.add_argument(
+        "--frame-position-error-limit",
+        type=float,
+        default=0.015,
+        help="Total position-error request per outer IK solve in meters.",
+    )
+    parser.add_argument(
+        "--frame-orientation-error-limit",
+        type=float,
+        default=0.20,
+        help="Total orientation-error request per outer IK solve in radians.",
+    )
     parser.add_argument("--nullspace-cost", type=float, default=12.0)
     parser.add_argument("--nullspace-return-rate", type=float, default=1.6)
     parser.add_argument(
@@ -223,7 +234,7 @@ def register_ik_args(parser: argparse.ArgumentParser) -> None:
         default=True,
         help="Enable preventive joint braking with velocity limits (default: enabled).",
     )
-    parser.add_argument("--joint-braking-distance", type=float, default=0.5)
+    parser.add_argument("--joint-braking-distance", type=float, default=0.2)
     parser.add_argument(
         "--singularity-max-approach-rate",
         type=float,
@@ -260,6 +271,7 @@ def ik_params_from_args(args: argparse.Namespace) -> IKParams:
         max_iters=args.max_iters,
         velocity_limits=velocity_limits,
         frame_position_error_limit=args.frame_position_error_limit,
+        frame_orientation_error_limit=args.frame_orientation_error_limit,
         nullspace_cost=args.nullspace_cost,
         nullspace_return_rate=args.nullspace_return_rate,
         joint_braking=args.joint_braking,

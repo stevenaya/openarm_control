@@ -16,29 +16,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 import mink
 import mujoco
 import numpy as np
 import numpy.typing as npt
 
 from .singularity import normalized_arm_jacobian
-
-
-@dataclass(frozen=True)
-class NullspaceState:
-    """Diagnostics for the most recently assembled task objective."""
-
-    direction: np.ndarray
-    singular_values: np.ndarray
-    singularity_ratio: float
-    activation: float
-    effective_cost: float
-    posture_error: float
-    return_speed: float
-    displacement: float
-    jacobian_residual: float
 
 
 def smoothstep_activation(value: float, low: float, high: float) -> float:
@@ -130,7 +113,6 @@ class NullspacePostureTask(mink.Task):
         self._singularity_high = singularity_high
         self._characteristic_length = characteristic_length
         self._previous_direction: np.ndarray | None = None
-        self.last_state: NullspaceState | None = None
 
     def _compute_terms(
         self, configuration: mink.Configuration
@@ -177,17 +159,6 @@ class NullspacePostureTask(mink.Task):
         jacobian[0, self._dof_indices] = direction
         error = np.array([-displacement], dtype=np.float64)
 
-        self.last_state = NullspaceState(
-            direction=direction.copy(),
-            singular_values=singular_values.copy(),
-            singularity_ratio=ratio,
-            activation=activation,
-            effective_cost=effective_cost,
-            posture_error=posture_error,
-            return_speed=return_speed,
-            displacement=displacement,
-            jacobian_residual=float(np.linalg.norm(normalized_jacobian @ direction)),
-        )
         return error, jacobian
 
     def compute_error(self, configuration: mink.Configuration) -> np.ndarray:

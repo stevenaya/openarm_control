@@ -16,8 +16,6 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 import mink
 import mujoco
 import numpy as np
@@ -27,20 +25,6 @@ from openarm_control.singularity import (
     normalized_arm_jacobian,
     singularity_ratio,
 )
-
-
-@dataclass(frozen=True)
-class SingularityApproachState:
-    """Diagnostics for the current linearized singularity-rate constraint."""
-
-    command_ratio: float
-    measured_ratio: float | None
-    effective_ratio: float
-    activation: float
-    max_approach_rate: float
-    gradient: np.ndarray
-    gradient_norm: float
-    singular_values: np.ndarray
 
 
 class SingularityApproachLimit(mink.Limit):
@@ -91,7 +75,6 @@ class SingularityApproachLimit(mink.Limit):
         self._measured_qpos: np.ndarray | None = None
         self._G: np.ndarray | None = None
         self._allowed_rate = self.max_rate
-        self.last_state: SingularityApproachState | None = None
 
     def update_measured_configuration(self, qpos: npt.ArrayLike) -> None:
         """Update the measured configuration used to activate the envelope."""
@@ -108,7 +91,7 @@ class SingularityApproachLimit(mink.Limit):
 
     def prepare(self, configuration: mink.Configuration) -> None:
         """Linearize rho(q) once for the next outer IK control step."""
-        command_ratio, singular_values = self._ratio(configuration)
+        command_ratio, _ = self._ratio(configuration)
         measured_ratio: float | None = None
         if self._measured_qpos is not None:
             self._scratch.update(q=self._measured_qpos)
@@ -128,16 +111,6 @@ class SingularityApproachLimit(mink.Limit):
         G = np.zeros((1, self.model.nv), dtype=np.float64)
         G[0, self.dof_indices] = -gradient
         self._G = G
-        self.last_state = SingularityApproachState(
-            command_ratio=command_ratio,
-            measured_ratio=measured_ratio,
-            effective_ratio=effective_ratio,
-            activation=activation,
-            max_approach_rate=self._allowed_rate,
-            gradient=gradient.copy(),
-            gradient_norm=float(np.linalg.norm(gradient)),
-            singular_values=singular_values.copy(),
-        )
 
     def compute_qp_inequalities(
         self,

@@ -48,9 +48,9 @@ ARM_JOINT_VELOCITY_LIMITS_RAD_S: list[float] = [
     2.0,  # joint2 DM 8009
     3.14,  # joint3 DM 4340
     3.14,  # joint4 DM 4340
-    12.6,  # joint5 DM 4310
-    12.6,  # joint6 DM 4310
-    12.6,  # joint7 DM 4310
+    6.3,  # joint5 DM 4310
+    6.3,  # joint6 DM 4310
+    6.3,  # joint7 DM 4310
 ]
 
 
@@ -157,30 +157,23 @@ class ArmSetup:
         origin = read_ee_pose(self.data, self.origin_id, self.origin_type)
         return relative_pose(origin, pose)
 
-    def driver_state_to_mujoco(
+    def driver_qpos_to_mujoco(
         self,
         qpos16: np.ndarray,
-        qvel16: np.ndarray,
         *,
         base_qpos: np.ndarray,
-    ) -> tuple[np.ndarray, np.ndarray]:
-        """Map bimanual driver state into full MuJoCo configuration and velocity."""
+    ) -> np.ndarray:
+        """Map bimanual driver qpos into a full MuJoCo configuration."""
         driver_qpos = np.asarray(qpos16, dtype=np.float64)
-        driver_qvel = np.asarray(qvel16, dtype=np.float64)
         model_qpos = np.asarray(base_qpos, dtype=np.float64)
-        if driver_qpos.shape != (16,) or driver_qvel.shape != (16,):
-            raise ValueError("Measured bimanual qpos and qvel must have shape (16,).")
+        if driver_qpos.shape != (16,):
+            raise ValueError("Measured bimanual qpos must have shape (16,).")
         if model_qpos.shape != (self.model.nq,):
             raise ValueError(f"Base qpos must have shape ({self.model.nq},).")
-        if (
-            not np.all(np.isfinite(driver_qpos))
-            or not np.all(np.isfinite(driver_qvel))
-            or not np.all(np.isfinite(model_qpos))
-        ):
-            raise ValueError("Measured driver state and base qpos must be finite.")
+        if not np.all(np.isfinite(driver_qpos)) or not np.all(np.isfinite(model_qpos)):
+            raise ValueError("Measured driver qpos and base qpos must be finite.")
 
         model_qpos = model_qpos.copy()
-        model_qvel = np.zeros(self.model.nv, dtype=np.float64)
         for side, offset in (("right", 0), ("left", 8)):
             if side not in self.sides:
                 continue
@@ -189,10 +182,7 @@ class ArmSetup:
                 driver_qpos[offset : offset + 8],
                 side,
             )
-            model_qvel[self.joint_resolver.arm_dof_indices(side)] = driver_qvel[
-                offset : offset + 7
-            ]
-        return model_qpos, model_qvel
+        return model_qpos
 
 
 def _resolve_frame_id(model: mujoco.MjModel, name: str, ftype: str) -> int:

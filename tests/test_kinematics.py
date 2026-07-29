@@ -32,6 +32,7 @@ from openarm_control.nullspace_posture_task import (
     smoothstep_activation,
     structural_nullspace_direction,
 )
+from openarm_control.singularity import normalized_arm_jacobian
 from openarm_control.singularity_approach_limit import SingularityApproachLimit
 
 
@@ -71,19 +72,17 @@ def _velocity_mapping(*sides: str) -> dict[str, float]:
 
 
 class ArmSetupTest(unittest.TestCase):
-    """Verify driver-state mapping respects MuJoCo qpos and tangent-space indices."""
+    """Verify driver qpos mapping respects MuJoCo configuration indices."""
 
-    def test_driver_state_mapping_updates_only_active_arm(self) -> None:
+    def test_driver_qpos_mapping_updates_only_active_arm(self) -> None:
         setup = _setup("right")
         base_qpos = setup.data.qpos.copy()
         driver_qpos = _driver_state(setup).astype(np.float64)
-        driver_qvel = np.arange(16, dtype=np.float64) * 0.1
         driver_qpos[:7] += 0.1
         driver_qpos[8:15] += 0.2
 
-        model_qpos, model_qvel = setup.driver_state_to_mujoco(
+        model_qpos = setup.driver_qpos_to_mujoco(
             driver_qpos,
-            driver_qvel,
             base_qpos=base_qpos,
         )
 
@@ -94,14 +93,6 @@ class ArmSetupTest(unittest.TestCase):
         np.testing.assert_array_equal(
             model_qpos[setup.joint_resolver.arm_qpos_indices("left")],
             base_qpos[setup.joint_resolver.arm_qpos_indices("left")],
-        )
-        np.testing.assert_array_equal(
-            model_qvel[setup.joint_resolver.arm_dof_indices("right")],
-            driver_qvel[:7],
-        )
-        np.testing.assert_array_equal(
-            model_qvel[setup.joint_resolver.arm_dof_indices("left")],
-            np.zeros(7),
         )
 
 
@@ -122,11 +113,14 @@ class ParameterTest(unittest.TestCase):
         self.assertEqual(params.posture_cost, 0.0)
         self.assertEqual(params.max_iters, 5)
         self.assertEqual(params.dt, 0.004)
-        self.assertEqual(params.frame_position_error_limit, 0.003)
+        self.assertEqual(params.frame_position_error_limit, 0.015)
+        self.assertEqual(params.frame_orientation_error_limit, 0.20)
+        self.assertEqual(params.frame_error_latch_threshold, 0.006)
         self.assertEqual(params.nullspace_cost, 12.0)
         self.assertEqual(params.nullspace_return_rate, 1.6)
         self.assertTrue(params.joint_braking)
-        self.assertEqual(params.joint_braking_distance, 0.5)
+        self.assertEqual(params.joint_braking_distance, 0.2)
+        self.assertFalse(hasattr(params, "joint_braking_reaction_time"))
         self.assertEqual(params.singularity_max_approach_rate, 0.25)
         self.assertEqual(params.kinetic_energy_cost, 3e-5)
         self.assertFalse(hasattr(params, "diag_reg"))
@@ -177,6 +171,8 @@ class ParameterTest(unittest.TestCase):
                         str(path),
                         "--frame-position-error-limit",
                         "0.004",
+                        "--frame-orientation-error-limit",
+                        "0.05",
                         "--nullspace-cost",
                         "8",
                         "--nullspace-return-rate",
@@ -192,6 +188,7 @@ class ParameterTest(unittest.TestCase):
             )
 
         self.assertEqual(params.frame_position_error_limit, 0.004)
+        self.assertEqual(params.frame_orientation_error_limit, 0.05)
         self.assertEqual(params.nullspace_cost, 8.0)
         self.assertEqual(params.nullspace_return_rate, 1.2)
         self.assertEqual(params.joint_braking_distance, 0.4)
@@ -254,7 +251,7 @@ class RelativeFrameTest(unittest.TestCase):
             IKParams(
                 position_cost=10.0,
                 orientation_cost=1.0,
-                lm_damping=0.02,
+                lm_damping=0.01,
                 damping=0.1,
                 posture_cost=0.0,
                 dt=0.004,
@@ -267,7 +264,7 @@ class RelativeFrameTest(unittest.TestCase):
         self.assertIsInstance(task, BoundedFrameTask)
         assert isinstance(task, BoundedFrameTask)
         self.assertIsInstance(task.frame_task, mink.RelativeFrameTask)
-        self.assertEqual(task.root_name, "openarm_right_base_link")
+        self.assertEqual(task.frame_task.root_name, "openarm_right_base_link")
 
         kinematics.set_target("right", setup.read_ee_pose("right"))
         self.assertIsNotNone(kinematics.solve())
@@ -278,6 +275,9 @@ class BoundedFrameTaskTest(unittest.TestCase):
 
     def _task(
         self,
+        *,
+        orientation_error_limit: float = 0.0,
+        substeps: int = 5,
     ) -> tuple[ArmSetup, mink.Configuration, mink.FrameTask, BoundedFrameTask]:
         setup = _setup("right")
         configuration = mink.Configuration(setup.model, q=setup.data.qpos.copy())
@@ -286,7 +286,7 @@ class BoundedFrameTaskTest(unittest.TestCase):
             "site",
             position_cost=10.0,
             orientation_cost=1.0,
-            lm_damping=0.02,
+            lm_damping=0.01,
         )
         return (
             setup,
@@ -294,11 +294,13 @@ class BoundedFrameTaskTest(unittest.TestCase):
             native,
             BoundedFrameTask(
                 native,
-                position_error_limit=0.003,
+                position_error_limit=0.015,
+                orientation_error_limit=orientation_error_limit,
                 control_dt=0.004,
+                substeps=substeps,
                 speed_slow=0.6,
                 speed_fast=0.9,
-                latch_multiplier=2.0,
+                position_latch_threshold=0.006,
             ),
         )
 
@@ -312,7 +314,7 @@ class BoundedFrameTaskTest(unittest.TestCase):
         limited_error = task.compute_limited_error(configuration)
 
         self.assertGreater(float(np.linalg.norm(full_error[:3])), 0.09)
-        self.assertAlmostEqual(float(np.linalg.norm(limited_error[:3])), 0.003)
+        self.assertAlmostEqual(float(np.linalg.norm(limited_error[:3])), 0.015 / 5)
         np.testing.assert_array_equal(limited_error[3:], full_error[3:])
         self.assertIsNotNone(native.transform_target_to_world)
 
@@ -328,6 +330,80 @@ class BoundedFrameTaskTest(unittest.TestCase):
 
         np.testing.assert_array_equal(wrapped_objective.H, native_objective.H)
         np.testing.assert_array_equal(wrapped_objective.c, native_objective.c)
+
+    def test_orientation_limit_is_independent_of_position_activation(self) -> None:
+        setup, configuration, _, task = self._task(orientation_error_limit=0.20)
+        target = setup.read_ee_pose("right").astype(np.float64)
+        target[:3] += [0.03, -0.02, 0.01]
+        rotation = np.array(
+            [np.cos(0.5), np.sin(0.5), 0.0, 0.0],
+            dtype=np.float64,
+        )
+        mujoco.mju_mulQuat(target[3:7], target[3:7].copy(), rotation)
+        task.set_target(pose_to_se3(target))
+        task.set_limit_activation(0.0)
+
+        full_error = task.compute_full_error(configuration)
+        limited_error = task.compute_limited_error(configuration)
+        self.assertGreater(float(np.linalg.norm(full_error[3:])), 0.9)
+        self.assertAlmostEqual(float(np.linalg.norm(limited_error[3:])), 0.20 / 5)
+
+        expected_error = full_error.copy()
+        expected_error[3:] = limited_error[3:]
+        expected = task._assemble_qp(
+            expected_error,
+            task.compute_jacobian(configuration),
+            configuration._eye_nv,
+        )
+        actual = task.compute_qp_objective(configuration)
+        np.testing.assert_allclose(actual.H, expected.H)
+        np.testing.assert_allclose(actual.c, expected.c)
+
+    def test_total_error_budgets_are_independent_of_substep_count(self) -> None:
+        for substeps in (1, 5, 10):
+            setup, configuration, _, task = self._task(
+                orientation_error_limit=0.20,
+                substeps=substeps,
+            )
+            target = setup.read_ee_pose("right").astype(np.float64)
+            target[0] += 0.1
+            rotation = np.array(
+                [np.cos(0.5), np.sin(0.5), 0.0, 0.0],
+                dtype=np.float64,
+            )
+            mujoco.mju_mulQuat(target[3:7], target[3:7].copy(), rotation)
+            task.set_target(pose_to_se3(target))
+
+            limited_error = task.compute_limited_error(configuration)
+            self.assertAlmostEqual(
+                float(np.linalg.norm(limited_error[:3])) * substeps,
+                0.015,
+            )
+            self.assertAlmostEqual(
+                float(np.linalg.norm(limited_error[3:])) * substeps,
+                0.20,
+            )
+
+    def test_latch_uses_fixed_outer_position_error_threshold(self) -> None:
+        setup, configuration, _, latched = self._task(substeps=10)
+        pose = setup.read_ee_pose("right").astype(np.float64)
+        above_threshold = pose.copy()
+        above_threshold[0] += 0.010
+        latched.set_target_and_update_schedule(
+            pose_to_se3(above_threshold),
+            configuration,
+        )
+        self.assertEqual(latched.limit_activation, 1.0)
+
+        setup, configuration, _, released = self._task(substeps=1)
+        pose = setup.read_ee_pose("right").astype(np.float64)
+        below_threshold = pose.copy()
+        below_threshold[0] += 0.005
+        released.set_target_and_update_schedule(
+            pose_to_se3(below_threshold),
+            configuration,
+        )
+        self.assertEqual(released.limit_activation, 0.0)
 
     def test_speed_schedule_is_instant_and_latches_accumulated_error(self) -> None:
         setup = _setup("right")
@@ -375,7 +451,6 @@ class ArmJointLimitTest(unittest.TestCase):
             position_gain=0.95,
             braking_distance=braking_distance,
             braking_exponent=2.0,
-            braking_reaction_time=0.04,
             braking_distance_buffer=0.01,
         )
         configuration = mink.Configuration(setup.model, q=setup.data.qpos.copy())
@@ -428,23 +503,17 @@ class ArmJointLimitTest(unittest.TestCase):
             0.25 * limit.max_velocity[row] * 0.01,
         )
 
-    def test_measured_q_dq_reduce_effective_distance(self) -> None:
+    def test_measured_q_reduces_effective_distance(self) -> None:
         limit, configuration = self._limit()
         row = 0
         qpos_index = limit.qpos_indices[row]
-        dof_index = limit.dof_indices[row]
         measured_q = configuration.q
-        measured_q[qpos_index] = limit.lower[row] + 0.1
-        measured_dq = np.zeros(configuration.model.nv)
-        measured_dq[dof_index] = -1.0
-        limit.update_measured_state(measured_q, measured_dq)
-        limit.compute_qp_inequalities(configuration, dt=0.01)
+        measured_q[qpos_index] = limit.lower[row] + limit.braking_distance_buffer
+        limit.update_measured_state(measured_q)
+        constraint = limit.compute_qp_inequalities(configuration, dt=0.01)
+        assert constraint.h is not None
 
-        state = limit.last_state
-        assert state is not None
-        assert state.lower_distance is not None
-        self.assertAlmostEqual(state.lower_distance[row], 0.05)
-        self.assertGreater(state.lower_step[row], -1e-3)
+        self.assertAlmostEqual(constraint.h[limit.indices.size + row], 0.0)
 
     def test_overshoot_has_one_feasible_recovery_step(self) -> None:
         limit, configuration = self._limit()
@@ -452,16 +521,14 @@ class ArmJointLimitTest(unittest.TestCase):
         q = configuration.q
         q[limit.qpos_indices[row]] = limit.lower[row] - 0.1
         configuration.update(q=q)
-        limit.compute_qp_inequalities(configuration, dt=0.01)
-        state = limit.last_state
-        assert state is not None
+        constraint = limit.compute_qp_inequalities(configuration, dt=0.01)
+        assert constraint.h is not None
+        upper_step = constraint.h[row]
+        lower_step = -constraint.h[limit.indices.size + row]
 
-        self.assertGreater(state.lower_step[row], 0.0)
-        self.assertAlmostEqual(state.lower_step[row], state.upper_step[row])
-        self.assertLessEqual(
-            state.upper_step[row],
-            limit.max_velocity[row] * 0.01,
-        )
+        self.assertGreater(lower_step, 0.0)
+        self.assertAlmostEqual(lower_step, upper_step)
+        self.assertLessEqual(upper_step, limit.max_velocity[row] * 0.01)
 
 
 class NullspaceTaskTest(unittest.TestCase):
@@ -506,22 +573,27 @@ class NullspaceTaskTest(unittest.TestCase):
             singularity_high=1e-9,
             characteristic_length=0.3,
         )
-        task.compute_qp_objective(configuration)
-        initial = task.last_state
-        assert initial is not None
+        _, initial_jacobian = task._compute_terms(configuration)
+        initial_direction = initial_jacobian[0, dofs].copy()
 
         q = configuration.q
         tangent = np.zeros(setup.model.nv)
-        tangent[dofs] = initial.direction
+        tangent[dofs] = initial_direction
         mujoco.mj_integratePos(setup.model, q, tangent, 0.5)
         configuration.update(q=q)
-        task.compute_qp_objective(configuration)
-        state = task.last_state
-        assert state is not None
+        error, jacobian = task._compute_terms(configuration)
+        direction = jacobian[0, dofs]
+        geometric_jacobian = normalized_arm_jacobian(
+            frame_task,
+            configuration,
+            dofs,
+            0.3,
+        )
+        return_speed = -float(error[0]) / 0.0008
 
-        self.assertLess(state.jacobian_residual, 1e-10)
-        self.assertLessEqual(abs(state.return_speed), 1.0)
-        self.assertAlmostEqual(abs(state.displacement), 0.0008)
+        self.assertLess(float(np.linalg.norm(geometric_jacobian @ direction)), 1e-10)
+        self.assertLessEqual(abs(return_speed), 1.0)
+        self.assertAlmostEqual(abs(float(error[0])), 0.0008)
 
     def test_sync_does_not_move_home_reference(self) -> None:
         setup = _setup()
@@ -574,19 +646,19 @@ class SingularityLimitTest(unittest.TestCase):
         _, limit, configuration = self._limit()
         limit.prepare(configuration)
         constraint = limit.compute_qp_inequalities(configuration, dt=0.004)
-        state = limit.last_state
-        assert state is not None
         assert constraint.G is not None
+        gradient = -constraint.G[0, limit.dof_indices]
         approach = np.zeros(configuration.model.nv)
-        approach[limit.dof_indices] = -state.gradient
+        approach[limit.dof_indices] = -gradient
         self.assertGreater(float((constraint.G @ approach)[0]), 0.0)
         self.assertLess(float((constraint.G @ (-approach))[0]), 0.0)
 
     def test_target_does_not_change_geometric_ratio(self) -> None:
         setup, limit, configuration = self._limit()
         limit.prepare(configuration)
-        initial = limit.last_state
-        assert initial is not None
+        initial = limit.compute_qp_inequalities(configuration, dt=0.004)
+        assert initial.G is not None
+        assert initial.h is not None
 
         wrapped = BoundedFrameTask(
             mink.FrameTask(
@@ -595,11 +667,12 @@ class SingularityLimitTest(unittest.TestCase):
                 position_cost=10.0,
                 orientation_cost=1.0,
             ),
-            position_error_limit=0.003,
+            position_error_limit=0.015,
             control_dt=0.004,
+            substeps=5,
             speed_slow=0.6,
             speed_fast=0.9,
-            latch_multiplier=2.0,
+            position_latch_threshold=0.006,
         )
         target = setup.read_ee_pose("right").astype(np.float64)
         target[:3] += [0.2, -0.1, 0.15]
@@ -614,11 +687,12 @@ class SingularityLimitTest(unittest.TestCase):
             max_approach_rate=0.25,
         )
         second.prepare(configuration)
-        state = second.last_state
-        assert state is not None
+        shifted = second.compute_qp_inequalities(configuration, dt=0.004)
+        assert shifted.G is not None
+        assert shifted.h is not None
 
-        self.assertAlmostEqual(state.command_ratio, initial.command_ratio)
-        np.testing.assert_allclose(state.gradient, initial.gradient, atol=1e-12)
+        np.testing.assert_allclose(shifted.G, initial.G, atol=1e-12)
+        np.testing.assert_allclose(shifted.h, initial.h, atol=1e-12)
 
 
 class SolverTest(unittest.TestCase):
@@ -640,7 +714,7 @@ class SolverTest(unittest.TestCase):
 
         self.assertEqual(solver._posture_cost, 0.01)
         assert solver._joint_limit is not None
-        self.assertEqual(solver._joint_limit.braking_distance, 0.5)
+        self.assertEqual(solver._joint_limit.braking_distance, 0.2)
         self.assertIsInstance(solver._tasks["right"], BoundedFrameTask)
         self.assertIsInstance(solver._joint_limit, ArmJointLimit)
         assert solver._joint_limit is not None
@@ -724,7 +798,7 @@ class SolverTest(unittest.TestCase):
         measured = _driver_state(setup)
         measured[0] += 0.1
 
-        kinematics.update_measured_state(measured, np.zeros(16))
+        kinematics.update_measured_state(measured)
 
         np.testing.assert_array_equal(solver._config.q, command_before)
         assert solver._joint_limit is not None
@@ -780,7 +854,7 @@ class SolverTest(unittest.TestCase):
                     IKParams(
                         position_cost=10.0,
                         orientation_cost=1.0,
-                        lm_damping=0.02,
+                        lm_damping=0.01,
                         damping=0.1,
                         posture_cost=0.0,
                         dt=0.004,

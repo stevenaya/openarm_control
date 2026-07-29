@@ -30,9 +30,10 @@ class BoundedFrameTask(mink.Task):
         position_error_limit: float,
         orientation_error_limit: float = 0.0,
         control_dt: float,
+        substeps: int,
         speed_slow: float,
         speed_fast: float,
-        latch_multiplier: float,
+        position_latch_threshold: float,
     ) -> None:
         """Wrap either a world-frame or relative-frame Mink task."""
         if not isinstance(frame_task, (mink.FrameTask, mink.RelativeFrameTask)):
@@ -45,12 +46,18 @@ class BoundedFrameTask(mink.Task):
                 raise ValueError(f"{name} must be finite and non-negative.")
         if not np.isfinite(control_dt) or control_dt <= 0.0:
             raise ValueError("control_dt must be finite and positive.")
+        if (
+            not isinstance(substeps, (int, np.integer))
+            or isinstance(substeps, (bool, np.bool_))
+            or substeps <= 0
+        ):
+            raise ValueError("substeps must be a positive integer.")
         if not np.isfinite(speed_slow) or speed_slow < 0.0:
             raise ValueError("speed_slow must be finite and non-negative.")
         if not np.isfinite(speed_fast) or speed_fast <= speed_slow:
             raise ValueError("speed_fast must be finite and greater than speed_slow.")
-        if not np.isfinite(latch_multiplier) or latch_multiplier <= 0.0:
-            raise ValueError("latch_multiplier must be finite and positive.")
+        if not np.isfinite(position_latch_threshold) or position_latch_threshold <= 0.0:
+            raise ValueError("position_latch_threshold must be finite and positive.")
 
         super().__init__(
             cost=frame_task.cost.copy(),
@@ -61,15 +68,12 @@ class BoundedFrameTask(mink.Task):
         self.position_error_limit = float(position_error_limit)
         self.orientation_error_limit = float(orientation_error_limit)
         self._control_dt = float(control_dt)
+        self._substeps = int(substeps)
         self._speed_slow = float(speed_slow)
         self._speed_fast = float(speed_fast)
-        self._latch_multiplier = float(latch_multiplier)
+        self._position_latch_threshold = float(position_latch_threshold)
         self._previous_target_position: np.ndarray | None = None
         self.limit_activation = 1.0
-
-    def __getattr__(self, name: str) -> object:
-        """Expose native frame metadata such as frame and root names."""
-        return getattr(self.frame_task, name)
 
     def set_target(self, transform: mink.SE3) -> None:
         """Set the target on the wrapped native task."""
@@ -97,11 +101,9 @@ class BoundedFrameTask(mink.Task):
             1.0,
         )
         activation = float(u * u * (3.0 - 2.0 * u))
-        if self.limit_activation > 0.0:
+        if self.position_error_limit > 0.0 and self.limit_activation > 0.0:
             full_error = self.compute_full_error(configuration)
-            if float(np.linalg.norm(full_error[:3])) > (
-                self._latch_multiplier * self.position_error_limit
-            ):
+            if float(np.linalg.norm(full_error[:3])) > self._position_latch_threshold:
                 activation = max(activation, self.limit_activation)
         self.set_limit_activation(activation)
 
@@ -120,12 +122,13 @@ class BoundedFrameTask(mink.Task):
         return self.frame_task.compute_error(configuration)
 
     def compute_limited_error(self, configuration: mink.Configuration) -> np.ndarray:
-        """Return independently norm-limited position and orientation errors."""
+        """Return one substep of the total position and orientation budgets."""
         error = self.compute_full_error(configuration).copy()
-        for part, limit in (
+        for part, total_limit in (
             (slice(0, 3), self.position_error_limit),
             (slice(3, 6), self.orientation_error_limit),
         ):
+            limit = total_limit / self._substeps
             norm = float(np.linalg.norm(error[part]))
             if limit > 0.0 and norm > limit:
                 error[part] *= limit / norm
@@ -143,15 +146,19 @@ class BoundedFrameTask(mink.Task):
         self,
         configuration: mink.Configuration,
     ) -> mink.Objective:
-        """Assemble the native objective with only its error request modulated."""
-        if self.limit_activation == 0.0 or (
-            self.position_error_limit == 0.0 and self.orientation_error_limit == 0.0
-        ):
+        """Modulate position by its schedule and always bound orientation."""
+        bound_position = self.position_error_limit > 0.0 and self.limit_activation > 0.0
+        bound_orientation = self.orientation_error_limit > 0.0
+        if not bound_position and not bound_orientation:
             return self.frame_task.compute_qp_objective(configuration)
 
         full_error = self.compute_full_error(configuration)
         limited_error = self.compute_limited_error(configuration)
-        error = full_error + self.limit_activation * (limited_error - full_error)
+        error = full_error.copy()
+        if bound_position:
+            error[:3] += self.limit_activation * (limited_error[:3] - full_error[:3])
+        if bound_orientation:
+            error[3:] = limited_error[3:]
         return self._assemble_qp(
             error,
             self.compute_jacobian(configuration),
