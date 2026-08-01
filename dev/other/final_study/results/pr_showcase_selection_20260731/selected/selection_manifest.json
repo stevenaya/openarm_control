@@ -1,0 +1,289 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-07-31T03:45:40.829467+09:00",
+  "openarm_control_revision": "d006ece506f2c4965c390d897b1f5e7d0ea74cae",
+  "dataflow_args": "--tick-hz 250 --mode bimanual --origin-frame arm_origin --origin-frame-type site --max-iters 5 --pos-cost 12 --ori-cost 1.5 --damping 0.1 --posture-cost 0 --lm-damping 0.01 --frame-position-error-limit 0.02 --frame-orientation-error-limit 0.25 --limit-velocity --nullspace-cost 8.5 --nullspace-return-rate 1.6 --joint-braking-distance 0.2 --singularity-max-approach-rate 0.25 --kinetic-energy-cost 2e-5 --measured-state-timeout 0.1",
+  "profiles": {
+    "pr_current_dataflow": {
+      "name": "pr_current_dataflow",
+      "overrides": {
+        "position_cost": 12.0,
+        "orientation_cost": 1.5,
+        "lm_damping": 0.01,
+        "damping": 0.1,
+        "posture_cost": 0.0,
+        "frame_position_error_limit": 0.02,
+        "frame_orientation_error_limit": 0.25,
+        "nullspace_cost": 8.5,
+        "nullspace_return_rate": 1.6,
+        "joint_braking": true,
+        "joint_braking_distance": 0.2,
+        "singularity_max_approach_rate": 0.25,
+        "kinetic_energy_cost": 2e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Exact active dataflow arguments on 2026-07-31."
+    },
+    "mainline_with_ik_velocity": {
+      "name": "mainline_with_ik_velocity",
+      "overrides": {
+        "position_cost": 1.0,
+        "orientation_cost": 1.0,
+        "lm_damping": 0.01,
+        "damping": 0.1,
+        "posture_cost": 0.01,
+        "frame_position_error_limit": 0.0,
+        "frame_orientation_error_limit": 0.0,
+        "nullspace_cost": 0.0,
+        "joint_braking": true,
+        "joint_braking_distance": 0.2,
+        "singularity_max_approach_rate": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Mainline task set with the same IK velocity/braking envelope."
+    },
+    "pr_current_no_frame_bound": {
+      "name": "pr_current_no_frame_bound",
+      "overrides": {
+        "position_cost": 12.0,
+        "orientation_cost": 1.5,
+        "lm_damping": 0.01,
+        "damping": 0.1,
+        "posture_cost": 0.0,
+        "frame_position_error_limit": 0.0,
+        "frame_orientation_error_limit": 0.0,
+        "nullspace_cost": 8.5,
+        "nullspace_return_rate": 1.6,
+        "joint_braking": true,
+        "joint_braking_distance": 0.2,
+        "singularity_max_approach_rate": 0.25,
+        "kinetic_energy_cost": 2e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Current dataflow profile without the 6D frame bound."
+    },
+    "pr_current_no_nullspace": {
+      "name": "pr_current_no_nullspace",
+      "overrides": {
+        "position_cost": 12.0,
+        "orientation_cost": 1.5,
+        "lm_damping": 0.01,
+        "damping": 0.1,
+        "posture_cost": 0.0,
+        "frame_position_error_limit": 0.02,
+        "frame_orientation_error_limit": 0.25,
+        "nullspace_cost": 0.0,
+        "nullspace_return_rate": 1.6,
+        "joint_braking": true,
+        "joint_braking_distance": 0.2,
+        "singularity_max_approach_rate": 0.25,
+        "kinetic_energy_cost": 2e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Current dataflow profile without nullspace regulation."
+    }
+  },
+  "selected": {
+    "chest": {
+      "source_episode": 73,
+      "source_window_s": [
+        97.70274209976196,
+        100.34270811080933
+      ],
+      "source_label": "triphasic_98s",
+      "scenario": "episode73_triphasic_98s_straight_position",
+      "artifact": "/home/hilab/workdir.evaluation/openarm_control/dev/final_study/results/pr_showcase_selection_20260731/selected/chest_ep73_triphasic98_v1.npz",
+      "target_semantics": "Recorded FK(action) orientation with a smooth start-to-end position path; raw VR target unavailable.",
+      "selection_reason": "Clearly reproduces mainline retract-pause-recover behavior while the exact active PR profile remains near the smooth position command.",
+      "metrics": {
+        "pr_current_dataflow": {
+          "actual_elbow_lateral_range_m": 0.15156374073746284,
+          "actual_position_max_m": 0.017833351298588686,
+          "actual_position_rmse_m": 0.012753972277214596,
+          "actual_orientation_rmse_rad": 0.4954506651746983,
+          "actual_elbow_accel_p99_m_s2": 9.289330386549858,
+          "command_velocity_saturation_fraction": 0.1602787456445993,
+          "solver_failures": 0
+        },
+        "mainline_with_ik_velocity": {
+          "actual_elbow_lateral_range_m": 0.13407665682700162,
+          "actual_position_max_m": 0.17896441178336014,
+          "actual_position_rmse_m": 0.06168648503847387,
+          "actual_orientation_rmse_rad": 0.25388019018376984,
+          "actual_elbow_accel_p99_m_s2": 13.770844053670297,
+          "command_velocity_saturation_fraction": 0.3310104529616725,
+          "solver_failures": 0
+        },
+        "pr_current_no_frame_bound": {
+          "actual_elbow_lateral_range_m": 0.14432337640993143,
+          "actual_position_max_m": 0.04809570442728065,
+          "actual_position_rmse_m": 0.017942192032502087,
+          "actual_orientation_rmse_rad": 0.3837865576153089,
+          "actual_elbow_accel_p99_m_s2": 10.355831397786313,
+          "command_velocity_saturation_fraction": 0.22880371660859466,
+          "solver_failures": 0
+        }
+      },
+      "videos": [
+        "/home/hilab/workdir.evaluation/note/openarm_control/final_report/videos/showcase_candidate_v1_chest_ep73_triphasic98_pr_vs_mainline.mp4",
+        "/home/hilab/workdir.evaluation/note/openarm_control/final_report/videos/showcase_selected_v1_chest_ep73_triphasic98_controller_comparison.mp4"
+      ]
+    },
+    "retract": {
+      "source_episode": 75,
+      "source_event": 32,
+      "source_window_s": [
+        90.3268370628357,
+        92.33481121063232
+      ],
+      "scenario": "recorded_ep75_right_retract32_straight_retract",
+      "artifact": "/home/hilab/workdir.evaluation/openarm_control/dev/final_study/results/pr_showcase_selection_20260731/selected/retract_ep75_event32_v1.npz",
+      "target_semantics": "Smooth start-to-end position chord with the recorded FK(action) orientation; raw VR target unavailable.",
+      "selection_reason": "Current PR preserves a compact elbow branch while mainline with the same IK limits and PR without nullspace regulation both swing outward.",
+      "metrics": {
+        "pr_current_dataflow": {
+          "actual_elbow_lateral_range_m": 0.05849078645473593,
+          "actual_position_max_m": 0.0396657180134237,
+          "actual_position_rmse_m": 0.016957092522967496,
+          "actual_orientation_rmse_rad": 0.10582264071048138,
+          "actual_elbow_accel_p99_m_s2": 10.3985567346954,
+          "command_velocity_saturation_fraction": 0.358814352574103,
+          "solver_failures": 0
+        },
+        "mainline_with_ik_velocity": {
+          "actual_elbow_lateral_range_m": 0.1970821995292396,
+          "actual_position_max_m": 0.03500470704325138,
+          "actual_position_rmse_m": 0.016659474645392722,
+          "actual_orientation_rmse_rad": 0.10980849783284743,
+          "actual_elbow_accel_p99_m_s2": 10.519271109614515,
+          "command_velocity_saturation_fraction": 0.30265210608424337,
+          "solver_failures": 0
+        },
+        "pr_current_no_nullspace": {
+          "actual_elbow_lateral_range_m": 0.18572392046004624,
+          "actual_position_max_m": 0.032376595606424835,
+          "actual_position_rmse_m": 0.01571017526734618,
+          "actual_orientation_rmse_rad": 0.10943205404270548,
+          "actual_elbow_accel_p99_m_s2": 9.594561962608667,
+          "command_velocity_saturation_fraction": 0.36817472698907955,
+          "solver_failures": 0
+        }
+      },
+      "videos": [
+        "/home/hilab/workdir.evaluation/note/openarm_control/final_report/videos/showcase_candidate_v1_retract_ep75_event32_pr_vs_mainline.mp4",
+        "/home/hilab/workdir.evaluation/note/openarm_control/final_report/videos/showcase_selected_v1_retract_ep75_event32_controller_comparison.mp4"
+      ]
+    }
+  },
+  "summary_figure": "/home/hilab/workdir.evaluation/openarm_control/dev/final_study/results/pr_showcase_selection_20260731/selected/selected_showcase_metrics.png",
+  "deferred": "Root-cause work on residual chest wrist-flip failures is deferred until raw/filtered/final VR pose logging is available."
+}
