@@ -111,14 +111,14 @@ $$
 
 ### 2.2 6D End-Effector Error Modulation
 
-$e_p,e_R\in\mathbb{R}^3$ を frame task の position error と orientation error とし、方向を保つ norm saturation を定義します。
+$e_p,e_R\in\mathbb{R}^3$ を frame task の position error と orientation error とします。方向を保つ norm saturation は次の 2 条件で定義します。
 
 $$
-\mathrm{sat}_b(x)=
-\begin{cases}
-x, & \lVert x\rVert\le b,\\
-b\dfrac{x}{\lVert x\rVert}, & \lVert x\rVert>b.
-\end{cases}
+\lVert x\rVert\le b:\quad \mathrm{sat}_b(x)=x.
+$$
+
+$$
+\lVert x\rVert>b:\quad \mathrm{sat}_b(x)=b\frac{x}{\lVert x\rVert}.
 $$
 
 Position と orientation の parameter $B_p,B_R$ は 1 outer solve の total budget で、$N$ substep に均等配分されます。
@@ -148,11 +148,10 @@ $$
 
 ### 2.3 Exact-Nullspace Home Regulation
 
-$J_p,J_R$ を geometric linear/angular velocity Jacobian とします。Characteristic length $l_c=0.3\,\mathrm{m}$ により行の数値 scale をそろえます。
+$J_p,J_R$ を geometric linear/angular velocity Jacobian とします。Characteristic length $l_c=0.3\,\mathrm{m}$ により行の数値 scale をそろえます。Normalized Jacobian は $J_p/l_c$ の下に $J_R$ を積み重ねたもので、転置を用いると次のように書けます。
 
 $$
-J_{\mathrm{norm}}=
-\begin{bmatrix}J_p/l_c\\J_R\end{bmatrix}.
+J_{\mathrm{norm}}^\mathsf{T}=\left[(J_p/l_c)^\mathsf{T}\quad J_R^\mathsf{T}\right].
 $$
 
 この可逆な row scaling は nullspace を変えません。7-DoF arm の $6\times7$ Jacobian を full SVD すると、
@@ -458,11 +457,10 @@ PR default はすべての個別 metric を最適化するものではありま�
 
 ### 4.2 単一機能 Ablation
 
-次の図は、PR default から毎回一つの機能だけを外します。各 column の metric について、cell は次を表します。
+次の図は、PR default から毎回一つの機能だけを外します。各 cell は、column に示した metric の変化率をパーセントで表します。
 
 $$
-100\%\times\frac{m_{\mathrm{without\ feature}}-m_{\mathrm{PR}}}
-{|m_{\mathrm{PR}}|}.
+\Delta_m=100\frac{m_{\mathrm{ablated}}-m_{\mathrm{PR}}}{\left|m_{\mathrm{PR}}\right|}.
 $$
 
 Column は position RMSE、orientation RMSE、joint-acceleration p99、elbow-acceleration p99、elbow lateral range、tail EEF movement、driver-cap occupancy の順です。正値は metric の増加を表します。負値は tracking/stability tradeoff による場合があり、必ずしも全体改善を意味しません。

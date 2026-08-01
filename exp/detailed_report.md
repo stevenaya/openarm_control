@@ -111,14 +111,14 @@ With the current $\Delta t_{\mathrm{outer}}=4\,\mathrm{ms}$ and $N=5$, each subs
 
 ### 2.2 6D End-Effector Error Modulation
 
-Let $e_p,e_R\in\mathbb{R}^3$ denote the frame task's position and orientation errors. Define the direction-preserving norm saturation
+Let $e_p,e_R\in\mathbb{R}^3$ denote the frame task's position and orientation errors. The direction-preserving norm saturation has two branches:
 
 $$
-\mathrm{sat}_b(x)=
-\begin{cases}
-x, & \lVert x\rVert\le b,\\
-b\dfrac{x}{\lVert x\rVert}, & \lVert x\rVert>b.
-\end{cases}
+\lVert x\rVert\le b:\quad \mathrm{sat}_b(x)=x.
+$$
+
+$$
+\lVert x\rVert>b:\quad \mathrm{sat}_b(x)=b\frac{x}{\lVert x\rVert}.
 $$
 
 The position and orientation parameters $B_p,B_R$ are total budgets for one outer solve and are divided equally among $N$ substeps:
@@ -148,11 +148,10 @@ The current speed-scheduling interval is `0.6 -> 0.9 m/s`. Once position clippin
 
 ### 2.3 Exact-Nullspace Home Regulation
 
-Let $J_p,J_R$ be the geometric linear- and angular-velocity Jacobians. A characteristic length $l_c=0.3\,\mathrm{m}$ places their rows on comparable numerical scales:
+Let $J_p,J_R$ be the geometric linear- and angular-velocity Jacobians. A characteristic length $l_c=0.3\,\mathrm{m}$ places their rows on comparable numerical scales. The normalized Jacobian stacks $J_p/l_c$ above $J_R$, equivalently:
 
 $$
-J_{\mathrm{norm}}=
-\begin{bmatrix}J_p/l_c\\J_R\end{bmatrix}.
+J_{\mathrm{norm}}^\mathsf{T}=\left[(J_p/l_c)^\mathsf{T}\quad J_R^\mathsf{T}\right].
 $$
 
 This invertible row scaling does not change the nullspace. A full SVD of the $6\times7$ Jacobian of one 7-DoF arm gives
@@ -458,11 +457,10 @@ The PR default does not optimize every individual metric. It deliberately accept
 
 ### 4.2 Single-Feature Ablation
 
-Each row below removes one feature from the PR default. For the metric named by each column, every cell is
+Each row below removes one feature from the PR default. For the metric named by each column, every cell reports the following percentage change:
 
 $$
-100\%\times\frac{m_{\mathrm{without\ feature}}-m_{\mathrm{PR}}}
-{|m_{\mathrm{PR}}|}.
+\Delta_m=100\frac{m_{\mathrm{ablated}}-m_{\mathrm{PR}}}{\left|m_{\mathrm{PR}}\right|}.
 $$
 
 Columns are position RMSE, orientation RMSE, joint-acceleration p99, elbow-acceleration p99, elbow lateral range, tail EEF movement, and driver-cap occupancy. A positive value means the metric increased. A negative value may reflect a tracking/stability tradeoff and does not necessarily indicate an overall improvement.

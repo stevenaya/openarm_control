@@ -111,14 +111,14 @@ $$
 
 ### 2.2 6D 末端误差调制
 
-令 $e_p,e_R\in\mathbb{R}^3$ 为 frame task 的位置和朝向误差，并定义保持方向的范数截断
+令 $e_p,e_R\in\mathbb{R}^3$ 为 frame task 的位置和朝向误差。保持方向的范数截断分为两种情况：
 
 $$
-\mathrm{sat}_b(x)=
-\begin{cases}
-x, & \lVert x\rVert\le b,\\
-b\dfrac{x}{\lVert x\rVert}, & \lVert x\rVert>b.
-\end{cases}
+\lVert x\rVert\le b:\quad \mathrm{sat}_b(x)=x.
+$$
+
+$$
+\lVert x\rVert>b:\quad \mathrm{sat}_b(x)=b\frac{x}{\lVert x\rVert}.
 $$
 
 位置和朝向参数 $B_p,B_R$ 表示一次外层求解的总预算，并平均分配给 $N$ 个子步：
@@ -148,11 +148,10 @@ $$
 
 ### 2.3 精确零空间 home 正则
 
-令 $J_p,J_R$ 为几何线速度和角速度 Jacobian。以特征长度 $l_c=0.3\,\mathrm{m}$ 统一两类行的数值尺度：
+令 $J_p,J_R$ 为几何线速度和角速度 Jacobian。以特征长度 $l_c=0.3\,\mathrm{m}$ 统一两类行的数值尺度。归一化 Jacobian 将 $J_p/l_c$ 叠放在 $J_R$ 上方，等价地写为：
 
 $$
-J_{\mathrm{norm}}=
-\begin{bmatrix}J_p/l_c\\J_R\end{bmatrix}.
+J_{\mathrm{norm}}^\mathsf{T}=\left[(J_p/l_c)^\mathsf{T}\quad J_R^\mathsf{T}\right].
 $$
 
 该可逆行缩放不改变零空间。对 7-DoF 单臂的 $6\times7$ Jacobian 做完整 SVD：
@@ -458,11 +457,10 @@ PR 默认配置并未优化所有单项指标。它主动容忍部分朝向滞�
 
 ### 4.2 单功能消融
 
-下图每次只从 PR default 移除一个功能。每个单元格针对列标题所示指标计算
+下图每次只从 PR default 移除一个功能。每个单元格表示列标题所示指标的百分比变化：
 
 $$
-100\%\times\frac{m_{\mathrm{without\ feature}}-m_{\mathrm{PR}}}
-{|m_{\mathrm{PR}}|}.
+\Delta_m=100\frac{m_{\mathrm{ablated}}-m_{\mathrm{PR}}}{\left|m_{\mathrm{PR}}\right|}.
 $$
 
 列指标依次为位置 RMSE、朝向 RMSE、关节加速度 p99、肘部加速度 p99、肘横向范围、末段 EEF 运动和驱动器限速激活率。正值表示指标增大；负值可能来自跟踪与稳定性的取舍，不必然代表整体改善。

@@ -19,6 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 PUBLIC_DIRS = ("assets", "videos", "tables", "manifests")
 DEFAULT_OMISSIONS = {"solver", "velocity_limits"}
+UNSAFE_GITHUB_MATH = (r"\begin{bmatrix}", r"\begin{cases}")
 
 
 def _resolve_recorded_path(value: str) -> Path:
@@ -52,6 +53,11 @@ def _validate_math(path: Path) -> list[str]:
         errors.append(f"{path.name}: double-escaped display-math delimiter")
     if r"\operatorname" in text:
         errors.append(f"{path.name}: GitHub math does not allow \\operatorname")
+    for expression in UNSAFE_GITHUB_MATH:
+        if expression in text:
+            errors.append(
+                f"{path.name}: GitHub may consume row separators in {expression}"
+            )
     if "<video" in text:
         errors.append(f"{path.name}: GitHub does not render repository video tags")
     return errors
