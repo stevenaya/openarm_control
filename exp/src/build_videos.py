@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import subprocess
 from pathlib import Path
 
 import render_videos as video
@@ -12,6 +13,42 @@ import render_videos as video
 HERE = Path(__file__).resolve().parent
 DEFAULT_RESULTS = HERE.parent / "results" / "final_report_20260801"
 DEFAULT_OUTPUT = HERE.parent / "videos"
+DEFAULT_PREVIEW_OUTPUT = HERE.parent / "assets" / "video_previews"
+
+
+def animated_previews(video_dir: Path, output: Path) -> tuple[Path, ...]:
+    """Generate compact GitHub-renderable previews for the public MP4 files."""
+    output.mkdir(parents=True, exist_ok=True)
+    paths: list[Path] = []
+    for source in sorted(video_dir.glob("*.mp4")):
+        catalog = source.name == "ideal_reference_trajectory_catalog.mp4"
+        fps = 4 if catalog else 6
+        width = 600 if catalog else 720
+        colors = 96 if catalog else 128
+        target = output / f"{source.stem}.gif"
+        video_filter = (
+            f"fps={fps},scale={width}:-1:flags=lanczos,split[s0][s1];"
+            f"[s0]palettegen=max_colors={colors}[p];"
+            "[s1][p]paletteuse=dither=bayer:bayer_scale=5"
+        )
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-loglevel",
+                "error",
+                "-i",
+                str(source),
+                "-vf",
+                video_filter,
+                "-loop",
+                "0",
+                str(target),
+            ],
+            check=True,
+        )
+        paths.append(target)
+    return tuple(paths)
 
 
 def ideal_reference_video(output: Path) -> Path:
@@ -278,6 +315,17 @@ def main() -> None:
         action="store_true",
         help="Regenerate only the 21-mode reference catalog.",
     )
+    output_mode.add_argument(
+        "--previews-only",
+        action="store_true",
+        help="Regenerate animated previews from existing MP4 files.",
+    )
+    parser.add_argument(
+        "--preview-dir",
+        type=Path,
+        default=DEFAULT_PREVIEW_OUTPUT,
+        help="Output directory for GitHub-renderable GIF previews.",
+    )
     args = parser.parse_args()
     root = args.results.resolve()
     output = args.output_dir.resolve()
@@ -296,12 +344,15 @@ def main() -> None:
             "refresh_nullspace": root / "nullspace_sweep",
         }
     )
-    if not args.catalog_only:
-        for spec in comparisons():
-            path = video.comparison_video(spec)
-            print(f"Wrote {path}")
-    if not args.skip_catalog:
-        print(f"Wrote {ideal_reference_video(output)}")
+    if not args.previews_only:
+        if not args.catalog_only:
+            for spec in comparisons():
+                path = video.comparison_video(spec)
+                print(f"Wrote {path}")
+        if not args.skip_catalog:
+            print(f"Wrote {ideal_reference_video(output)}")
+    for path in animated_previews(output, args.preview_dir.resolve()):
+        print(f"Wrote {path}")
 
 
 if __name__ == "__main__":

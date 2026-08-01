@@ -17,7 +17,7 @@ step-by-step workflow is documented in
 | `trajectory_catalog.py` | Enumerate and validate every target generator without writing trajectory arrays |
 | `TRAJECTORIES.md` | Generated catalog of the 70 unique targets, builders, suites, and hashes |
 | `build_figures.py` | Regenerate report figures and CSV tables from retained results |
-| `build_videos.py` | Regenerate the public comparison videos from retained traces |
+| `build_videos.py` | Regenerate public MP4 videos and GitHub-renderable GIF previews from retained traces |
 | `validate_report.py` | Validate links, parameters, manifests, inputs, and asset checksums |
 | `study.py` | Shared MuJoCo plant, trajectories, profiles, metrics, and matrix runner |
 | `targeted_study.py` | Chest, braking, and robustness scenarios |
@@ -87,11 +87,13 @@ Regenerate figures and tables from the retained results:
 uv run --project exp/src --frozen python exp/src/build_figures.py
 ```
 
-Regenerate all public videos, or only the 21-action trajectory catalog:
+Regenerate all public videos and GitHub-renderable animated previews, or only
+the 21-action trajectory catalog:
 
 ```bash
 uv run --project exp/src --frozen python exp/src/build_videos.py
 uv run --project exp/src --frozen python exp/src/build_videos.py --catalog-only
+uv run --project exp/src --frozen python exp/src/build_videos.py --previews-only
 ```
 
 Validate the complete published report:

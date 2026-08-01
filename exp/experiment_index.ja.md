@@ -137,15 +137,15 @@ Screening suite は固定比較用の `42` trajectory を使用する。他 suit
 
 | Video | Type | Playback | 内容 |
 |---|---|---:|---|
-| [Reference-action catalog](videos/ideal_reference_trajectory_catalog.mp4) | Target catalog | Segment ごと | 21 representative clip と 42/70 set 内の family count。Controller A/B ではない |
-| [胸前 controller 比較](videos/near_chest_fast_wrist_roll_controller_comparison.mp4) | 1 recorded-command-derived trajectory | 0.5x | PR default / Mainline baseline / PR w/o 6D error bound |
-| [Fast-retract 6D error bound](videos/fast_retract_frame_error_bound_comparison.mp4) | `2x` time-compressed recorded path | 0.5x | PR default / PR w/o 6D error bound、2 column |
-| [胸前 roll + diagonal translation](videos/near_chest_roll_translation_error_bound_comparison.mp4) | 1 synthetic trajectory | 0.5x | PR default / PR w/o 6D error bound |
-| [Fast-retract controller 比較](videos/fast_retract_controller_comparison.mp4) | 1 recorded-command-derived trajectory | 0.5x | PR default / Mainline baseline / PR w/o posture regulation、2 view |
-| [Posture-regulation 比較](videos/fast_retract_posture_regulation_comparison.mp4) | 1 recorded-command-derived trajectory | 0.5x | PR default / PR w/o posture regulation / PR: full-home posture 0.01 / 0.03 |
-| [Nullspace parameter 2x2](videos/fast_retract_nullspace_parameter_comparison.mp4) | 1 recorded-command-derived trajectory | 0.5x | PR default と 3 nullspace candidate |
-| [IK velocity limit](videos/fast_retract_ik_velocity_limit_comparison.mp4) | 1 recorded-command-derived trajectory | 0.5x | PR default / PR w/o IK velocity limits |
-| [伸展 singularity](videos/straight_reach_singularity_limit_comparison.mp4) | Deep-start shoulder-height synthetic trajectory | 0.5x | Start を `0.10 m` 後退、同じ最遠点。Singularity limit on/off。Actual J1 acceleration を表示 |
+| [Reference-action catalogプレビュー](assets/video_previews/ideal_reference_trajectory_catalog.gif) ([MP4](videos/ideal_reference_trajectory_catalog.mp4)) | Target catalog | Segment ごと | 21 representative clip と 42/70 set 内の family count。Controller A/B ではない |
+| [胸前 controller 比較プレビュー](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif) ([MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)) | 1 recorded-command-derived trajectory | 0.5x | PR default / Mainline baseline / PR w/o 6D error bound |
+| [Fast-retract 6D error boundプレビュー](assets/video_previews/fast_retract_frame_error_bound_comparison.gif) ([MP4](videos/fast_retract_frame_error_bound_comparison.mp4)) | `2x` time-compressed recorded path | 0.5x | PR default / PR w/o 6D error bound、2 column |
+| [胸前 roll + diagonal translationプレビュー](assets/video_previews/near_chest_roll_translation_error_bound_comparison.gif) ([MP4](videos/near_chest_roll_translation_error_bound_comparison.mp4)) | 1 synthetic trajectory | 0.5x | PR default / PR w/o 6D error bound |
+| [Fast-retract controller 比較プレビュー](assets/video_previews/fast_retract_controller_comparison.gif) ([MP4](videos/fast_retract_controller_comparison.mp4)) | 1 recorded-command-derived trajectory | 0.5x | PR default / Mainline baseline / PR w/o posture regulation、2 view |
+| [Posture-regulation 比較プレビュー](assets/video_previews/fast_retract_posture_regulation_comparison.gif) ([MP4](videos/fast_retract_posture_regulation_comparison.mp4)) | 1 recorded-command-derived trajectory | 0.5x | PR default / PR w/o posture regulation / PR: full-home posture 0.01 / 0.03 |
+| [Nullspace parameter 2x2プレビュー](assets/video_previews/fast_retract_nullspace_parameter_comparison.gif) ([MP4](videos/fast_retract_nullspace_parameter_comparison.mp4)) | 1 recorded-command-derived trajectory | 0.5x | PR default と 3 nullspace candidate |
+| [IK velocity limitプレビュー](assets/video_previews/fast_retract_ik_velocity_limit_comparison.gif) ([MP4](videos/fast_retract_ik_velocity_limit_comparison.mp4)) | 1 recorded-command-derived trajectory | 0.5x | PR default / PR w/o IK velocity limits |
+| [伸展 singularityプレビュー](assets/video_previews/straight_reach_singularity_limit_comparison.gif) ([MP4](videos/straight_reach_singularity_limit_comparison.mp4)) | Deep-start shoulder-height synthetic trajectory | 0.5x | Start を `0.10 m` 後退、同じ最遠点。Singularity limit on/off。Actual J1 acceleration を表示 |
 
 ## 7. CSV 索引
 

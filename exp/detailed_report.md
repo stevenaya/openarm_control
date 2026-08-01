@@ -114,7 +114,7 @@ With the current $\Delta t_{\mathrm{outer}}=4\,\mathrm{ms}$ and $N=5$, each subs
 Let $e_p,e_R\in\mathbb{R}^3$ denote the frame task's position and orientation errors. Define the direction-preserving norm saturation
 
 $$
-\operatorname{sat}_b(x)=
+\mathrm{sat}_b(x)=
 \begin{cases}
 x, & \lVert x\rVert\le b,\\
 b\dfrac{x}{\lVert x\rVert}, & \lVert x\rVert>b.
@@ -124,8 +124,8 @@ $$
 The position and orientation parameters $B_p,B_R$ are total budgets for one outer solve and are divided equally among $N$ substeps:
 
 $$
-\bar e_p=\operatorname{sat}_{B_p/N}(e_p),\qquad
-\bar e_R=\operatorname{sat}_{B_R/N}(e_R).
+\bar e_p=\mathrm{sat}_{B_p/N}(e_p),\qquad
+\bar e_R=\mathrm{sat}_{B_R/N}(e_R).
 $$
 
 Orientation always uses $\bar e_R$. Position obtains an activation $\alpha_p\in[0,1]$ from target linear speed and continuously blends the full and clipped errors:
@@ -138,7 +138,7 @@ $$
 If $v_t$ is the target-position finite-difference velocity over the outer period,
 
 $$
-u_p=\operatorname{clip}\left(
+u_p=\mathrm{clip}\left(
 \frac{\lVert v_t\rVert-v_{\mathrm{slow}}}
 {v_{\mathrm{fast}}-v_{\mathrm{slow}}},0,1\right),
 \qquad \alpha_p=3u_p^2-2u_p^3.
@@ -171,7 +171,7 @@ e_q=q\ominus q_{\mathrm{home}},
 $$
 
 $$
-v_{\mathrm{ns}}=\operatorname{clip}
+v_{\mathrm{ns}}=\mathrm{clip}
 \left(-k_{\mathrm{ns}}e_{\mathrm{ns}},
 -v_{\mathrm{ns,max}},v_{\mathrm{ns,max}}\right).
 $$
@@ -189,7 +189,7 @@ $$
 \rho=\frac{\sigma_{\min}(J_{\mathrm{norm}})}
 {\sigma_{\max}(J_{\mathrm{norm}})},
 \quad
-u_{\mathrm{ns}}=\operatorname{clip}
+u_{\mathrm{ns}}=\mathrm{clip}
 \left(\frac{\rho-\rho_{\mathrm{low}}}
 {\rho_{\mathrm{high}}-\rho_{\mathrm{low}}},0,1\right),
 $$
@@ -214,7 +214,7 @@ $$
 The implementation computes $g$ with central finite differences along joint tangent-space directions. To first order, $\dot\rho\approx g^\mathsf{T}\dot q$; the arm approaches a singularity only when $g^\mathsf{T}\dot q<0$. The permitted approach rate tightens smoothly with the current $\rho$:
 
 $$
-u_\rho=\operatorname{clip}
+u_\rho=\mathrm{clip}
 \left(\frac{\rho-\rho_{\mathrm{stop}}}
 {\rho_{\mathrm{slow}}-\rho_{\mathrm{stop}}},0,1\right),
 \qquad
@@ -236,13 +236,13 @@ Thus, only the component that decreases $\rho$ is slowed; motion leaving the sin
 For each scalar arm joint, let $q_{min},q_{max}$ be position limits, $v_{max}$ the physical velocity limit, and $k_q\in(0,1]$ a position gain. The recoverable envelope combines position recovery and velocity bounds into one pair of one-step limits:
 
 $$
-\Delta q_{low}=\operatorname{clip}
+\Delta q_{low}=\mathrm{clip}
 \left(k_q(q_{min}-q),-v_{max}\Delta t_{\mathrm{sub}},
 v_{max}\Delta t_{\mathrm{sub}}\right),
 $$
 
 $$
-\Delta q_{high}=\operatorname{clip}
+\Delta q_{high}=\mathrm{clip}
 \left(k_q(q_{max}-q),-v_{max}\Delta t_{\mathrm{sub}},
 v_{max}\Delta t_{\mathrm{sub}}\right).
 $$
@@ -252,7 +252,7 @@ If a joint is slightly outside its position range and the required recovery exce
 When braking is enabled, let $m$ be the effective distance to the position limit in the direction of motion and $d_b$ the braking distance:
 
 $$
-u=\operatorname{clip}\left(\frac{\max(m,0)}{d_b},0,1\right),
+u=\mathrm{clip}\left(\frac{\max(m,0)}{d_b},0,1\right),
 \qquad
 v_{\mathrm{allowed}}(m)=v_{max}(3u^2-2u^3)^p.
 $$
@@ -370,12 +370,13 @@ The table below shows the number and purpose of trajectories in each motion fami
 
 ![Reference target-trajectory catalog](assets/02_trajectory_catalog.png)
 
+GitHub does not render repository MP4 files inline. This report therefore embeds animated GIF previews; click a preview or the adjacent link to access the original MP4.
+
 **Video: 21 reference-motion clips; on-screen labels show each family's counts in the 42-trajectory fixed set and all 70 targets**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/ideal_reference_trajectory_catalog.mp4" type="video/mp4">
-  <a href="videos/ideal_reference_trajectory_catalog.mp4">Open MP4</a>
-</video>
+[![Animated video preview](assets/video_previews/ideal_reference_trajectory_catalog.gif)](videos/ideal_reference_trajectory_catalog.mp4)
+
+[Download MP4](videos/ideal_reference_trajectory_catalog.mp4)
 
 #### 3.2.3 Experiment Suites and Run Counts
 
@@ -506,10 +507,9 @@ Without the 6D error bound, position error, elbow lateral motion, joint accelera
 
 **Video: Near-chest roll + diagonal translation, 0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/near_chest_roll_translation_error_bound_comparison.mp4" type="video/mp4">
-  <a href="videos/near_chest_roll_translation_error_bound_comparison.mp4">Open MP4</a>
-</video>
+[![Animated video preview](assets/video_previews/near_chest_roll_translation_error_bound_comparison.gif)](videos/near_chest_roll_translation_error_bound_comparison.mp4)
+
+[Download MP4](videos/near_chest_roll_translation_error_bound_comparison.mp4)
 
 #### 5.1.2 Hardware-Record-Derived Near-Chest Simulation Replay
 
@@ -527,10 +527,9 @@ The Mainline baseline has the lowest orientation RMSE, but its EEF position path
 
 **Video: controller comparison for near-chest fast wrist rotation, one hardware-record-derived trajectory, 0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/near_chest_fast_wrist_roll_controller_comparison.mp4" type="video/mp4">
-  <a href="videos/near_chest_fast_wrist_roll_controller_comparison.mp4">Open MP4</a>
-</video>
+[![Animated video preview](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif)](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
+
+[Download MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
 
 This result shows that error modulation primarily suppresses whole-arm instability induced by fast wrist rotation rather than prioritizing orientation catch-up. Slower orientation tracking is an explicit control tradeoff.
 
@@ -540,10 +539,9 @@ To isolate the role of the 6D error bound during fast retraction, the following 
 
 **Video: side-by-side fast-retract 6D error-bound comparison, trajectory accelerated 2x and played at 0.5x**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_frame_error_bound_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_frame_error_bound_comparison.mp4">Open MP4</a>
-</video>
+[![Animated video preview](assets/video_previews/fast_retract_frame_error_bound_comparison.gif)](videos/fast_retract_frame_error_bound_comparison.mp4)
+
+[Download MP4](videos/fast_retract_frame_error_bound_comparison.mp4)
 
 ### 5.2 Redundancy and Singularity
 
@@ -571,10 +569,9 @@ Y-Z is the actual elbow path in the `arm_origin` plane, and `y-y0` is displaceme
 
 **Video: four-way secondary-posture comparison, one hardware-record-derived trajectory, 0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_posture_regulation_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_posture_regulation_comparison.mp4">Open MP4</a>
-</video>
+[![Animated video preview](assets/video_previews/fast_retract_posture_regulation_comparison.gif)](videos/fast_retract_posture_regulation_comparison.mp4)
+
+[Download MP4](videos/fast_retract_posture_regulation_comparison.mp4)
 
 With `posture_cost=0.003/0.01/0.03`, elbow lateral ranges are `17.60/17.61/17.76 cm`; none forms a branch constraint equivalent to exact-nullspace regulation. Exact-nullspace regulation accepts approximately `3 mm` additional position RMSE to reduce elbow excursion by approximately `13.6 cm`, without applying the home preference directly in all joint-space directions.
 
@@ -584,10 +581,9 @@ The preceding experiment changes only the secondary posture task. The following 
 
 **Video: fast-retract controller comparison, one hardware-record-derived trajectory, 0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_controller_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_controller_comparison.mp4">Open MP4</a>
-</video>
+[![Animated video preview](assets/video_previews/fast_retract_controller_comparison.gif)](videos/fast_retract_controller_comparison.mp4)
+
+[Download MP4](videos/fast_retract_controller_comparison.mp4)
 
 #### 5.2.2 Singularity-Approach Limit During Extension and Retraction
 
@@ -610,10 +606,9 @@ The video uses a deep-start variant with the same farthest target. Its start and
 
 **Video: A/B comparison in the extended-arm singular region, 0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/straight_reach_singularity_limit_comparison.mp4" type="video/mp4">
-  <a href="videos/straight_reach_singularity_limit_comparison.mp4">Open MP4</a>
-</video>
+[![Animated video preview](assets/video_previews/straight_reach_singularity_limit_comparison.gif)](videos/straight_reach_singularity_limit_comparison.mp4)
+
+[Download MP4](videos/straight_reach_singularity_limit_comparison.mp4)
 
 ### 5.3 Joint Safety Envelope
 
@@ -682,10 +677,9 @@ Maximum absolute along-track lag over the full run increases from `2.57 cm` unde
 
 **Video: fast-retract QP velocity-limit A/B; driver limits enabled in both columns, 0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_ik_velocity_limit_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_ik_velocity_limit_comparison.mp4">Open MP4</a>
-</video>
+[![Animated video preview](assets/video_previews/fast_retract_ik_velocity_limit_comparison.gif)](videos/fast_retract_ik_velocity_limit_comparison.mp4)
+
+[Download MP4](videos/fast_retract_ik_velocity_limit_comparison.mp4)
 
 ## 6. Parameters, Correctness, and Performance
 
@@ -709,10 +703,9 @@ To test generalization, the next figure cross-validates candidates on `11` direc
 
 **Video: 2x2 exact-nullspace parameters during fast retraction, one hardware-record-derived trajectory, 0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_nullspace_parameter_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_nullspace_parameter_comparison.mp4">Open MP4</a>
-</video>
+[![Animated video preview](assets/video_previews/fast_retract_nullspace_parameter_comparison.gif)](videos/fast_retract_nullspace_parameter_comparison.mp4)
+
+[Download MP4](videos/fast_retract_nullspace_parameter_comparison.mp4)
 
 Visual differences are modest.
 

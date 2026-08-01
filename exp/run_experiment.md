@@ -272,16 +272,26 @@ uv run --project exp/src --frozen python exp/src/build_videos.py \
   --skip-catalog
 ```
 
+Regenerate only the GitHub-renderable animated previews from existing MP4 files:
+
+```bash
+uv run --project exp/src --frozen python exp/src/build_videos.py \
+  --previews-only
+```
+
 Use an independent result set and output directory:
 
 ```bash
 uv run --project exp/src --frozen python exp/src/build_videos.py \
   --results exp/results/reproduction \
-  --output-dir /tmp/openarm-video-reproduction
+  --output-dir /tmp/openarm-video-reproduction \
+  --preview-dir /tmp/openarm-video-previews
 ```
 
 The renderer uses `MUJOCO_GL=egl` by default and streams RGB frames directly to
-FFmpeg without retaining an intermediate image sequence.
+FFmpeg without retaining an intermediate image sequence. It also writes compact
+animated GIF previews to `exp/assets/video_previews/`, because GitHub does not
+render repository MP4 files inline.
 
 ## 9. Update and Validate the Published Report
 

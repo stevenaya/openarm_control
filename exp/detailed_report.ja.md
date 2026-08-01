@@ -114,7 +114,7 @@ $$
 $e_p,e_R\in\mathbb{R}^3$ を frame task の position error と orientation error とし、方向を保つ norm saturation を定義します。
 
 $$
-\operatorname{sat}_b(x)=
+\mathrm{sat}_b(x)=
 \begin{cases}
 x, & \lVert x\rVert\le b,\\
 b\dfrac{x}{\lVert x\rVert}, & \lVert x\rVert>b.
@@ -124,8 +124,8 @@ $$
 Position と orientation の parameter $B_p,B_R$ は 1 outer solve の total budget で、$N$ substep に均等配分されます。
 
 $$
-\bar e_p=\operatorname{sat}_{B_p/N}(e_p),\qquad
-\bar e_R=\operatorname{sat}_{B_R/N}(e_R).
+\bar e_p=\mathrm{sat}_{B_p/N}(e_p),\qquad
+\bar e_R=\mathrm{sat}_{B_R/N}(e_R).
 $$
 
 Orientation は常に $\bar e_R$ を使用します。Position は target linear speed から $\alpha_p\in[0,1]$ を求め、full error と clipped error を連続的に混合します。
@@ -138,7 +138,7 @@ $$
 $v_t$ を outer period 間の target-position finite-difference velocity とすると、
 
 $$
-u_p=\operatorname{clip}\left(
+u_p=\mathrm{clip}\left(
 \frac{\lVert v_t\rVert-v_{\mathrm{slow}}}
 {v_{\mathrm{fast}}-v_{\mathrm{slow}}},0,1\right),
 \qquad \alpha_p=3u_p^2-2u_p^3.
@@ -171,7 +171,7 @@ e_q=q\ominus q_{\mathrm{home}},
 $$
 
 $$
-v_{\mathrm{ns}}=\operatorname{clip}
+v_{\mathrm{ns}}=\mathrm{clip}
 \left(-k_{\mathrm{ns}}e_{\mathrm{ns}},
 -v_{\mathrm{ns,max}},v_{\mathrm{ns,max}}\right).
 $$
@@ -189,7 +189,7 @@ $$
 \rho=\frac{\sigma_{\min}(J_{\mathrm{norm}})}
 {\sigma_{\max}(J_{\mathrm{norm}})},
 \quad
-u_{\mathrm{ns}}=\operatorname{clip}
+u_{\mathrm{ns}}=\mathrm{clip}
 \left(\frac{\rho-\rho_{\mathrm{low}}}
 {\rho_{\mathrm{high}}-\rho_{\mathrm{low}}},0,1\right),
 $$
@@ -214,7 +214,7 @@ $$
 実装は joint tangent-space direction に沿う central finite difference で $g$ を計算します。1 次近似では $\dot\rho\approx g^\mathsf{T}\dot q$ であり、$g^\mathsf{T}\dot q<0$ のときだけ arm は singularity に接近します。許容 approach rate は current $\rho$ に応じて滑らかに縮小します。
 
 $$
-u_\rho=\operatorname{clip}
+u_\rho=\mathrm{clip}
 \left(\frac{\rho-\rho_{\mathrm{stop}}}
 {\rho_{\mathrm{slow}}-\rho_{\mathrm{stop}}},0,1\right),
 \qquad
@@ -236,13 +236,13 @@ $$
 各 scalar arm joint について、$q_{min},q_{max}$ を position limit、$v_{max}$ を physical velocity limit、$k_q\in(0,1]$ を position gain とします。Recoverable envelope は position recovery と velocity bound を一組の one-step limit に統合します。
 
 $$
-\Delta q_{low}=\operatorname{clip}
+\Delta q_{low}=\mathrm{clip}
 \left(k_q(q_{min}-q),-v_{max}\Delta t_{\mathrm{sub}},
 v_{max}\Delta t_{\mathrm{sub}}\right),
 $$
 
 $$
-\Delta q_{high}=\operatorname{clip}
+\Delta q_{high}=\mathrm{clip}
 \left(k_q(q_{max}-q),-v_{max}\Delta t_{\mathrm{sub}},
 v_{max}\Delta t_{\mathrm{sub}}\right).
 $$
@@ -252,7 +252,7 @@ Joint が position range のわずか外にあり、必要な recovery が veloc
 Braking 有効時、$m$ を motion direction にある position limit までの effective distance、$d_b$ を braking distance とします。
 
 $$
-u=\operatorname{clip}\left(\frac{\max(m,0)}{d_b},0,1\right),
+u=\mathrm{clip}\left(\frac{\max(m,0)}{d_b},0,1\right),
 \qquad
 v_{\mathrm{allowed}}(m)=v_{max}(3u^2-2u^3)^p.
 $$
@@ -370,12 +370,13 @@ Control chain の各量は次を意味します。
 
 ![Reference target-trajectory catalog](assets/02_trajectory_catalog.png)
 
+GitHub は repository 内の MP4 を inline 再生しないため、本 report では animated GIF preview を表示する。Preview または隣接 link をクリックすると元の MP4 にアクセスできる。
+
 **動画：21 reference-motion clip。画面内 label は 42 本の fixed set と全 70 target における各 family の本数を表示**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/ideal_reference_trajectory_catalog.mp4" type="video/mp4">
-  <a href="videos/ideal_reference_trajectory_catalog.mp4">MP4 を開く</a>
-</video>
+[![動画プレビュー](assets/video_previews/ideal_reference_trajectory_catalog.gif)](videos/ideal_reference_trajectory_catalog.mp4)
+
+[MP4 をダウンロード](videos/ideal_reference_trajectory_catalog.mp4)
 
 #### 3.2.3 Experiment Suite と Run Count
 
@@ -506,10 +507,9 @@ $\max_i |\dot q_{i,\mathrm{actual}}|$ と $\max_i |\ddot q_{i,\mathrm{actual}}|$
 
 **動画：Near-chest roll + diagonal translation、0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/near_chest_roll_translation_error_bound_comparison.mp4" type="video/mp4">
-  <a href="videos/near_chest_roll_translation_error_bound_comparison.mp4">MP4 を開く</a>
-</video>
+[![動画プレビュー](assets/video_previews/near_chest_roll_translation_error_bound_comparison.gif)](videos/near_chest_roll_translation_error_bound_comparison.mp4)
+
+[MP4 をダウンロード](videos/near_chest_roll_translation_error_bound_comparison.mp4)
 
 #### 5.1.2 Hardware Record 由来の胸前 Simulation Replay
 
@@ -527,10 +527,9 @@ Mainline baseline は orientation RMSE が最小ですが、EEF position path �
 
 **動画：胸前高速 wrist rotation の controller comparison、hardware record 由来の単一 trajectory、0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/near_chest_fast_wrist_roll_controller_comparison.mp4" type="video/mp4">
-  <a href="videos/near_chest_fast_wrist_roll_controller_comparison.mp4">MP4 を開く</a>
-</video>
+[![動画プレビュー](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif)](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
+
+[MP4 をダウンロード](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
 
 この結果は、error modulation の主目的が orientation を急いで追従することではなく、高速 wrist rotation が引き起こす whole-arm instability の抑制であることを示します。遅い orientation tracking は明示的な control tradeoff です。
 
@@ -540,10 +539,9 @@ Mainline baseline は orientation RMSE が最小ですが、EEF position path �
 
 **動画：高速 retract の 6D error-bound side-by-side comparison、trajectory 2x、0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_frame_error_bound_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_frame_error_bound_comparison.mp4">MP4 を開く</a>
-</video>
+[![動画プレビュー](assets/video_previews/fast_retract_frame_error_bound_comparison.gif)](videos/fast_retract_frame_error_bound_comparison.mp4)
+
+[MP4 をダウンロード](videos/fast_retract_frame_error_bound_comparison.mp4)
 
 ### 5.2 Redundancy と Singularity
 
@@ -571,10 +569,9 @@ Y-Z は `arm_origin` plane における actual elbow path、`y-y0` は初期 lat
 
 **動画：secondary-posture 4-way comparison、hardware record 由来の単一 trajectory、0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_posture_regulation_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_posture_regulation_comparison.mp4">MP4 を開く</a>
-</video>
+[![動画プレビュー](assets/video_previews/fast_retract_posture_regulation_comparison.gif)](videos/fast_retract_posture_regulation_comparison.mp4)
+
+[MP4 をダウンロード](videos/fast_retract_posture_regulation_comparison.mp4)
 
 `posture_cost=0.003/0.01/0.03` の elbow lateral range は `17.60/17.61/17.76 cm` で、いずれも exact-nullspace regulation と等価な branch constraint を形成しません。Exact-nullspace regulation は約 `3 mm` の追加 position RMSE を受け入れ、elbow excursion を約 `13.6 cm` 減らします。また、home preference を joint-space の全方向へ直接加えません。
 
@@ -584,10 +581,9 @@ Y-Z は `arm_origin` plane における actual elbow path、`y-y0` は初期 lat
 
 **動画：高速 retract controller comparison、hardware record 由来の単一 trajectory、0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_controller_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_controller_comparison.mp4">MP4 を開く</a>
-</video>
+[![動画プレビュー](assets/video_previews/fast_retract_controller_comparison.gif)](videos/fast_retract_controller_comparison.mp4)
+
+[MP4 をダウンロード](videos/fast_retract_controller_comparison.mp4)
 
 #### 5.2.2 Extension と Retract における Singularity-Approach Limit
 
@@ -610,10 +606,9 @@ Limit を有効にすると、blue の extension segment が yellow slow zone �
 
 **動画：Extended-arm singular region の A/B、0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/straight_reach_singularity_limit_comparison.mp4" type="video/mp4">
-  <a href="videos/straight_reach_singularity_limit_comparison.mp4">MP4 を開く</a>
-</video>
+[![動画プレビュー](assets/video_previews/straight_reach_singularity_limit_comparison.gif)](videos/straight_reach_singularity_limit_comparison.mp4)
+
+[MP4 をダウンロード](videos/straight_reach_singularity_limit_comparison.mp4)
 
 ### 5.3 Joint Safety Envelope
 
@@ -682,10 +677,9 @@ QP と driver は同じ per-joint numerical limit を使いますが、役割は
 
 **動画：高速 retract の QP velocity-limit A/B。両列で driver limit 有効、0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_ik_velocity_limit_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_ik_velocity_limit_comparison.mp4">MP4 を開く</a>
-</video>
+[![動画プレビュー](assets/video_previews/fast_retract_ik_velocity_limit_comparison.gif)](videos/fast_retract_ik_velocity_limit_comparison.mp4)
+
+[MP4 をダウンロード](videos/fast_retract_ik_velocity_limit_comparison.mp4)
 
 ## 6. パラメータ、正しさ、性能
 
@@ -709,10 +703,9 @@ Generalization を確認するため、次図は七つの motion type にまた�
 
 **動画：高速 retract の exact-nullspace parameter 2x2、hardware record 由来の単一 trajectory、0.5x playback**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_nullspace_parameter_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_nullspace_parameter_comparison.mp4">MP4 を開く</a>
-</video>
+[![動画プレビュー](assets/video_previews/fast_retract_nullspace_parameter_comparison.gif)](videos/fast_retract_nullspace_parameter_comparison.mp4)
+
+[MP4 をダウンロード](videos/fast_retract_nullspace_parameter_comparison.mp4)
 
 見た目の差は小さい結果です。
 

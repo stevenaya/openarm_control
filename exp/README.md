@@ -56,7 +56,7 @@ The experiments use `70` unique target trajectories. A fixed set of `42` support
 | Additional targeted trajectories | `28`, bringing the union to `70` unique targets | Left/right mirrors, additional speeds and directions, near-chest fast wrist rotation, joint braking, recorded-command replay, and deep-start singularity motion |
 | Example-action video | `21` clips selected from the `70` targets | Shows target motion and representative responses; not a separate quantitative dataset |
 
-Thirteen dynamic experiment groups execute `1,921` controller-profile × target-trajectory simulations across `119` controller profiles with no QP solver failures. A separate static suite contains `378` joint-boundary conditions. The action-family accounting, names of all 21 clips, and suite inventory are in the [experiment and asset index](experiment_index.md#3-target-trajectories). The [catalog video](videos/ideal_reference_trajectory_catalog.mp4) provides a quick visual overview.
+Thirteen dynamic experiment groups execute `1,921` controller-profile × target-trajectory simulations across `119` controller profiles with no QP solver failures. A separate static suite contains `378` joint-boundary conditions. The action-family accounting, names of all 21 clips, and suite inventory are in the [experiment and asset index](experiment_index.md#3-target-trajectories). The [animated catalog preview](assets/video_previews/ideal_reference_trajectory_catalog.gif) provides a quick visual overview; the [original MP4](videos/ideal_reference_trajectory_catalog.mp4) is also available.
 
 Two focal targets are derived from recorded hardware commands and replayed using a common target, MuJoCo plant, and driver velocity limits:
 
@@ -109,7 +109,7 @@ The target translates only about `4.8 cm`, but reaches `12.02 rad/s` peak angula
 
 ![Figure 4: Simulation replay derived from a recorded near-chest fast wrist roll. PR default limits maximum position deviation and actual joint acceleration at the cost of transient orientation lag](assets/34_chest_flip_benchmark_timeseries_and_path.png)
 
-[Watch the three-controller video at 0.5x](videos/near_chest_fast_wrist_roll_controller_comparison.mp4) · [See the near-chest stress-test A/B](detailed_report.md#511-near-chest-stress-test)
+[View the animated three-controller preview](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif) · [Download the MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4) · [See the near-chest stress-test A/B](detailed_report.md#511-near-chest-stress-test)
 
 ### 2. Fast Retract: Exact-Nullspace Branch Regulation
 
@@ -125,7 +125,7 @@ The exact-nullspace task regulates only the projection of home-configuration err
 
 For about `3 mm` additional position RMSE, exact-nullspace regulation reduces elbow lateral range by about `13.6 cm`. Full-home `PostureTask` produces about `17.6 cm` range at `posture_cost=0.003/0.01/0.03` and does not provide an equivalent branch constraint.
 
-[Watch the posture-regulation comparison](videos/fast_retract_posture_regulation_comparison.mp4) · [Watch the full-controller comparison](videos/fast_retract_controller_comparison.mp4)
+[Posture-regulation preview](assets/video_previews/fast_retract_posture_regulation_comparison.gif) · [Full-controller preview](assets/video_previews/fast_retract_controller_comparison.gif) · [MP4 files](experiment_index.md#6-video-index)
 
 ### 3. Extension Beyond Reach: Singularity-Approach Limiting
 
@@ -139,7 +139,7 @@ The QP limits only joint motion that further decreases $\rho$; motion away from 
 
 ![Figure 6: The singularity-approach limit changes only the extension phase and releases automatically during retraction](assets/09_singularity_reach_timeseries.png)
 
-[Watch the extension singularity A/B](videos/straight_reach_singularity_limit_comparison.mp4)
+[View the animated extension-singularity A/B](assets/video_previews/straight_reach_singularity_limit_comparison.gif) · [Download the MP4](videos/straight_reach_singularity_limit_comparison.mp4)
 
 ## Other Key Validation
 

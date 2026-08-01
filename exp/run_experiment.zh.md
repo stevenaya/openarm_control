@@ -253,16 +253,25 @@ uv run --project exp/src --frozen python exp/src/build_videos.py \
   --skip-catalog
 ```
 
+仅根据现有 MP4 重新生成可在 GitHub 直接显示的动画预览：
+
+```bash
+uv run --project exp/src --frozen python exp/src/build_videos.py \
+  --previews-only
+```
+
 使用独立结果和输出目录：
 
 ```bash
 uv run --project exp/src --frozen python exp/src/build_videos.py \
   --results exp/results/reproduction \
-  --output-dir /tmp/openarm-video-reproduction
+  --output-dir /tmp/openarm-video-reproduction \
+  --preview-dir /tmp/openarm-video-previews
 ```
 
 渲染脚本默认使用 `MUJOCO_GL=egl`，并将 RGB frame 直接输送给 FFmpeg，不
-保留中间图片序列。
+保留中间图片序列。由于 GitHub 不会内嵌播放仓库中的 MP4，脚本还会在
+`exp/assets/video_previews/` 下生成小体积 GIF 动画预览。
 
 ## 9. 更新和校验公开报告
 

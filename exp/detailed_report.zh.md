@@ -114,7 +114,7 @@ $$
 令 $e_p,e_R\in\mathbb{R}^3$ 为 frame task 的位置和朝向误差，并定义保持方向的范数截断
 
 $$
-\operatorname{sat}_b(x)=
+\mathrm{sat}_b(x)=
 \begin{cases}
 x, & \lVert x\rVert\le b,\\
 b\dfrac{x}{\lVert x\rVert}, & \lVert x\rVert>b.
@@ -124,8 +124,8 @@ $$
 位置和朝向参数 $B_p,B_R$ 表示一次外层求解的总预算，并平均分配给 $N$ 个子步：
 
 $$
-\bar e_p=\operatorname{sat}_{B_p/N}(e_p),\qquad
-\bar e_R=\operatorname{sat}_{B_R/N}(e_R).
+\bar e_p=\mathrm{sat}_{B_p/N}(e_p),\qquad
+\bar e_R=\mathrm{sat}_{B_R/N}(e_R).
 $$
 
 朝向始终使用 $\bar e_R$；位置根据目标线速度得到 $\alpha_p\in[0,1]$，在完整误差和限幅误差之间连续混合：
@@ -138,7 +138,7 @@ $$
 令 $v_t$ 为相邻目标位置在外层周期上的差分速度，则
 
 $$
-u_p=\operatorname{clip}\left(
+u_p=\mathrm{clip}\left(
 \frac{\lVert v_t\rVert-v_{\mathrm{slow}}}
 {v_{\mathrm{fast}}-v_{\mathrm{slow}}},0,1\right),
 \qquad \alpha_p=3u_p^2-2u_p^3.
@@ -171,7 +171,7 @@ e_q=q\ominus q_{\mathrm{home}},
 $$
 
 $$
-v_{\mathrm{ns}}=\operatorname{clip}
+v_{\mathrm{ns}}=\mathrm{clip}
 \left(-k_{\mathrm{ns}}e_{\mathrm{ns}},
 -v_{\mathrm{ns,max}},v_{\mathrm{ns,max}}\right).
 $$
@@ -189,7 +189,7 @@ $$
 \rho=\frac{\sigma_{\min}(J_{\mathrm{norm}})}
 {\sigma_{\max}(J_{\mathrm{norm}})},
 \quad
-u_{\mathrm{ns}}=\operatorname{clip}
+u_{\mathrm{ns}}=\mathrm{clip}
 \left(\frac{\rho-\rho_{\mathrm{low}}}
 {\rho_{\mathrm{high}}-\rho_{\mathrm{low}}},0,1\right),
 $$
@@ -214,7 +214,7 @@ $$
 当前实现沿关节切空间方向用中心有限差分计算 $g$。一阶近似下 $\dot\rho\approx g^\mathsf{T}\dot q$；仅当 $g^\mathsf{T}\dot q<0$ 时，机械臂才在接近奇异点。允许接近率随当前 $\rho$ 平滑收紧：
 
 $$
-u_\rho=\operatorname{clip}
+u_\rho=\mathrm{clip}
 \left(\frac{\rho-\rho_{\mathrm{stop}}}
 {\rho_{\mathrm{slow}}-\rho_{\mathrm{stop}}},0,1\right),
 \qquad
@@ -236,13 +236,13 @@ $$
 对每个标量手臂关节，令 $q_{min},q_{max}$ 为位置界限，$v_{max}$ 为物理速度上限，$k_q\in(0,1]$ 为位置增益。可恢复包络将位置恢复与速度边界合并为同一组单步上下界：
 
 $$
-\Delta q_{low}=\operatorname{clip}
+\Delta q_{low}=\mathrm{clip}
 \left(k_q(q_{min}-q),-v_{max}\Delta t_{\mathrm{sub}},
 v_{max}\Delta t_{\mathrm{sub}}\right),
 $$
 
 $$
-\Delta q_{high}=\operatorname{clip}
+\Delta q_{high}=\mathrm{clip}
 \left(k_q(q_{max}-q),-v_{max}\Delta t_{\mathrm{sub}},
 v_{max}\Delta t_{\mathrm{sub}}\right).
 $$
@@ -252,7 +252,7 @@ $$
 若启用制动，设朝目标侧位置界限的有效距离为 $m$、制动距离为 $d_b$：
 
 $$
-u=\operatorname{clip}\left(\frac{\max(m,0)}{d_b},0,1\right),
+u=\mathrm{clip}\left(\frac{\max(m,0)}{d_b},0,1\right),
 \qquad
 v_{\mathrm{allowed}}(m)=v_{max}(3u^2-2u^3)^p.
 $$
@@ -370,12 +370,13 @@ $$
 
 ![参考目标轨迹目录](assets/02_trajectory_catalog.png)
 
+GitHub 不会内嵌播放仓库中的 MP4 文件，因此本报告直接显示 GIF 动画预览；点击预览图或相邻链接可访问原始 MP4。
+
 **视频：21 个参考动作片段；画面文字标出所属动作组在 42 条固定对比轨迹和 70 条全部目标中的数量**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/ideal_reference_trajectory_catalog.mp4" type="video/mp4">
-  <a href="videos/ideal_reference_trajectory_catalog.mp4">打开 MP4</a>
-</video>
+[![动画视频预览](assets/video_previews/ideal_reference_trajectory_catalog.gif)](videos/ideal_reference_trajectory_catalog.mp4)
+
+[下载 MP4](videos/ideal_reference_trajectory_catalog.mp4)
 
 #### 3.2.3 实验组与运行次数
 
@@ -506,10 +507,9 @@ $\max_i |\dot q_{i,\mathrm{actual}}|$ 和 $\max_i |\ddot q_{i,\mathrm{actual}}|$
 
 **视频：Near-chest roll + diagonal translation，0.5x**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/near_chest_roll_translation_error_bound_comparison.mp4" type="video/mp4">
-  <a href="videos/near_chest_roll_translation_error_bound_comparison.mp4">打开 MP4</a>
-</video>
+[![动画视频预览](assets/video_previews/near_chest_roll_translation_error_bound_comparison.gif)](videos/near_chest_roll_translation_error_bound_comparison.mp4)
+
+[下载 MP4](videos/near_chest_roll_translation_error_bound_comparison.mp4)
 
 #### 5.1.2 实机记录派生的胸前仿真回放
 
@@ -527,10 +527,9 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 
 **视频：胸前快速翻腕控制器对照，单条实机记录派生轨迹，0.5x**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/near_chest_fast_wrist_roll_controller_comparison.mp4" type="video/mp4">
-  <a href="videos/near_chest_fast_wrist_roll_controller_comparison.mp4">打开 MP4</a>
-</video>
+[![动画视频预览](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif)](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
+
+[下载 MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
 
 该结果表明，误差调制的首要目标是抑制快速翻腕引发的整臂不稳定，而非优先追赶朝向。朝向跟踪变慢是明确的控制取舍。
 
@@ -540,10 +539,9 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 
 **视频：快速回缩 6D 误差上限双栏对照，轨迹 2x 加速，0.5x 播放**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_frame_error_bound_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_frame_error_bound_comparison.mp4">打开 MP4</a>
-</video>
+[![动画视频预览](assets/video_previews/fast_retract_frame_error_bound_comparison.gif)](videos/fast_retract_frame_error_bound_comparison.mp4)
+
+[下载 MP4](videos/fast_retract_frame_error_bound_comparison.mp4)
 
 ### 5.2 冗余与奇异点
 
@@ -571,10 +569,9 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 
 **视频：次级姿态正则四方对照，单条实机记录派生轨迹，0.5x**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_posture_regulation_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_posture_regulation_comparison.mp4">打开 MP4</a>
-</video>
+[![动画视频预览](assets/video_previews/fast_retract_posture_regulation_comparison.gif)](videos/fast_retract_posture_regulation_comparison.mp4)
+
+[下载 MP4](videos/fast_retract_posture_regulation_comparison.mp4)
 
 `posture_cost=0.003/0.01/0.03` 时，肘横向范围分别为 `17.60/17.61/17.76 cm`，均未形成与精确零空间正则等价的分支约束。精确零空间正则以约 `3 mm` 的额外位置 RMSE，将肘横移减少约 `13.6 cm`，且不把 home 偏好直接施加到全部关节方向。
 
@@ -584,10 +581,9 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 
 **视频：快速回缩控制器对照，单条实机记录派生轨迹，0.5x**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_controller_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_controller_comparison.mp4">打开 MP4</a>
-</video>
+[![动画视频预览](assets/video_previews/fast_retract_controller_comparison.gif)](videos/fast_retract_controller_comparison.mp4)
+
+[下载 MP4](videos/fast_retract_controller_comparison.mp4)
 
 #### 5.2.2 奇异点接近限速：伸直与回缩
 
@@ -612,10 +608,9 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 
 **视频：伸直奇异区 A/B，0.5x**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/straight_reach_singularity_limit_comparison.mp4" type="video/mp4">
-  <a href="videos/straight_reach_singularity_limit_comparison.mp4">打开 MP4</a>
-</video>
+[![动画视频预览](assets/video_previews/straight_reach_singularity_limit_comparison.gif)](videos/straight_reach_singularity_limit_comparison.mp4)
+
+[下载 MP4](videos/straight_reach_singularity_limit_comparison.mp4)
 
 ### 5.3 关节安全包络
 
@@ -684,10 +679,9 @@ PR w/o velocity limits 的跟踪更好，但实际动态明显更激进。PR w/o
 
 **视频：快速回缩 QP 速度上限 A/B；驱动器限速均开启，0.5x**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_ik_velocity_limit_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_ik_velocity_limit_comparison.mp4">打开 MP4</a>
-</video>
+[![动画视频预览](assets/video_previews/fast_retract_ik_velocity_limit_comparison.gif)](videos/fast_retract_ik_velocity_limit_comparison.mp4)
+
+[下载 MP4](videos/fast_retract_ik_velocity_limit_comparison.mp4)
 
 ## 6. 参数、正确性与性能
 
@@ -711,10 +705,9 @@ PR w/o velocity limits 的跟踪更好，但实际动态明显更激进。PR w/o
 
 **视频：快速回缩精确零空间参数 2x2，单条实机记录派生轨迹，0.5x**
 
-<video controls preload="metadata" playsinline width="100%">
-  <source src="videos/fast_retract_nullspace_parameter_comparison.mp4" type="video/mp4">
-  <a href="videos/fast_retract_nullspace_parameter_comparison.mp4">打开 MP4</a>
-</video>
+[![动画视频预览](assets/video_previews/fast_retract_nullspace_parameter_comparison.gif)](videos/fast_retract_nullspace_parameter_comparison.mp4)
+
+[下载 MP4](videos/fast_retract_nullspace_parameter_comparison.mp4)
 
 可见效果差异不明显。
 

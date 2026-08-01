@@ -50,6 +50,10 @@ def _validate_math(path: Path) -> list[str]:
         errors.append(f"{path.name}: unbalanced \\[ / \\] delimiters")
     if "\\\\[" in text or "\\\\]" in text:
         errors.append(f"{path.name}: double-escaped display-math delimiter")
+    if r"\operatorname" in text:
+        errors.append(f"{path.name}: GitHub math does not allow \\operatorname")
+    if "<video" in text:
+        errors.append(f"{path.name}: GitHub does not render repository video tags")
     return errors
 
 

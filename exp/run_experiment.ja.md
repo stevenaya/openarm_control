@@ -264,16 +264,25 @@ uv run --project exp/src --frozen python exp/src/build_videos.py \
   --skip-catalog
 ```
 
+既存 MP4 から GitHub で表示可能な animated preview のみ再生成します。
+
+```bash
+uv run --project exp/src --frozen python exp/src/build_videos.py \
+  --previews-only
+```
+
 独立 result と output directory を使用します。
 
 ```bash
 uv run --project exp/src --frozen python exp/src/build_videos.py \
   --results exp/results/reproduction \
-  --output-dir /tmp/openarm-video-reproduction
+  --output-dir /tmp/openarm-video-reproduction \
+  --preview-dir /tmp/openarm-video-previews
 ```
 
 renderer は既定で `MUJOCO_GL=egl` を使用し、中間画像列を保持せず RGB frame を
-FFmpeg に直接送ります。
+FFmpeg に直接送ります。GitHub は repository 内の MP4 を inline 再生しないため、
+script は `exp/assets/video_previews/` に小容量の animated GIF preview も生成します。
 
 ## 9. 公開レポートの更新と検証
 
