@@ -1,0 +1,1086 @@
+{
+  "revision": "d006ece506f2c4965c390d897b1f5e7d0ea74cae",
+  "worktree": {
+    "dirty": true,
+    "tracked_diff_sha256": "0ef6a402a7636d436b19c231c2b1fa9603bf139f36d698497314d004590ad90f"
+  },
+  "study_revision": "2dfe7d3bd17cb6cf",
+  "generated_at": "2026-08-01T00:52:03+0900",
+  "command": [
+    "python",
+    "exp/src/run_experiments.py",
+    "--suite",
+    "all",
+    "--output-dir",
+    "exp/results/final_report_20260801",
+    "--workers",
+    "8"
+  ],
+  "environment": {
+    "python": "3.14.6 (main, Jun 23 2026, 15:18:23) [Clang 22.1.3 ]",
+    "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.39",
+    "mujoco": "3.11.0",
+    "mink": "1.1.0",
+    "daqp": "0.7.2",
+    "openarm_mujoco": "2.0.1"
+  },
+  "sampling": {
+    "random_sampling": false,
+    "random_seed": 0
+  },
+  "control_dt": 0.004,
+  "model_xml": "openarm_mujoco/v2/cell.xml",
+  "model_xml_sha256": "cb0322c264b2acd781ea08e873970ef21dd1db491e64ed0c02844aa8c1a3bfa7",
+  "current_deployment_parameters": {
+    "position_cost": 12.0,
+    "orientation_cost": 1.5,
+    "lm_damping": 0.01,
+    "damping": 0.1,
+    "posture_cost": 0.0,
+    "dt": 0.004,
+    "max_iters": 5,
+    "frame_position_error_limit": 0.02,
+    "frame_orientation_error_limit": 0.25,
+    "target_linear_speed_slow": 0.6,
+    "target_linear_speed_fast": 0.9,
+    "position_error_latch_threshold": 0.006,
+    "joint_limit_gain": 0.95,
+    "joint_braking": true,
+    "joint_braking_distance": 0.2,
+    "joint_braking_exponent": 2.0,
+    "joint_braking_distance_buffer": 0.01,
+    "jacobian_characteristic_length": 0.3,
+    "nullspace_cost": 8.5,
+    "nullspace_return_rate": 1.6,
+    "nullspace_max_speed": 1.0,
+    "nullspace_ratio_low": 0.02,
+    "nullspace_ratio_high": 0.05,
+    "singularity_ratio_stop": 0.02,
+    "singularity_ratio_slow": 0.08,
+    "singularity_max_approach_rate": 0.25,
+    "singularity_braking_exponent": 2.0,
+    "singularity_gradient_epsilon": 0.0001,
+    "kinetic_energy_cost": 2e-05
+  },
+  "driver_config": {
+    "path": "exp/src/inputs/experiment_driver_config.yaml",
+    "sha256": "26487b54f3ad3d9c2498245cee00b7c3656750faa2ea36a0ceba5699930889d4",
+    "arm_joint_velocity_caps_rad_s": [
+      2.0,
+      2.0,
+      3.14,
+      3.14,
+      6.3,
+      6.3,
+      6.3
+    ]
+  },
+  "matrix": {
+    "profile_count": 17,
+    "scenario_count": 14,
+    "controller_trajectory_runs": 238
+  },
+  "scenario_inventory": {
+    "independent_target_trajectories": 14,
+    "family_counts": {
+      "chest_wrist_outward": 13,
+      "normal_wrist": 1
+    },
+    "mode_counts": {
+      "right": 14
+    },
+    "speed_values": [
+      4.0,
+      8.0,
+      10.0,
+      12.0
+    ]
+  },
+  "profiles": [
+    {
+      "name": "current_deployment",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "strict_mainline",
+      "overrides": {
+        "position_cost": 1.0,
+        "orientation_cost": 1.0,
+        "lm_damping": 0.01,
+        "damping": 0.25,
+        "posture_cost": 0.01,
+        "frame_position_error_limit": 0.0,
+        "frame_orientation_error_limit": 0.0,
+        "joint_braking": false,
+        "nullspace_cost": 0.0,
+        "singularity_max_approach_rate": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": false,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Mainline baseline task parameters, evaluated with the PR recoverable position/velocity envelope and common 0.8 ms substeps."
+    },
+    {
+      "name": "no_frame_error_bound",
+      "overrides": {
+        "frame_position_error_limit": 0.0,
+        "frame_orientation_error_limit": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "no_branch_regulation",
+      "overrides": {
+        "nullspace_cost": 0.0,
+        "posture_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default profile with both exact-nullspace and full-home branch regulation disabled."
+    },
+    {
+      "name": "no_kinetic_regularization",
+      "overrides": {
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "orientation_budget_0p1",
+      "overrides": {
+        "frame_orientation_error_limit": 0.1
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "orientation_budget_0p15",
+      "overrides": {
+        "frame_orientation_error_limit": 0.15
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "orientation_budget_0p2",
+      "overrides": {
+        "frame_orientation_error_limit": 0.2
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "orientation_budget_0p25",
+      "overrides": {
+        "frame_orientation_error_limit": 0.25
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "orientation_budget_0p3",
+      "overrides": {
+        "frame_orientation_error_limit": 0.3
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "orientation_budget_0p4",
+      "overrides": {
+        "frame_orientation_error_limit": 0.4
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "position_budget_0",
+      "overrides": {
+        "frame_position_error_limit": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "position_budget_0p01",
+      "overrides": {
+        "frame_position_error_limit": 0.01
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "position_budget_0p015",
+      "overrides": {
+        "frame_position_error_limit": 0.015
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "position_budget_0p02",
+      "overrides": {
+        "frame_position_error_limit": 0.02
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "position_budget_0p025",
+      "overrides": {
+        "frame_position_error_limit": 0.025
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "position_budget_0p03",
+      "overrides": {
+        "frame_position_error_limit": 0.03
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "chest_outward_flip_right_v0p30_w4p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 4.0,
+      "sample_count": 495,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "835fd9b2258691002b3299c74d4e8e202289558a3b2b04cc14286235a702e621"
+    },
+    {
+      "name": "chest_outward_flip_right_v0p30_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "3f8ca84bef88e8dd0f0e1402c42f83880669d0f41d08cd8508e2cfce63d6e76d"
+    },
+    {
+      "name": "chest_outward_flip_right_v0p30_w12p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 12.0,
+      "sample_count": 299,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "40e3075d0d5941e9449403fbf3b4ae8fd60796156a0572bac792977a6c245af2"
+    },
+    {
+      "name": "chest_outward_flip_right_v0p80_w4p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 4.0,
+      "sample_count": 495,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "efe4ddc42d8c2919162d12b6bae6d6c14778803906d2176e880796d4f5f790aa"
+    },
+    {
+      "name": "chest_outward_flip_right_v0p80_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "92a6f91c6b1a6a49ad5419b54471ab5a968330596e3a8a89dd2122c52d8c14a0"
+    },
+    {
+      "name": "chest_outward_flip_right_v0p80_w12p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 12.0,
+      "sample_count": 299,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "5dedc84179ef4d5357b078b5817cbfcd53073679bb9792dd9d1dcc2f5c6dc43d"
+    },
+    {
+      "name": "chest_outward_flip_right_v1p20_w4p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 4.0,
+      "sample_count": 495,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "b478b564e321a031cfd6cd00a80741e45714ea48016dc83c73600a687fcec6c6"
+    },
+    {
+      "name": "chest_outward_flip_right_v1p20_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "fe432fcac76d16bfa544c0154cf567ae35089c8ac7278f4a86aff1aa98a3909b"
+    },
+    {
+      "name": "chest_outward_flip_right_v1p20_w12p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 12.0,
+      "sample_count": 299,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "d354bcad112b96d3ffde5a6cfbc54a0c6f299df3ab98e19727bb007aabd610bd"
+    },
+    {
+      "name": "chest_outward_flip_right_forward_v1p20_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step. Translation variant: forward.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "1331b923581fa871f8205e04f4b7e1fbd9895395e7624122dde9b6c624e56f6d"
+    },
+    {
+      "name": "chest_outward_flip_right_lateral_v1p20_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step. Translation variant: lateral.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "0035a5bb432ce45db3000d4f513fd87b8ab436a4968930a05d02cd9b170c5077"
+    },
+    {
+      "name": "chest_outward_flip_right_down_v1p20_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step. Translation variant: down.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "1b5c08d877a03ae15f146ed99c2de91b89bd97d05086d4b581692a3322204a67"
+    },
+    {
+      "name": "chest_outward_flip_right_diagonal_v1p20_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step. Translation variant: diagonal.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "5727663ee12e85c6e2d555426a566c7e20a4d2eb637eafed713c171aab0e5efc"
+    },
+    {
+      "name": "normal_wrist_right_chest_w10p0",
+      "family": "normal_wrist",
+      "mode": "right",
+      "speed": 10.0,
+      "sample_count": 369,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "6eb025b224891f467e4f97905599d2f54357f7be55df98efd036d82383eedc90"
+    }
+  ]
+}

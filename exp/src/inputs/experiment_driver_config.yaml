@@ -1,0 +1,12 @@
+# Frozen downstream velocity envelope used by the report simulations.
+# The first seven entries are the arm joints; the eighth is the gripper and is
+# retained to match the deployment configuration shape.
+joint_velocity_limits:
+  - 2.0
+  - 2.0
+  - 3.14
+  - 3.14
+  - 6.3
+  - 6.3
+  - 6.3
+  - 20.0

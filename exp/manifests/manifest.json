@@ -1,0 +1,151 @@
+{
+  "purpose": "Refreshed OpenArm IK public report experiment set",
+  "reproduction_environment": {
+    "python": "3.14.6",
+    "lock_path": "exp/src/uv.lock",
+    "lock_sha256": "586236cf31dc5ec30c2e7a258d4dfe5a1b88fcf0a9652d06322f26872c30e1c0"
+  },
+  "current_deployment_parameters": {
+    "position_cost": 12.0,
+    "orientation_cost": 1.5,
+    "lm_damping": 0.01,
+    "damping": 0.1,
+    "posture_cost": 0.0,
+    "dt": 0.004,
+    "max_iters": 5,
+    "frame_position_error_limit": 0.02,
+    "frame_orientation_error_limit": 0.25,
+    "target_linear_speed_slow": 0.6,
+    "target_linear_speed_fast": 0.9,
+    "position_error_latch_threshold": 0.006,
+    "joint_limit_gain": 0.95,
+    "joint_braking": true,
+    "joint_braking_distance": 0.2,
+    "joint_braking_exponent": 2.0,
+    "joint_braking_distance_buffer": 0.01,
+    "jacobian_characteristic_length": 0.3,
+    "nullspace_cost": 8.5,
+    "nullspace_return_rate": 1.6,
+    "nullspace_max_speed": 1.0,
+    "nullspace_ratio_low": 0.02,
+    "nullspace_ratio_high": 0.05,
+    "singularity_ratio_stop": 0.02,
+    "singularity_ratio_slow": 0.08,
+    "singularity_max_approach_rate": 0.25,
+    "singularity_braking_exponent": 2.0,
+    "singularity_gradient_epsilon": 0.0001,
+    "kinetic_energy_cost": 2e-05
+  },
+  "driver_config": {
+    "path": "exp/src/inputs/experiment_driver_config.yaml",
+    "sha256": "26487b54f3ad3d9c2498245cee00b7c3656750faa2ea36a0ceba5699930889d4",
+    "arm_joint_velocity_caps_rad_s": [
+      2.0,
+      2.0,
+      3.14,
+      3.14,
+      6.3,
+      6.3,
+      6.3
+    ]
+  },
+  "frozen_sources": {
+    "near_chest_fast_wrist_roll": {
+      "path": "exp/src/inputs/near_chest_fast_wrist_roll.npz",
+      "sha256": "915973663e5fa786c433c4465d08247f65df4eb8ef2fd8a3714754edb91eb391"
+    },
+    "fast_retract_elbow_branch": {
+      "path": "exp/src/inputs/fast_retract_elbow_branch.npz",
+      "sha256": "a0667f64c76bd8db321e3987f71f0692af3f26d703599c43d320cae33be53a19"
+    }
+  },
+  "dynamic_controller_trajectory_runs": 1921,
+  "unique_target_trajectory_hashes": 70,
+  "static_joint_limit_conditions": 378,
+  "suites": {
+    "boundary": {
+      "metadata": "boundary/metadata.json",
+      "controller_trajectory_runs": 0,
+      "scenario_count": 0,
+      "profile_count": 0
+    },
+    "braking": {
+      "metadata": "braking/metadata.json",
+      "controller_trajectory_runs": 24,
+      "scenario_count": 4,
+      "profile_count": 6
+    },
+    "candidates": {
+      "metadata": "candidates/metadata.json",
+      "controller_trajectory_runs": 210,
+      "scenario_count": 42,
+      "profile_count": 5
+    },
+    "chest": {
+      "metadata": "chest/metadata.json",
+      "controller_trajectory_runs": 238,
+      "scenario_count": 14,
+      "profile_count": 17
+    },
+    "driver": {
+      "metadata": "driver/metadata.json",
+      "controller_trajectory_runs": 44,
+      "scenario_count": 11,
+      "profile_count": 4
+    },
+    "fast_retract_error_bound": {
+      "metadata": "fast_retract_error_bound/metadata.json",
+      "controller_trajectory_runs": 2,
+      "scenario_count": 1,
+      "profile_count": 2
+    },
+    "frozen": {
+      "metadata": "frozen/metadata.json",
+      "controller_trajectory_runs": 14,
+      "scenario_count": 2,
+      "profile_count": 7
+    },
+    "nullspace_sweep": {
+      "metadata": "nullspace_sweep/metadata.json",
+      "controller_trajectory_runs": 44,
+      "scenario_count": 1,
+      "profile_count": 44
+    },
+    "nullspace_validation": {
+      "metadata": "nullspace_validation/metadata.json",
+      "controller_trajectory_runs": 66,
+      "scenario_count": 11,
+      "profile_count": 6
+    },
+    "parameters": {
+      "metadata": "parameters/metadata.json",
+      "controller_trajectory_runs": 594,
+      "scenario_count": 11,
+      "profile_count": 54
+    },
+    "robustness": {
+      "metadata": "robustness/metadata.json",
+      "controller_trajectory_runs": 45,
+      "scenario_count": 5,
+      "profile_count": 9
+    },
+    "screening": {
+      "metadata": "screening/metadata.json",
+      "controller_trajectory_runs": 588,
+      "scenario_count": 42,
+      "profile_count": 14
+    },
+    "singularity_video": {
+      "metadata": "singularity_video/metadata.json",
+      "controller_trajectory_runs": 2,
+      "scenario_count": 1,
+      "profile_count": 2
+    },
+    "symmetry": {
+      "metadata": "symmetry/metadata.json",
+      "controller_trajectory_runs": 50,
+      "scenario_count": 25,
+      "profile_count": 2
+    }
+  }
+}

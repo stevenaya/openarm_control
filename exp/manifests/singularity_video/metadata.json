@@ -1,0 +1,192 @@
+{
+  "revision": "d006ece506f2c4965c390d897b1f5e7d0ea74cae",
+  "worktree": {
+    "dirty": true,
+    "tracked_diff_sha256": "0ef6a402a7636d436b19c231c2b1fa9603bf139f36d698497314d004590ad90f"
+  },
+  "study_revision": "2dfe7d3bd17cb6cf",
+  "generated_at": "2026-08-01T12:26:45+0900",
+  "command": [
+    "python",
+    "exp/src/run_experiments.py",
+    "--suite",
+    "singularity_video",
+    "--workers",
+    "1"
+  ],
+  "environment": {
+    "python": "3.14.6 (main, Jun 23 2026, 15:18:23) [Clang 22.1.3 ]",
+    "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.39",
+    "mujoco": "3.11.0",
+    "mink": "1.1.0",
+    "daqp": "0.7.2",
+    "openarm_mujoco": "2.0.1"
+  },
+  "sampling": {
+    "random_sampling": false,
+    "random_seed": 0
+  },
+  "control_dt": 0.004,
+  "model_xml": "openarm_mujoco/v2/cell.xml",
+  "model_xml_sha256": "cb0322c264b2acd781ea08e873970ef21dd1db491e64ed0c02844aa8c1a3bfa7",
+  "current_deployment_parameters": {
+    "position_cost": 12.0,
+    "orientation_cost": 1.5,
+    "lm_damping": 0.01,
+    "damping": 0.1,
+    "posture_cost": 0.0,
+    "dt": 0.004,
+    "max_iters": 5,
+    "frame_position_error_limit": 0.02,
+    "frame_orientation_error_limit": 0.25,
+    "target_linear_speed_slow": 0.6,
+    "target_linear_speed_fast": 0.9,
+    "position_error_latch_threshold": 0.006,
+    "joint_limit_gain": 0.95,
+    "joint_braking": true,
+    "joint_braking_distance": 0.2,
+    "joint_braking_exponent": 2.0,
+    "joint_braking_distance_buffer": 0.01,
+    "jacobian_characteristic_length": 0.3,
+    "nullspace_cost": 8.5,
+    "nullspace_return_rate": 1.6,
+    "nullspace_max_speed": 1.0,
+    "nullspace_ratio_low": 0.02,
+    "nullspace_ratio_high": 0.05,
+    "singularity_ratio_stop": 0.02,
+    "singularity_ratio_slow": 0.08,
+    "singularity_max_approach_rate": 0.25,
+    "singularity_braking_exponent": 2.0,
+    "singularity_gradient_epsilon": 0.0001,
+    "kinetic_energy_cost": 2e-05
+  },
+  "driver_config": {
+    "path": "exp/src/inputs/experiment_driver_config.yaml",
+    "sha256": "26487b54f3ad3d9c2498245cee00b7c3656750faa2ea36a0ceba5699930889d4",
+    "arm_joint_velocity_caps_rad_s": [
+      2.0,
+      2.0,
+      3.14,
+      3.14,
+      6.3,
+      6.3,
+      6.3
+    ]
+  },
+  "matrix": {
+    "profile_count": 2,
+    "scenario_count": 1,
+    "controller_trajectory_runs": 2
+  },
+  "scenario_inventory": {
+    "independent_target_trajectories": 1,
+    "family_counts": {
+      "reach": 1
+    },
+    "mode_counts": {
+      "right": 1
+    },
+    "speed_values": [
+      0.8
+    ]
+  },
+  "profiles": [
+    {
+      "name": "current_deployment",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "no_singularity_limit",
+      "overrides": {
+        "singularity_max_approach_rate": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "reach_deep_start_right_p0p00_v0p80",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 738,
+      "description": "Shoulder-height reach starting 10 cm farther back while retaining the original far target.",
+      "initial_right": [
+        0.798584,
+        0.000184,
+        -0.000189,
+        1.562622,
+        0.000273,
+        0.437062,
+        -0.000207
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "1398d2e4c12b76d078994b8dddbabe94b5826bd3d3e81399b6f7309cc827159d"
+    }
+  ]
+}

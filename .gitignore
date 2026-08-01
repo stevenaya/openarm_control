@@ -38,6 +38,9 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
+# Local experiment outputs
+exp/results/
+
 # Editor / OS
 .vscode/
 .idea/

@@ -1,0 +1,413 @@
+{
+  "revision": "d006ece506f2c4965c390d897b1f5e7d0ea74cae",
+  "worktree": {
+    "dirty": true,
+    "tracked_diff_sha256": "0ef6a402a7636d436b19c231c2b1fa9603bf139f36d698497314d004590ad90f"
+  },
+  "study_revision": "2dfe7d3bd17cb6cf",
+  "generated_at": "2026-08-01T00:54:01+0900",
+  "command": [
+    "python",
+    "exp/src/run_experiments.py",
+    "--suite",
+    "all",
+    "--output-dir",
+    "exp/results/final_report_20260801",
+    "--workers",
+    "8"
+  ],
+  "environment": {
+    "python": "3.14.6 (main, Jun 23 2026, 15:18:23) [Clang 22.1.3 ]",
+    "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.39",
+    "mujoco": "3.11.0",
+    "mink": "1.1.0",
+    "daqp": "0.7.2",
+    "openarm_mujoco": "2.0.1"
+  },
+  "sampling": {
+    "random_sampling": false,
+    "random_seed": 0
+  },
+  "control_dt": 0.004,
+  "model_xml": "openarm_mujoco/v2/cell.xml",
+  "model_xml_sha256": "cb0322c264b2acd781ea08e873970ef21dd1db491e64ed0c02844aa8c1a3bfa7",
+  "current_deployment_parameters": {
+    "position_cost": 12.0,
+    "orientation_cost": 1.5,
+    "lm_damping": 0.01,
+    "damping": 0.1,
+    "posture_cost": 0.0,
+    "dt": 0.004,
+    "max_iters": 5,
+    "frame_position_error_limit": 0.02,
+    "frame_orientation_error_limit": 0.25,
+    "target_linear_speed_slow": 0.6,
+    "target_linear_speed_fast": 0.9,
+    "position_error_latch_threshold": 0.006,
+    "joint_limit_gain": 0.95,
+    "joint_braking": true,
+    "joint_braking_distance": 0.2,
+    "joint_braking_exponent": 2.0,
+    "joint_braking_distance_buffer": 0.01,
+    "jacobian_characteristic_length": 0.3,
+    "nullspace_cost": 8.5,
+    "nullspace_return_rate": 1.6,
+    "nullspace_max_speed": 1.0,
+    "nullspace_ratio_low": 0.02,
+    "nullspace_ratio_high": 0.05,
+    "singularity_ratio_stop": 0.02,
+    "singularity_ratio_slow": 0.08,
+    "singularity_max_approach_rate": 0.25,
+    "singularity_braking_exponent": 2.0,
+    "singularity_gradient_epsilon": 0.0001,
+    "kinetic_energy_cost": 2e-05
+  },
+  "driver_config": {
+    "path": "exp/src/inputs/experiment_driver_config.yaml",
+    "sha256": "26487b54f3ad3d9c2498245cee00b7c3656750faa2ea36a0ceba5699930889d4",
+    "arm_joint_velocity_caps_rad_s": [
+      2.0,
+      2.0,
+      3.14,
+      3.14,
+      6.3,
+      6.3,
+      6.3
+    ]
+  },
+  "matrix": {
+    "profile_count": 7,
+    "scenario_count": 2,
+    "controller_trajectory_runs": 14
+  },
+  "scenario_inventory": {
+    "independent_target_trajectories": 2,
+    "family_counts": {
+      "frozen_fast_retract": 1,
+      "frozen_near_chest_wrist_roll": 1
+    },
+    "mode_counts": {
+      "right": 2
+    },
+    "speed_values": [
+      0.027388268833711413,
+      0.5889998211057215
+    ]
+  },
+  "profiles": [
+    {
+      "name": "current_deployment",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "strict_mainline",
+      "overrides": {
+        "position_cost": 1.0,
+        "orientation_cost": 1.0,
+        "lm_damping": 0.01,
+        "damping": 0.25,
+        "posture_cost": 0.01,
+        "frame_position_error_limit": 0.0,
+        "frame_orientation_error_limit": 0.0,
+        "joint_braking": false,
+        "nullspace_cost": 0.0,
+        "singularity_max_approach_rate": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": false,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Mainline baseline task parameters, evaluated with the PR recoverable position/velocity envelope and common 0.8 ms substeps."
+    },
+    {
+      "name": "no_frame_error_bound",
+      "overrides": {
+        "frame_position_error_limit": 0.0,
+        "frame_orientation_error_limit": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "no_branch_regulation",
+      "overrides": {
+        "nullspace_cost": 0.0,
+        "posture_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default profile with both exact-nullspace and full-home branch regulation disabled."
+    },
+    {
+      "name": "full_home_replacement_0p003",
+      "overrides": {
+        "nullspace_cost": 0.0,
+        "posture_cost": 0.003
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default mechanisms with exact-nullspace regulation replaced by a full-home PostureTask at cost 0.003."
+    },
+    {
+      "name": "full_home_replacement_0p01",
+      "overrides": {
+        "nullspace_cost": 0.0,
+        "posture_cost": 0.01
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default mechanisms with exact-nullspace regulation replaced by a full-home PostureTask at cost 0.01."
+    },
+    {
+      "name": "full_home_replacement_0p03",
+      "overrides": {
+        "nullspace_cost": 0.0,
+        "posture_cost": 0.03
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default mechanisms with exact-nullspace regulation replaced by a full-home PostureTask at cost 0.03."
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "near_chest_fast_wrist_roll",
+      "family": "frozen_near_chest_wrist_roll",
+      "mode": "right",
+      "speed": 0.027388268833711413,
+      "sample_count": 986,
+      "description": "Frozen near-chest target with fast wrist roll and simultaneous Cartesian translation; used to evaluate tracking and vibration.",
+      "initial_right": [
+        -0.12536028261120255,
+        0.6080561178488004,
+        0.41152496767068386,
+        1.549092659835971,
+        1.441747959313011,
+        0.3588859774305284,
+        0.30393295872582277
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "9bbf05b814e0263b81593231144d243c71893accb41f32b10b63147399bbf28a"
+    },
+    {
+      "name": "fast_retract_elbow_branch",
+      "family": "frozen_fast_retract",
+      "mode": "right",
+      "speed": 0.5889998211057215,
+      "sample_count": 732,
+      "description": "Frozen fast right-arm retract target; used to evaluate elbow branch consistency, Cartesian error, and joint dynamics.",
+      "initial_right": [
+        -0.20235287871828625,
+        0.17514480679109182,
+        0.03533263610168469,
+        2.008943562750216,
+        -0.2757227915463385,
+        0.1774088391103765,
+        0.06976242725371706
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "7eeb1e61683a4d4a292873cc0fb5755bb1ba942ac4c4c6767af68e875db9cf3c"
+    }
+  ]
+}

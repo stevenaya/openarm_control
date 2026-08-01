@@ -1,0 +1,4 @@
+profile,scenario,along_track_lag_abs_max_cm,cross_track_gap_max_cm
+current_deployment,retract_diag_p0p10_v0p80,2.567360337046488,2.6762570920423787
+driver_only_velocity,retract_diag_p0p10_v0p80,9.149516093972938,9.432656364283336
+no_velocity_limits,retract_diag_p0p10_v0p80,2.4836746615689984,2.604359520462615

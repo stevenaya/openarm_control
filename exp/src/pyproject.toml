@@ -1,0 +1,25 @@
+[project]
+name = "openarm-control-final-report"
+version = "0.0.0"
+description = "Locked environment for the OpenArm VR IK final report"
+requires-python = "==3.14.6"
+dependencies = [
+    "daqp==0.7.2",
+    "matplotlib==3.11.1",
+    "mink==1.1.0",
+    "mujoco==3.11.0",
+    "numpy==2.5.1",
+    "openarm-control",
+    "openarm-mujoco==2.0.1",
+    "pandas==3.0.5",
+    "pillow==12.3.0",
+    "pyyaml==6.0.3",
+    "scipy==1.18.0",
+    "seaborn==0.13.2",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+openarm-control = { path = "../..", editable = true }

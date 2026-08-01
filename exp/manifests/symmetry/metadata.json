@@ -1,0 +1,862 @@
+{
+  "revision": "d006ece506f2c4965c390d897b1f5e7d0ea74cae",
+  "worktree": {
+    "dirty": true,
+    "tracked_diff_sha256": "0ef6a402a7636d436b19c231c2b1fa9603bf139f36d698497314d004590ad90f"
+  },
+  "study_revision": "2dfe7d3bd17cb6cf",
+  "generated_at": "2026-08-01T00:51:55+0900",
+  "command": [
+    "python",
+    "exp/src/run_experiments.py",
+    "--suite",
+    "all",
+    "--output-dir",
+    "exp/results/final_report_20260801",
+    "--workers",
+    "8"
+  ],
+  "environment": {
+    "python": "3.14.6 (main, Jun 23 2026, 15:18:23) [Clang 22.1.3 ]",
+    "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.39",
+    "mujoco": "3.11.0",
+    "mink": "1.1.0",
+    "daqp": "0.7.2",
+    "openarm_mujoco": "2.0.1"
+  },
+  "sampling": {
+    "random_sampling": false,
+    "random_seed": 0
+  },
+  "control_dt": 0.004,
+  "model_xml": "openarm_mujoco/v2/cell.xml",
+  "model_xml_sha256": "cb0322c264b2acd781ea08e873970ef21dd1db491e64ed0c02844aa8c1a3bfa7",
+  "current_deployment_parameters": {
+    "position_cost": 12.0,
+    "orientation_cost": 1.5,
+    "lm_damping": 0.01,
+    "damping": 0.1,
+    "posture_cost": 0.0,
+    "dt": 0.004,
+    "max_iters": 5,
+    "frame_position_error_limit": 0.02,
+    "frame_orientation_error_limit": 0.25,
+    "target_linear_speed_slow": 0.6,
+    "target_linear_speed_fast": 0.9,
+    "position_error_latch_threshold": 0.006,
+    "joint_limit_gain": 0.95,
+    "joint_braking": true,
+    "joint_braking_distance": 0.2,
+    "joint_braking_exponent": 2.0,
+    "joint_braking_distance_buffer": 0.01,
+    "jacobian_characteristic_length": 0.3,
+    "nullspace_cost": 8.5,
+    "nullspace_return_rate": 1.6,
+    "nullspace_max_speed": 1.0,
+    "nullspace_ratio_low": 0.02,
+    "nullspace_ratio_high": 0.05,
+    "singularity_ratio_stop": 0.02,
+    "singularity_ratio_slow": 0.08,
+    "singularity_max_approach_rate": 0.25,
+    "singularity_braking_exponent": 2.0,
+    "singularity_gradient_epsilon": 0.0001,
+    "kinetic_energy_cost": 2e-05
+  },
+  "driver_config": {
+    "path": "exp/src/inputs/experiment_driver_config.yaml",
+    "sha256": "26487b54f3ad3d9c2498245cee00b7c3656750faa2ea36a0ceba5699930889d4",
+    "arm_joint_velocity_caps_rad_s": [
+      2.0,
+      2.0,
+      3.14,
+      3.14,
+      6.3,
+      6.3,
+      6.3
+    ]
+  },
+  "matrix": {
+    "profile_count": 2,
+    "scenario_count": 25,
+    "controller_trajectory_runs": 50
+  },
+  "scenario_inventory": {
+    "independent_target_trajectories": 25,
+    "family_counts": {
+      "extended_translation": 4,
+      "extended_wrist": 4,
+      "normal_workspace": 3,
+      "normal_wrist": 6,
+      "reach": 8
+    },
+    "mode_counts": {
+      "bimanual": 1,
+      "left": 12,
+      "right": 12
+    },
+    "speed_values": [
+      0.4,
+      0.6,
+      0.8,
+      6.0,
+      10.0
+    ]
+  },
+  "profiles": [
+    {
+      "name": "current_deployment",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "PR default experiment profile: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "strict_mainline",
+      "overrides": {
+        "position_cost": 1.0,
+        "orientation_cost": 1.0,
+        "lm_damping": 0.01,
+        "damping": 0.25,
+        "posture_cost": 0.01,
+        "frame_position_error_limit": 0.0,
+        "frame_orientation_error_limit": 0.0,
+        "joint_braking": false,
+        "nullspace_cost": 0.0,
+        "singularity_max_approach_rate": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "use_measured_state": false,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Mainline baseline task parameters, evaluated with the PR recoverable position/velocity envelope and common 0.8 ms substeps."
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "reach_right_p0p00_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 926,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "fdb5ed3b26791c4a8d38457d922844eba1d6c93c1f78f83ad25374874911e6ab"
+    },
+    {
+      "name": "reach_left_p0p00_v0p40",
+      "family": "reach",
+      "mode": "left",
+      "speed": 0.4,
+      "sample_count": 926,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "345fa12a75e3c970c907fd457d124e1d11cf7024059aa677442aa2f00f428a17"
+    },
+    {
+      "name": "reach_right_p0p10_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 956,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "dbcb4ac1708d315b509d9f4ce7ff7ec2f1f28880ac4f00e35a4097c91db2566d"
+    },
+    {
+      "name": "reach_left_m0p10_v0p40",
+      "family": "reach",
+      "mode": "left",
+      "speed": 0.4,
+      "sample_count": 956,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "6a9a71df8a2b318ee25b3e038fa5d957b8d9db29023d57532bbcee17411a00ad"
+    },
+    {
+      "name": "extended_circle_right_v0p40",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 364,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "35968d8accb12613ffdbd7162e1221beb2ef93409b867974c64ec083b3e48119"
+    },
+    {
+      "name": "extended_circle_left_v0p40",
+      "family": "extended_translation",
+      "mode": "left",
+      "speed": 0.4,
+      "sample_count": 364,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "73b233ad73d9a272ccdddb84a75bcd9dbc1e03ddcb38f249ca55539d7aeb7558"
+    },
+    {
+      "name": "reach_right_p0p00_v0p80",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 644,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "971c9123488d52dc3f9de2af12b9638859b4757deaa00c3229eae31deb8bb315"
+    },
+    {
+      "name": "reach_left_p0p00_v0p80",
+      "family": "reach",
+      "mode": "left",
+      "speed": 0.8,
+      "sample_count": 644,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "7231e7aa1511c18caa923a4bfacce848af096f03ede3569ba0e185731d96de66"
+    },
+    {
+      "name": "reach_right_p0p10_v0p80",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 660,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "b6851fe0624499b0728cf015b6115f2de29f76bbc91a8687c1db5c204d953e19"
+    },
+    {
+      "name": "reach_left_m0p10_v0p80",
+      "family": "reach",
+      "mode": "left",
+      "speed": 0.8,
+      "sample_count": 660,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "959243314d58fb9716bbdafd4cbd97c1e909ae80b15d86d0eb8ff87f52bdb224"
+    },
+    {
+      "name": "extended_circle_right_v0p80",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 276,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "1cfc33189ffcc27287b5b67fa991fbf1f31df60e8019250666956c02e78dc306"
+    },
+    {
+      "name": "extended_circle_left_v0p80",
+      "family": "extended_translation",
+      "mode": "left",
+      "speed": 0.8,
+      "sample_count": 276,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "1fea888edf9f536001d1becec0a596f48cdb4386bc2da11a5db490468903b81e"
+    },
+    {
+      "name": "normal_wrist_right_w6p0",
+      "family": "normal_wrist",
+      "mode": "right",
+      "speed": 6.0,
+      "sample_count": 490,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "8b290a43ec6a6a776b105e944571f8b0758dc967c8aa972a8695e1c73080646f"
+    },
+    {
+      "name": "normal_wrist_left_w6p0",
+      "family": "normal_wrist",
+      "mode": "left",
+      "speed": 6.0,
+      "sample_count": 489,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "041236ea22d31bf8cbff6cfe5c38dc92ef15a054ffb3cc07f9e99da73884f947"
+    },
+    {
+      "name": "extended_wrist_right_w6p0",
+      "family": "extended_wrist",
+      "mode": "right",
+      "speed": 6.0,
+      "sample_count": 487,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "12c0ce6639e6a256605e530c5bc5fcb9a0c052b4f60b5c8e96b1b6e5884c05b2"
+    },
+    {
+      "name": "extended_wrist_left_w6p0",
+      "family": "extended_wrist",
+      "mode": "left",
+      "speed": 6.0,
+      "sample_count": 487,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "4a31f5d9560a012707cd54512b67095da0347b22cd373231eca6cba86d85d4df"
+    },
+    {
+      "name": "normal_wrist_right_w10p0",
+      "family": "normal_wrist",
+      "mode": "right",
+      "speed": 10.0,
+      "sample_count": 370,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "abb81df223889bad9ceef8b862d499a8c4faf2d8375149030a73c4467d6a8834"
+    },
+    {
+      "name": "normal_wrist_left_w10p0",
+      "family": "normal_wrist",
+      "mode": "left",
+      "speed": 10.0,
+      "sample_count": 369,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "800871f0425395c614e4f66304847b6d7bd4e51ef3d2c01487780826957a8a4f"
+    },
+    {
+      "name": "extended_wrist_right_w10p0",
+      "family": "extended_wrist",
+      "mode": "right",
+      "speed": 10.0,
+      "sample_count": 367,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "1e1cc5579c29d3ab9634f4667ddffa6055f23450041ad97eaceffc558e07e6e8"
+    },
+    {
+      "name": "extended_wrist_left_w10p0",
+      "family": "extended_wrist",
+      "mode": "left",
+      "speed": 10.0,
+      "sample_count": 367,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "520fb3edada7f2f165a9551604190186f2704ec78b9a2178337fb1d68e48619a"
+    },
+    {
+      "name": "normal_wrist_right_exact_mirror_w10p0",
+      "family": "normal_wrist",
+      "mode": "right",
+      "speed": 10.0,
+      "sample_count": 370,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.24633651,
+        -0.12070639,
+        -0.30554437,
+        2.1537668,
+        -0.44992149,
+        0.02483132,
+        -0.68082729
+      ],
+      "trajectory_sha256": "39199c04f2c8d445a04045d7432e17220f00edd79e55c64c7096edd674608e4e"
+    },
+    {
+      "name": "normal_wrist_left_exact_mirror_w10p0",
+      "family": "normal_wrist",
+      "mode": "left",
+      "speed": 10.0,
+      "sample_count": 370,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.24633651,
+        -0.12070639,
+        -0.30554437,
+        2.1537668,
+        -0.44992149,
+        0.02483132,
+        -0.68082729
+      ],
+      "trajectory_sha256": "a613147184753a13de990b9db80de73c1c37362eed81b37c0e8d824e19b71485"
+    },
+    {
+      "name": "normal_right_v0p60",
+      "family": "normal_workspace",
+      "mode": "right",
+      "speed": 0.6,
+      "sample_count": 684,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "5d6142f1ca5423e4c94b2238c55e3555405d253cf70e6ec8a0eaaa90623d2a99"
+    },
+    {
+      "name": "normal_left_v0p60",
+      "family": "normal_workspace",
+      "mode": "left",
+      "speed": 0.6,
+      "sample_count": 684,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "280700c90a0b438ae657d0735ffd35a6ce9c8b255d0b141cf3567dc5c9b6b12e"
+    },
+    {
+      "name": "normal_bimanual_v0p60",
+      "family": "normal_workspace",
+      "mode": "bimanual",
+      "speed": 0.6,
+      "sample_count": 684,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "60c08c884c36f159877e899a00c2bed21173898a75783aab8a16f08d8f0b178f"
+    }
+  ]
+}
