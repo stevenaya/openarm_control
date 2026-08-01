@@ -1,0 +1,55 @@
+{
+  "purpose": "Refreshed OpenArm IK public report experiment set",
+  "current_deployment_parameters": {
+    "position_cost": 12.0,
+    "orientation_cost": 1.5,
+    "lm_damping": 0.01,
+    "damping": 0.1,
+    "posture_cost": 0.0,
+    "dt": 0.004,
+    "max_iters": 5,
+    "frame_position_error_limit": 0.02,
+    "frame_orientation_error_limit": 0.25,
+    "target_linear_speed_slow": 0.6,
+    "target_linear_speed_fast": 0.9,
+    "position_error_latch_threshold": 0.006,
+    "joint_limit_gain": 0.95,
+    "joint_braking": true,
+    "joint_braking_distance": 0.2,
+    "joint_braking_exponent": 2.0,
+    "joint_braking_distance_buffer": 0.01,
+    "jacobian_characteristic_length": 0.3,
+    "nullspace_cost": 8.5,
+    "nullspace_return_rate": 1.6,
+    "nullspace_max_speed": 1.0,
+    "nullspace_ratio_low": 0.02,
+    "nullspace_ratio_high": 0.05,
+    "singularity_ratio_stop": 0.02,
+    "singularity_ratio_slow": 0.08,
+    "singularity_max_approach_rate": 0.25,
+    "singularity_braking_exponent": 2.0,
+    "singularity_gradient_epsilon": 0.0001,
+    "kinetic_energy_cost": 2e-05
+  },
+  "frozen_sources": {
+    "near_chest_fast_wrist_roll": {
+      "path": "/home/hilab/workdir.evaluation/openarm_control/dev/final_study/results/pr_showcase_selection_20260731/selected/chest_ep73_triphasic98_v1.npz",
+      "sha256": "915973663e5fa786c433c4465d08247f65df4eb8ef2fd8a3714754edb91eb391"
+    },
+    "fast_retract_elbow_branch": {
+      "path": "/home/hilab/workdir.evaluation/openarm_control/dev/final_study/results/corrected_retract_showcase_screen_20260731/frozen_scenarios/recorded_ep75_right_retract30_straight_retract.npz",
+      "sha256": "a0667f64c76bd8db321e3987f71f0692af3f26d703599c43d320cae33be53a19"
+    }
+  },
+  "dynamic_controller_trajectory_runs": 14,
+  "unique_target_trajectory_hashes": 2,
+  "static_joint_limit_conditions": 378,
+  "suites": {
+    "frozen": {
+      "metadata": "frozen/metadata.json",
+      "controller_trajectory_runs": 14,
+      "scenario_count": 2,
+      "profile_count": 7
+    }
+  }
+}

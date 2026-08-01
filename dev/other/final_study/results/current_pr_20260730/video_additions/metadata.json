@@ -1,0 +1,82 @@
+{
+  "revision": "d006ece506f2c4965c390d897b1f5e7d0ea74cae",
+  "study_revision": "d1ed2725d5f57585",
+  "generated_at": "2026-07-30T14:50:24+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "upstream_style_ik_velocity",
+      "overrides": {
+        "position_cost": 1.0,
+        "orientation_cost": 1.0,
+        "lm_damping": 0.01,
+        "damping": 0.25,
+        "posture_cost": 0.01,
+        "frame_position_error_limit": 0.0,
+        "frame_orientation_error_limit": 0.0,
+        "nullspace_cost": 0.0,
+        "singularity_max_approach_rate": 0.0,
+        "kinetic_energy_cost": 0.0,
+        "joint_braking": false
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Upstream task set with the current recoverable IK velocity envelope. Joint braking remains disabled to isolate velocity caps."
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "retract_diag_p0p10_v0p80",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 364,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}

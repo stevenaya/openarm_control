@@ -1,0 +1,121 @@
+{
+  "revision": "d006ece506f2c4965c390d897b1f5e7d0ea74cae",
+  "study_revision": "f01e8a4c64f2cddb",
+  "generated_at": "2026-07-30T02:17:02+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "pr_full",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "All current PR mechanisms enabled."
+    },
+    {
+      "name": "active_dataflow",
+      "overrides": {},
+      "velocity_caps": null,
+      "limit_style": "configuration_only",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Actual evaluation dataflow: no IK velocity limit; downstream driver velocity limiting remains active."
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "reach_right_p0p00_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 926,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_p0p00_v0p80",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 644,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}

@@ -1,0 +1,322 @@
+{
+  "revision": "d006ece506f2c4965c390d897b1f5e7d0ea74cae",
+  "study_revision": "d1a2c8e6893ff482",
+  "generated_at": "2026-07-30T03:05:30+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "brake_distance_0p08",
+      "overrides": {
+        "joint_braking_distance": 0.08,
+        "singularity_max_approach_rate": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_0p12",
+      "overrides": {
+        "joint_braking_distance": 0.12,
+        "singularity_max_approach_rate": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_0p2",
+      "overrides": {
+        "joint_braking_distance": 0.2,
+        "singularity_max_approach_rate": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "brake_distance_0p3",
+      "overrides": {
+        "joint_braking_distance": 0.3,
+        "singularity_max_approach_rate": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "no_braking",
+      "overrides": {
+        "joint_braking": false,
+        "singularity_max_approach_rate": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "configuration_only",
+      "overrides": {
+        "singularity_max_approach_rate": 0.0
+      },
+      "velocity_caps": null,
+      "limit_style": "configuration_only",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "joint6_bounds_w2p0",
+      "family": "joint_braking",
+      "mode": "right",
+      "speed": 2.0,
+      "sample_count": 925,
+      "description": "Orientation sweep whose nominal branch approaches both J6 bounds.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        0.0,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint6_bounds_w4p0",
+      "family": "joint_braking",
+      "mode": "right",
+      "speed": 4.0,
+      "sample_count": 632,
+      "description": "Orientation sweep whose nominal branch approaches both J6 bounds.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        0.0,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint6_bounds_w8p0",
+      "family": "joint_braking",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 485,
+      "description": "Orientation sweep whose nominal branch approaches both J6 bounds.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        0.0,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "joint6_bounds_w12p0",
+      "family": "joint_braking",
+      "mode": "right",
+      "speed": 12.0,
+      "sample_count": 436,
+      "description": "Orientation sweep whose nominal branch approaches both J6 bounds.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        0.0,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    }
+  ]
+}

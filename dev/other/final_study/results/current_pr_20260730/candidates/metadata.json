@@ -1,0 +1,1289 @@
+{
+  "revision": "d006ece506f2c4965c390d897b1f5e7d0ea74cae",
+  "study_revision": "d495f9b3b8e138a6",
+  "generated_at": "2026-07-30T02:32:11+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "pr_full",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Current PR defaults."
+    },
+    {
+      "name": "candidate_minimal",
+      "overrides": {
+        "frame_orientation_error_limit": 0.2,
+        "singularity_max_approach_rate": 0.18
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Only tighten the orientation budget and singularity approach rate; retain all other PR defaults."
+    },
+    {
+      "name": "candidate_balanced",
+      "overrides": {
+        "frame_orientation_error_limit": 0.2,
+        "nullspace_cost": 10.0,
+        "singularity_max_approach_rate": 0.18,
+        "joint_braking_distance": 0.12,
+        "kinetic_energy_cost": 3e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Balanced combination selected from the one-factor plateaus."
+    },
+    {
+      "name": "candidate_smooth",
+      "overrides": {
+        "frame_orientation_error_limit": 0.15,
+        "nullspace_cost": 12.0,
+        "singularity_max_approach_rate": 0.18,
+        "joint_braking_distance": 0.12,
+        "kinetic_energy_cost": 5e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "More conservative branch and acceleration tuning with additional permitted orientation lag."
+    },
+    {
+      "name": "candidate_tracking",
+      "overrides": {
+        "frame_orientation_error_limit": 0.25,
+        "nullspace_cost": 10.0,
+        "singularity_max_approach_rate": 0.18,
+        "joint_braking_distance": 0.12,
+        "kinetic_energy_cost": 3e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Retain the current orientation budget while tuning the secondary mechanisms."
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "reach_right_p0p00_v0p10",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.1,
+      "sample_count": 2614,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_p0p00_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 926,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_p0p00_v0p80",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 644,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_m0p10_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 956,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_m0p10_v0p10",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.1,
+      "sample_count": 1249,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_m0p10_v0p40",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 490,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_m0p10_v0p80",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 364,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "reach_right_p0p10_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 956,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_p0p10_v0p10",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.1,
+      "sample_count": 1249,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_p0p10_v0p40",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 490,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "retract_diag_p0p10_v0p80",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 364,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_circle_right_v0p15",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.15,
+      "sample_count": 659,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_circle_right_v0p40",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 364,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_circle_right_v0p80",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 276,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_up_right_v0p20",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.2,
+      "sample_count": 537,
+      "description": "Nearly extended up translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_up_right_v0p80",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 312,
+      "description": "Nearly extended up translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_down_right_v0p20",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.2,
+      "sample_count": 536,
+      "description": "Nearly extended down translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_down_right_v0p80",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 312,
+      "description": "Nearly extended down translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_left_right_v0p20",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.2,
+      "sample_count": 536,
+      "description": "Nearly extended left translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_left_right_v0p80",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 312,
+      "description": "Nearly extended left translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_right_right_v0p20",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.2,
+      "sample_count": 536,
+      "description": "Nearly extended right translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_right_right_v0p80",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 312,
+      "description": "Nearly extended right translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "extended_wrist_right_w2p0",
+      "family": "extended_wrist",
+      "mode": "right",
+      "speed": 2.0,
+      "sample_count": 1087,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "normal_wrist_right_w2p0",
+      "family": "normal_wrist",
+      "mode": "right",
+      "speed": 2.0,
+      "sample_count": 1090,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "extended_wrist_right_w6p0",
+      "family": "extended_wrist",
+      "mode": "right",
+      "speed": 6.0,
+      "sample_count": 487,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "normal_wrist_right_w6p0",
+      "family": "normal_wrist",
+      "mode": "right",
+      "speed": 6.0,
+      "sample_count": 490,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "extended_wrist_right_w10p0",
+      "family": "extended_wrist",
+      "mode": "right",
+      "speed": 10.0,
+      "sample_count": 367,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "normal_wrist_right_w10p0",
+      "family": "normal_wrist",
+      "mode": "right",
+      "speed": 10.0,
+      "sample_count": 370,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "normal_right_v0p20",
+      "family": "normal_workspace",
+      "mode": "right",
+      "speed": 0.2,
+      "sample_count": 1677,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "normal_right_v0p50",
+      "family": "normal_workspace",
+      "mode": "right",
+      "speed": 0.5,
+      "sample_count": 783,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "normal_right_v0p80",
+      "family": "normal_workspace",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 560,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "normal_bimanual_v0p30",
+      "family": "normal_workspace",
+      "mode": "bimanual",
+      "speed": 0.3,
+      "sample_count": 1180,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "normal_bimanual_v0p60",
+      "family": "normal_workspace",
+      "mode": "bimanual",
+      "speed": 0.6,
+      "sample_count": 684,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "chest_outward_flip_right_v0p30_w4p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 4.0,
+      "sample_count": 495,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "chest_outward_flip_right_v0p30_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "chest_outward_flip_right_v0p30_w12p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 12.0,
+      "sample_count": 299,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "chest_outward_flip_right_v0p80_w4p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 4.0,
+      "sample_count": 495,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "chest_outward_flip_right_v0p80_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "chest_outward_flip_right_v0p80_w12p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 12.0,
+      "sample_count": 299,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "chest_outward_flip_right_v1p20_w4p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 4.0,
+      "sample_count": 495,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "chest_outward_flip_right_v1p20_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    },
+    {
+      "name": "chest_outward_flip_right_v1p20_w12p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 12.0,
+      "sample_count": 299,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ]
+    }
+  ]
+}

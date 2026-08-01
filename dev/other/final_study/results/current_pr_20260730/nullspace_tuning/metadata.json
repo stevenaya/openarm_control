@@ -1,0 +1,2519 @@
+{
+  "revision": "d006ece506f2c4965c390d897b1f5e7d0ea74cae",
+  "study_revision": "d1ed2725d5f57585",
+  "generated_at": "2026-07-30T18:44:20+0900",
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "profiles": [
+    {
+      "name": "ns_cost_0",
+      "overrides": {
+        "nullspace_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cost_3",
+      "overrides": {
+        "nullspace_cost": 3.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cost_7",
+      "overrides": {
+        "nullspace_cost": 7.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cost_10",
+      "overrides": {
+        "nullspace_cost": 10.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cost_12",
+      "overrides": {
+        "nullspace_cost": 12.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cost_18",
+      "overrides": {
+        "nullspace_cost": 18.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cost_25",
+      "overrides": {
+        "nullspace_cost": 25.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_c12_v0p5",
+      "overrides": {
+        "nullspace_cost": 12.0,
+        "nullspace_max_speed": 0.5
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_c12_v0p75",
+      "overrides": {
+        "nullspace_cost": 12.0,
+        "nullspace_max_speed": 0.75
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_c12_v1",
+      "overrides": {
+        "nullspace_cost": 12.0,
+        "nullspace_max_speed": 1.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_c12_v1p25",
+      "overrides": {
+        "nullspace_cost": 12.0,
+        "nullspace_max_speed": 1.25
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_c12_v1p5",
+      "overrides": {
+        "nullspace_cost": 12.0,
+        "nullspace_max_speed": 1.5
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_c12_v2",
+      "overrides": {
+        "nullspace_cost": 12.0,
+        "nullspace_max_speed": 2.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_c12_v1p5_r0p8",
+      "overrides": {
+        "nullspace_cost": 12.0,
+        "nullspace_return_rate": 0.8,
+        "nullspace_max_speed": 1.5
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_c12_v1p5_r1p2",
+      "overrides": {
+        "nullspace_cost": 12.0,
+        "nullspace_return_rate": 1.2,
+        "nullspace_max_speed": 1.5
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_c12_v1p5_r1p6",
+      "overrides": {
+        "nullspace_cost": 12.0,
+        "nullspace_return_rate": 1.6,
+        "nullspace_max_speed": 1.5
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_c12_v1p5_r2p4",
+      "overrides": {
+        "nullspace_cost": 12.0,
+        "nullspace_return_rate": 2.4,
+        "nullspace_max_speed": 1.5
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_c12_v1p5_r3p2",
+      "overrides": {
+        "nullspace_cost": 12.0,
+        "nullspace_return_rate": 3.2,
+        "nullspace_max_speed": 1.5
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c5_r0p4",
+      "overrides": {
+        "nullspace_cost": 5.0,
+        "nullspace_return_rate": 0.4
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c5_r0p6",
+      "overrides": {
+        "nullspace_cost": 5.0,
+        "nullspace_return_rate": 0.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c5_r0p8",
+      "overrides": {
+        "nullspace_cost": 5.0,
+        "nullspace_return_rate": 0.8
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c5_r1",
+      "overrides": {
+        "nullspace_cost": 5.0,
+        "nullspace_return_rate": 1.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c5_r1p2",
+      "overrides": {
+        "nullspace_cost": 5.0,
+        "nullspace_return_rate": 1.2
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c5_r1p6",
+      "overrides": {
+        "nullspace_cost": 5.0,
+        "nullspace_return_rate": 1.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c6_r0p4",
+      "overrides": {
+        "nullspace_cost": 6.0,
+        "nullspace_return_rate": 0.4
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c6_r0p6",
+      "overrides": {
+        "nullspace_cost": 6.0,
+        "nullspace_return_rate": 0.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c6_r0p8",
+      "overrides": {
+        "nullspace_cost": 6.0,
+        "nullspace_return_rate": 0.8
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c6_r1",
+      "overrides": {
+        "nullspace_cost": 6.0,
+        "nullspace_return_rate": 1.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c6_r1p2",
+      "overrides": {
+        "nullspace_cost": 6.0,
+        "nullspace_return_rate": 1.2
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c6_r1p6",
+      "overrides": {
+        "nullspace_cost": 6.0,
+        "nullspace_return_rate": 1.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c7_r0p4",
+      "overrides": {
+        "nullspace_cost": 7.0,
+        "nullspace_return_rate": 0.4
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c7_r0p6",
+      "overrides": {
+        "nullspace_cost": 7.0,
+        "nullspace_return_rate": 0.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c7_r0p8",
+      "overrides": {
+        "nullspace_cost": 7.0,
+        "nullspace_return_rate": 0.8
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c7_r1",
+      "overrides": {
+        "nullspace_cost": 7.0,
+        "nullspace_return_rate": 1.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c7_r1p2",
+      "overrides": {
+        "nullspace_cost": 7.0,
+        "nullspace_return_rate": 1.2
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c7_r1p6",
+      "overrides": {
+        "nullspace_cost": 7.0,
+        "nullspace_return_rate": 1.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c8_r0p4",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_return_rate": 0.4
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c8_r0p6",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_return_rate": 0.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c8_r0p8",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_return_rate": 0.8
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c8_r1",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_return_rate": 1.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c8_r1p2",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_return_rate": 1.2
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c8_r1p6",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_return_rate": 1.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c9_r0p4",
+      "overrides": {
+        "nullspace_cost": 9.0,
+        "nullspace_return_rate": 0.4
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c9_r0p6",
+      "overrides": {
+        "nullspace_cost": 9.0,
+        "nullspace_return_rate": 0.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c9_r0p8",
+      "overrides": {
+        "nullspace_cost": 9.0,
+        "nullspace_return_rate": 0.8
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c9_r1",
+      "overrides": {
+        "nullspace_cost": 9.0,
+        "nullspace_return_rate": 1.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c9_r1p2",
+      "overrides": {
+        "nullspace_cost": 9.0,
+        "nullspace_return_rate": 1.2
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_local_c9_r1p6",
+      "overrides": {
+        "nullspace_cost": 9.0,
+        "nullspace_return_rate": 1.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c7p5_v0p3",
+      "overrides": {
+        "nullspace_cost": 7.5,
+        "nullspace_max_speed": 0.3
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c7p5_v0p4",
+      "overrides": {
+        "nullspace_cost": 7.5,
+        "nullspace_max_speed": 0.4
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c7p5_v0p5",
+      "overrides": {
+        "nullspace_cost": 7.5,
+        "nullspace_max_speed": 0.5
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c7p5_v0p6",
+      "overrides": {
+        "nullspace_cost": 7.5,
+        "nullspace_max_speed": 0.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c7p5_v0p7",
+      "overrides": {
+        "nullspace_cost": 7.5,
+        "nullspace_max_speed": 0.7
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c7p5_v0p8",
+      "overrides": {
+        "nullspace_cost": 7.5,
+        "nullspace_max_speed": 0.8
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c7p5_v1",
+      "overrides": {
+        "nullspace_cost": 7.5,
+        "nullspace_max_speed": 1.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8_v0p3",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_max_speed": 0.3
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8_v0p4",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_max_speed": 0.4
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8_v0p5",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_max_speed": 0.5
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8_v0p6",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_max_speed": 0.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8_v0p7",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_max_speed": 0.7
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8_v0p8",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_max_speed": 0.8
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8_v1",
+      "overrides": {
+        "nullspace_cost": 8.0,
+        "nullspace_max_speed": 1.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8p5_v0p3",
+      "overrides": {
+        "nullspace_cost": 8.5,
+        "nullspace_max_speed": 0.3
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8p5_v0p4",
+      "overrides": {
+        "nullspace_cost": 8.5,
+        "nullspace_max_speed": 0.4
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8p5_v0p5",
+      "overrides": {
+        "nullspace_cost": 8.5,
+        "nullspace_max_speed": 0.5
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8p5_v0p6",
+      "overrides": {
+        "nullspace_cost": 8.5,
+        "nullspace_max_speed": 0.6
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8p5_v0p7",
+      "overrides": {
+        "nullspace_cost": 8.5,
+        "nullspace_max_speed": 0.7
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8p5_v0p8",
+      "overrides": {
+        "nullspace_cost": 8.5,
+        "nullspace_max_speed": 0.8
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    },
+    {
+      "name": "ns_cap_c8p5_v1",
+      "overrides": {
+        "nullspace_cost": 8.5,
+        "nullspace_max_speed": 1.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": ""
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "retract_deep_p0p10_v0p80",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 404,
+      "description": "Fast diagonal retract ending 10 cm closer to the base-link rear plane with +0.10 m lateral motion.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}

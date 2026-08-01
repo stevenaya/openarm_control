@@ -1,0 +1,44 @@
+{
+  "table_geom": "cell_table_col",
+  "distance_semantics": "Primary clearance is the lowest collision-mesh vertex above the tabletop, after transforming vertices into the table frame. MuJoCo mj_geomDistance is retained only as a penetration check because separated box-mesh pairs return zero in this build. Full 8D recorded qpos is used.",
+  "episodes": {
+    "73": {
+      "samples": 35604,
+      "duration_s": 142.4101665019989,
+      "gripper_collision_geoms": [
+        "ee_base_link_right_collision_00",
+        "finger_inner_right_collision_00",
+        "finger_inner_right_collision_01",
+        "finger_inner_right_collision_02",
+        "finger_inner_right_collision_03",
+        "finger_outer_right_collision_00",
+        "finger_outer_right_collision_01",
+        "finger_outer_right_collision_02",
+        "finger_outer_right_collision_03"
+      ],
+      "action_min_clearance_m": -0.025415188605147687,
+      "obs_min_clearance_m": -0.02772403747979102,
+      "action_min_vertical_clearance_m": -0.03202688759142102,
+      "obs_min_vertical_clearance_m": -0.03566670214021627
+    },
+    "75": {
+      "samples": 44890,
+      "duration_s": 179.55368828773499,
+      "gripper_collision_geoms": [
+        "ee_base_link_right_collision_00",
+        "finger_inner_right_collision_00",
+        "finger_inner_right_collision_01",
+        "finger_inner_right_collision_02",
+        "finger_inner_right_collision_03",
+        "finger_outer_right_collision_00",
+        "finger_outer_right_collision_01",
+        "finger_outer_right_collision_02",
+        "finger_outer_right_collision_03"
+      ],
+      "action_min_clearance_m": -0.018826689523135934,
+      "obs_min_clearance_m": -0.024738084116937675,
+      "action_min_vertical_clearance_m": -0.01882668952313604,
+      "obs_min_vertical_clearance_m": -0.024738084116937783
+    }
+  }
+}

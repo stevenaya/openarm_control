@@ -1,0 +1,20 @@
+{
+  "packet_rates_hz": [
+    60.0,
+    72.0,
+    90.0,
+    120.0
+  ],
+  "pipelines": [
+    "unfiltered_fresh",
+    "old_repeated_shared_cutoff",
+    "old_fresh_shared_cutoff",
+    "fixed_fresh_separate_cutoff"
+  ],
+  "target_limits": {
+    "linear_m_s": 1.0,
+    "angular_rad_s": 6.0
+  },
+  "production_vr_revision": "5c0cb0f",
+  "fixed_reference_revision": "8346f2d with shortest-path SLERP"
+}

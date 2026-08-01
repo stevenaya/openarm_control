@@ -1,0 +1,53 @@
+[
+  {
+    "name": "triphasic_34s",
+    "start": 8469,
+    "end": 9140,
+    "start_s": 33.875563859939575,
+    "end_s": 36.55552935600281,
+    "retract_m": 0.16827521415895758,
+    "recover_m": 0.18992832941896798,
+    "min_reach_s": 35.73553991317749,
+    "pause_duration_s": 0.296,
+    "peak_angular_speed_rad_s": 7.074847639002066,
+    "orientation_travel_rad": 6.357233785708611,
+    "command_path_length_m": 0.49504053224866024,
+    "hardware_cross_track_max_m": 0.019531102552146885,
+    "scenario": "episode73_triphasic_34s_straight_position",
+    "target_semantics": "recorded command orientation + smooth start/end position"
+  },
+  {
+    "name": "triphasic_98s",
+    "start": 24426,
+    "end": 25087,
+    "start_s": 97.70274209976196,
+    "end_s": 100.34270811080933,
+    "retract_m": 0.17167034080368998,
+    "recover_m": 0.17981679254021843,
+    "min_reach_s": 98.78672814369202,
+    "pause_duration_s": 0.324,
+    "peak_angular_speed_rad_s": 10.129014604927317,
+    "orientation_travel_rad": 7.2409147043193425,
+    "command_path_length_m": 0.6238315758764277,
+    "hardware_cross_track_max_m": 0.024399536381048043,
+    "scenario": "episode73_triphasic_98s_straight_position",
+    "target_semantics": "recorded command orientation + smooth start/end position"
+  },
+  {
+    "name": "triphasic_132s",
+    "start": 32987,
+    "end": 33485,
+    "start_s": 131.94630122184753,
+    "end_s": 133.93427562713623,
+    "retract_m": 0.17960145850922238,
+    "recover_m": 0.1817390883129132,
+    "min_reach_s": 132.82228994369507,
+    "pause_duration_s": 0.248,
+    "peak_angular_speed_rad_s": 8.046541100851941,
+    "orientation_travel_rad": 6.336071874162365,
+    "command_path_length_m": 0.4912277540694675,
+    "hardware_cross_track_max_m": 0.020853887890016676,
+    "scenario": "episode73_triphasic_132s_straight_position",
+    "target_semantics": "recorded command orientation + smooth start/end position"
+  }
+]

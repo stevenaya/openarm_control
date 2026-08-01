@@ -1,0 +1,31 @@
+{
+  "run_dir": "/hdd_data/rollout/pillow_0702_tune_llm",
+  "episodes": {
+    "chest": 73,
+    "retract": 75
+  },
+  "dt": 0.004,
+  "records": {
+    "chest": {
+      "right": {
+        "duration_s": 142.4101665019989,
+        "sample_count": 35604
+      },
+      "left": {
+        "duration_s": 142.4101665019989,
+        "sample_count": 35604
+      }
+    },
+    "retract": {
+      "right": {
+        "duration_s": 179.55368828773499,
+        "sample_count": 44890
+      },
+      "left": {
+        "duration_s": 179.55368828773499,
+        "sample_count": 44890
+      }
+    }
+  },
+  "target_semantics": "FK(action q): IK command-pose proxy, not raw VR target"
+}
