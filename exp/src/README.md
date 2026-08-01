@@ -103,6 +103,9 @@ Validate the complete published report:
 uv run --project exp/src --frozen python exp/src/validate_report.py exp
 ```
 
-The experiment runner records the IK parameters, frozen driver envelope,
-model hash, source revision, and runtime package versions in the suite
-manifests. It does not read a deployment dataflow or any sibling repository.
+The experiment runner records the independently configured IK and frozen
+deployment driver velocity envelopes, other IK parameters, model hash, source
+revision, and runtime package versions in the suite manifests. The IK profile
+directly reproduces the built-in caps selected by the deployment's
+`--limit-velocity` flag without reading the deployment dataflow or any sibling
+repository.

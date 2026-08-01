@@ -260,7 +260,7 @@ Distance が小さくなるほど limit 方向の permitted velocity はゼロ�
 
 ### 2.6 QP Velocity Envelope と Measured State
 
-`--limit-velocity` 有効時、per-joint velocity limit は第 2.5 節の hard QP envelope に入ります。Cartesian task、nullspace task、その他 soft objective は、一つの executable velocity set 内で solve されます。Driver には execution-layer safeguard として同じ post-QP limit を残せます。Driver limit だけを残す方法が等価かどうかは第 5.5 節で検証します。
+`--limit-velocity` 有効時、per-joint velocity limit は第 2.5 節の hard QP envelope に入ります。Cartesian task、nullspace task、その他 soft objective は、一つの executable velocity set 内で solve されます。Driver には execution-layer safeguard として独立設定した post-QP envelope を残せます。Driver limit だけを残す方法が等価かどうかは第 5.5 節で検証します。
 
 Measured $q$ は Mink の integrated command configuration を上書きせず、braking margin と singularity-limit activation だけに保守的に影響します。これにより、tick ごとの強制同期で incremental position command を繰り返し縮小せずに、real state で safety boundary を補正できます。
 
@@ -346,7 +346,7 @@ Control chain の各量は次を意味します。
 | IK velocity limits J1-J7 | `[2, 2, 3.14, 3.14, 6.3, 6.3, 6.3] rad/s` |
 | Driver velocity limits J1-J7 | `[2, 2, 3.14, 3.14, 6.3, 6.3, 6.3] rad/s` |
 
-**IK velocity limits** は QP 内の joint constraint、**driver velocity limits** は QP 後の per-joint clipping です。文脈が明確な箇所では IK cap、driver cap と略記します。
+**IK velocity limits** は QP 内の joint constraint、**driver velocity limits** は QP 後の per-joint clipping です。両者は独立に設定・記録されます。この表で値が同じなのは固定 deployment profile の設定であり、実装上の必須条件ではありません。文脈が明確な箇所では IK cap、driver cap と略記します。
 
 #### 3.2.2 Test Trajectory の構成
 

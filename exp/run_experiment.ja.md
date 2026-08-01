@@ -81,10 +81,14 @@ commit されません。2 本の記録入力を除き、軌道はすべてコ�
 ### 3.1 実験設定
 
 実験 package は自己完結しており、deployment dataflow や sibling repository
-の設定を読みません。IK の値は評価対象 `IKParams` の default から取得し、各
-manifest に記録します。simulation の downstream limiter は
-`exp/src/inputs/experiment_driver_config.yaml` に固定した velocity envelope を
-読み、validator はその hash も検証します。
+の設定を読みません。IK の scalar parameter は評価対象 `IKParams` の default
+から取得します。Deployment は `--limit-velocity` で IK velocity envelope を
+有効化し、`--config` override を指定しないため、評価対象 controller revision
+の built-in caps を読みます。実験 profile は同じ mapping を直接注入します。
+simulation の downstream limiter は
+`exp/src/inputs/experiment_driver_config.yaml` に固定した deployment envelope を
+読みます。2 つの envelope は独立に設定・検証されます。本 deployment では
+同じ値ですが、常に一致する必要はありません。
 
 ### 3.2 System Tool
 

@@ -12,6 +12,7 @@ from pathlib import Path
 
 import yaml
 
+from openarm_control.config import ARM_JOINT_VELOCITY_LIMITS_RAD_S
 from openarm_control.ik_params import IKParams
 
 
@@ -20,6 +21,9 @@ MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 PUBLIC_DIRS = ("assets", "videos", "tables", "manifests")
 DEFAULT_OMISSIONS = {"solver", "velocity_limits"}
 UNSAFE_GITHUB_MATH = (r"\begin{bmatrix}", r"\begin{cases}")
+IK_VELOCITY_LIMIT_SOURCE = (
+    "openarm_control.config.ARM_JOINT_VELOCITY_LIMITS_RAD_S"
+)
 
 
 def _resolve_recorded_path(value: str) -> Path:
@@ -115,6 +119,78 @@ def _validate_driver_config(report_dir: Path) -> list[str]:
             errors.append(
                 f"driver config arm caps {actual!r} differ from manifest {expected!r}"
             )
+    return errors
+
+
+def _validate_velocity_envelopes(report_dir: Path) -> list[str]:
+    manifest_path = report_dir / "manifests" / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    recorded = manifest.get("velocity_envelopes")
+    if not isinstance(recorded, dict):
+        return ["top manifest does not define velocity_envelopes"]
+
+    ik = recorded.get("ik")
+    driver = recorded.get("driver")
+    if not isinstance(ik, dict) or not isinstance(driver, dict):
+        return ["velocity_envelopes must define independent ik and driver entries"]
+
+    errors: list[str] = []
+    expected_ik_caps = [
+        float(value) for value in ARM_JOINT_VELOCITY_LIMITS_RAD_S
+    ]
+    recorded_ik_caps = ik.get("arm_joint_caps_rad_s")
+    if ik.get("enabled") is not True:
+        errors.append("current deployment must enable the IK velocity envelope")
+    if ik.get("deployment_flag") != "--limit-velocity":
+        errors.append("current deployment IK envelope must record --limit-velocity")
+    if ik.get("config_override") is not None:
+        errors.append("current deployment IK envelope must use the built-in caps")
+    if ik.get("limit_style") != "recoverable":
+        errors.append("current deployment IK limit_style must be 'recoverable'")
+    if ik.get("source") != IK_VELOCITY_LIMIT_SOURCE:
+        errors.append("IK velocity-envelope source differs from the expected symbol")
+    if recorded_ik_caps != expected_ik_caps:
+        errors.append(
+            f"IK caps {recorded_ik_caps!r} differ from controller caps "
+            f"{expected_ik_caps!r}"
+        )
+
+    driver_config = manifest["driver_config"]
+    expected_driver_caps = driver_config["arm_joint_velocity_caps_rad_s"]
+    if driver.get("enabled") is not True:
+        errors.append("current deployment must enable the driver velocity envelope")
+    if driver.get("source") != driver_config["path"]:
+        errors.append("driver velocity-envelope source differs from driver_config")
+    if driver.get("config_sha256") != driver_config["sha256"]:
+        errors.append("driver velocity-envelope hash differs from driver_config")
+    if driver.get("arm_joint_caps_rad_s") != expected_driver_caps:
+        errors.append("driver velocity-envelope caps differ from driver_config")
+
+    deployment_profiles = 0
+    for suite in manifest["suites"].values():
+        metadata_path = manifest_path.parent / suite["metadata"]
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        for profile in metadata.get("profiles", []):
+            if profile.get("name") != "current_deployment":
+                continue
+            deployment_profiles += 1
+            if profile.get("velocity_caps") != expected_ik_caps:
+                errors.append(
+                    f"{metadata_path.parent.name}: current_deployment IK caps "
+                    "differ from the top manifest"
+                )
+            if profile.get("limit_style") != ik.get("limit_style"):
+                errors.append(
+                    f"{metadata_path.parent.name}: current_deployment limit style "
+                    "differs from the top manifest"
+                )
+            if profile.get("driver_velocity_caps") != expected_driver_caps:
+                errors.append(
+                    f"{metadata_path.parent.name}: current_deployment driver caps "
+                    "differ from the top manifest"
+                )
+    if deployment_profiles == 0:
+        errors.append("suite manifests contain no current_deployment profile")
     return errors
 
 
@@ -228,6 +304,7 @@ def validate(report_dir: Path, *, write_checksums: bool) -> list[str]:
     )
     errors.extend(_validate_parameters(report_dir))
     errors.extend(_validate_driver_config(report_dir))
+    errors.extend(_validate_velocity_envelopes(report_dir))
     errors.extend(_validate_manifests(report_dir))
     errors.extend(_validate_frozen_inputs(report_dir))
     errors.extend(_validate_reproduction_environment(report_dir))

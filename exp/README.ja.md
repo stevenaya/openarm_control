@@ -165,7 +165,8 @@ QP と driver limit の完全な timing および path decomposition は[第 5.5
 | Singularity-approach limit | stop/slow `0.02 / 0.08`; maximum approach rate `0.25 s⁻¹` |
 | Joint braking | distance `0.20 rad`; exponent `2`; measured-state buffer `0.01 rad` |
 | Kinetic regularization | `2e-5` |
-| IK / driver velocity limit J1-J7 | `[2, 2, 3.14, 3.14, 6.3, 6.3, 6.3] rad/s` |
+| IK velocity limit J1-J7 | `[2, 2, 3.14, 3.14, 6.3, 6.3, 6.3] rad/s` |
+| 固定 deployment driver limit J1-J7 | `[2, 2, 3.14, 3.14, 6.3, 6.3, 6.3] rad/s` |
 
 Exact-nullspace sweep と cross-validation は[第 6.1 節](detailed_report.ja.md#61-nullspace-parameter-sweep-と-cross-validation)、その他の parameter curve と組み合わせ候補は[第 6.2 節以降](detailed_report.ja.md#62-単一-parameter-感度)を参照。
 

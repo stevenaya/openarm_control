@@ -260,7 +260,7 @@ As distance decreases, permitted velocity toward the limit approaches zero; moti
 
 ### 2.6 QP Velocity Envelope and Measured State
 
-With `--limit-velocity`, per-joint velocity limits enter the hard QP envelope from Section 2.5. The Cartesian task, nullspace task, and other soft objectives are therefore solved within one executable velocity set. The driver can retain identical post-QP limits as an execution-layer safeguard. Section 5.5 tests whether keeping only the driver limit is equivalent.
+With `--limit-velocity`, per-joint velocity limits enter the hard QP envelope from Section 2.5. The Cartesian task, nullspace task, and other soft objectives are therefore solved within one executable velocity set. The driver can retain an independently configured post-QP envelope as an execution-layer safeguard. Section 5.5 tests whether keeping only the driver limit is equivalent.
 
 Measured $q$ does not overwrite Mink's integrated command configuration. It only conservatively affects braking margin and singularity-limit activation. This allows real state to correct safety boundaries without repeatedly shrinking incremental position commands through forced synchronization on every tick.
 
@@ -346,7 +346,7 @@ All tracking metrics are computed from target and simulated actual state unless 
 | IK velocity limits J1-J7 | `[2, 2, 3.14, 3.14, 6.3, 6.3, 6.3] rad/s` |
 | Driver velocity limits J1-J7 | `[2, 2, 3.14, 3.14, 6.3, 6.3, 6.3] rad/s` |
 
-Here, the **IK velocity limits** are joint constraints inside the QP, whereas the **driver velocity limits** are per-joint clipping after the QP. They are abbreviated as IK caps and driver caps where context is unambiguous.
+Here, the **IK velocity limits** are joint constraints inside the QP, whereas the **driver velocity limits** are per-joint clipping after the QP. They are configured and recorded independently; their equality in this table is specific to the frozen deployment profile, not an implementation requirement. They are abbreviated as IK caps and driver caps where context is unambiguous.
 
 #### 3.2.2 Composition of the Test Trajectories
 

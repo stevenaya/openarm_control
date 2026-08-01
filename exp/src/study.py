@@ -253,6 +253,29 @@ def driver_config_values() -> dict[str, Any]:
     }
 
 
+def deployment_velocity_envelopes() -> dict[str, Any]:
+    """Describe the independently configured IK and driver velocity envelopes."""
+    driver = driver_config_values()
+    return {
+        "ik": {
+            "enabled": True,
+            "deployment_flag": "--limit-velocity",
+            "config_override": None,
+            "limit_style": "recoverable",
+            "source": (
+                "openarm_control.config.ARM_JOINT_VELOCITY_LIMITS_RAD_S"
+            ),
+            "arm_joint_caps_rad_s": list(CONTROL_CAPS),
+        },
+        "driver": {
+            "enabled": True,
+            "source": driver["path"],
+            "config_sha256": driver["sha256"],
+            "arm_joint_caps_rad_s": driver["arm_joint_velocity_caps_rad_s"],
+        },
+    }
+
+
 def velocity_mapping(caps: tuple[float, ...] | None) -> dict[str, float] | None:
     """Build a Mink joint-name velocity mapping."""
     if caps is None:

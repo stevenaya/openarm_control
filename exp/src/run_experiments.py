@@ -322,6 +322,7 @@ def _write_top_manifest(root: Path) -> None:
             "lock_sha256": _sha256(HERE / "uv.lock"),
         },
         "current_deployment_parameters": study.current_parameter_values(),
+        "velocity_envelopes": study.deployment_velocity_envelopes(),
         "driver_config": study.driver_config_values(),
         "frozen_sources": {
             "near_chest_fast_wrist_roll": {
@@ -339,7 +340,7 @@ def _write_top_manifest(root: Path) -> None:
         "suites": children,
     }
     (root / "manifest.json").write_text(
-        json.dumps(manifest, indent=2),
+        json.dumps(manifest, indent=2) + "\n",
         encoding="utf-8",
     )
 

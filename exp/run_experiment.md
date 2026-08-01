@@ -82,11 +82,15 @@ NPZ files are stored.
 ### 3.1 Experiment Configuration
 
 The experiment package is self-contained. It does not read a deployment
-dataflow or a configuration from a sibling repository. IK values come from the
-evaluated `IKParams` defaults and are recorded in every manifest. The simulated
-downstream limiter reads the frozen velocity envelope in
-`exp/src/inputs/experiment_driver_config.yaml`; its hash is also recorded and
-validated.
+dataflow or a configuration from a sibling repository. Scalar IK values come
+from the evaluated `IKParams` defaults. The deployment enables the IK velocity
+envelope with `--limit-velocity`; because it supplies no `--config` override,
+the flag loads the built-in caps from the evaluated controller revision. The
+experiment profile injects the same mapping directly. The simulated downstream
+limiter reads the frozen deployment envelope in
+`exp/src/inputs/experiment_driver_config.yaml`. The two envelopes are configured
+and validated independently; they happen to use the same values in this
+deployment but are not required to do so.
 
 ### 3.2 System Tools
 

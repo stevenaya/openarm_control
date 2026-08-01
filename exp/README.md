@@ -165,7 +165,8 @@ Neither the single-parameter sweeps, combined tuning, nor targeted exact-nullspa
 | Singularity-approach limit | stop/slow `0.02 / 0.08`; maximum approach rate `0.25 s⁻¹` |
 | Joint braking | distance `0.20 rad`; exponent `2`; measured-state buffer `0.01 rad` |
 | Kinetic regularization | `2e-5` |
-| IK / driver velocity limits J1-J7 | `[2, 2, 3.14, 3.14, 6.3, 6.3, 6.3] rad/s` |
+| IK velocity limits J1-J7 | `[2, 2, 3.14, 3.14, 6.3, 6.3, 6.3] rad/s` |
+| Frozen deployment driver limits J1-J7 | `[2, 2, 3.14, 3.14, 6.3, 6.3, 6.3] rad/s` |
 
 See [Section 6.1](detailed_report.md#61-nullspace-parameter-sweep-and-cross-validation) for the exact-nullspace sweep and cross-validation, and [Section 6.2 onward](detailed_report.md#62-single-parameter-sensitivity) for other parameter curves and combined candidates.
 

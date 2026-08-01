@@ -70,10 +70,11 @@ exp/
 ### 3.1 实验配置
 
 实验包可以独立复现，不读取部署 dataflow，也不依赖同级仓库中的配置文件。
-IK 数值直接来自受测版本的 `IKParams` 默认值，并记录在各级 manifest 中。
-仿真的下游限速器读取
-`exp/src/inputs/experiment_driver_config.yaml` 中冻结的速度包络；校验器同时
-检查该文件的 hash。
+IK 标量参数来自受测版本的 `IKParams` 默认值。部署通过 `--limit-velocity`
+启用 IK 速度包络；由于没有提供 `--config` 覆盖，该参数读取受测控制器 revision
+中的内置 caps，实验 profile 则直接注入同一 mapping。仿真的下游限速器读取
+`exp/src/inputs/experiment_driver_config.yaml` 中冻结的部署速度包络。两层包络
+分别配置并分别校验；本次部署中数值恰好相同，但并不要求始终相等。
 
 ### 3.2 系统工具
 
