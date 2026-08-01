@@ -370,18 +370,18 @@ The table below shows the number and purpose of trajectories in each motion fami
 
 ![Reference target-trajectory catalog](assets/02_trajectory_catalog.png)
 
-GitHub does not render repository MP4 files inline. This report therefore embeds higher-resolution animated WebP previews at `8-12 fps`, displayed at `760-980 px` according to panel layout. Click a preview to access the original MP4; a compact GIF fallback remains available from the video index.
+GitHub does not render repository MP4 files inline. This report therefore embeds higher-resolution animated WebP previews at `8-12 fps`, displayed at `760-980 px` according to panel layout. Click a preview to open the full-size animation; use the adjacent MP4 link to download the source video. A compact GIF fallback remains available from the video index.
 
 **Video: 21 reference-motion clips; on-screen labels show each family's counts in the 42-trajectory fixed set and all 70 targets**
 
 <details>
 <summary>Animated preview (click to expand)</summary>
 
-<a href="videos/ideal_reference_trajectory_catalog.mp4"><img src="assets/video_previews/ideal_reference_trajectory_catalog.webp" alt="Animated video preview" width="820"></a>
+<a href="assets/video_previews/ideal_reference_trajectory_catalog.webp"><img src="assets/video_previews/ideal_reference_trajectory_catalog.webp" alt="Animated video preview" width="820"></a>
 
 </details>
 
-[Open high-resolution preview](assets/video_previews/ideal_reference_trajectory_catalog.webp) · [Download MP4](videos/ideal_reference_trajectory_catalog.mp4)
+[Open high-resolution preview](assets/video_previews/ideal_reference_trajectory_catalog.webp) · [Download MP4](videos/ideal_reference_trajectory_catalog.mp4?raw=1)
 
 #### 3.2.3 Experiment Suites and Run Counts
 
@@ -486,7 +486,7 @@ The algorithm is defined in Section 2.2. This section evaluates the error budget
 
 #### 5.1.1 Near-Chest Stress Test
 
-This suite contains `14` trajectories: `9` speed combinations of **Near-chest roll + diagonal translation** (`0.3/0.8/1.2 m/s` with `4/8/12 rad/s`), `4` forward/lateral/downward/diagonal direction variants peaking at `1.2 m/s + 8 rad/s`, and `1` **Near-chest wrist roll only** trajectory. Names match the [reference trajectory-catalog video](videos/ideal_reference_trajectory_catalog.mp4). Metrics are computed over each complete trajectory and then averaged across all `14`:
+This suite contains `14` trajectories: `9` speed combinations of **Near-chest roll + diagonal translation** (`0.3/0.8/1.2 m/s` with `4/8/12 rad/s`), `4` forward/lateral/downward/diagonal direction variants peaking at `1.2 m/s + 8 rad/s`, and `1` **Near-chest wrist roll only** trajectory. Names match the [reference trajectory-catalog preview](assets/video_previews/ideal_reference_trajectory_catalog.webp). Metrics are computed over each complete trajectory and then averaged across all `14`:
 
 | Metric | PR default | PR w/o 6D error bound |
 |---|---:|---:|
@@ -515,11 +515,11 @@ Without the 6D error bound, position error, elbow lateral motion, joint accelera
 <details>
 <summary>Animated preview (click to expand)</summary>
 
-<a href="videos/near_chest_roll_translation_error_bound_comparison.mp4"><img src="assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp" alt="Animated video preview" width="900"></a>
+<a href="assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp"><img src="assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp" alt="Animated video preview" width="900"></a>
 
 </details>
 
-[Open high-resolution preview](assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp) · [Download MP4](videos/near_chest_roll_translation_error_bound_comparison.mp4)
+[Open high-resolution preview](assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp) · [Download MP4](videos/near_chest_roll_translation_error_bound_comparison.mp4?raw=1)
 
 #### 5.1.2 Hardware-Record-Derived Near-Chest Simulation Replay
 
@@ -540,11 +540,11 @@ The Mainline baseline has the lowest orientation RMSE, but its EEF position path
 <details>
 <summary>Animated preview (click to expand)</summary>
 
-<a href="videos/near_chest_fast_wrist_roll_controller_comparison.mp4"><img src="assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp" alt="Animated video preview" width="980"></a>
+<a href="assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp"><img src="assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp" alt="Animated video preview" width="980"></a>
 
 </details>
 
-[Open high-resolution preview](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp) · [Download MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
+[Open high-resolution preview](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp) · [Download MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4?raw=1)
 
 This result shows that error modulation primarily suppresses whole-arm instability induced by fast wrist rotation rather than prioritizing orientation catch-up. Slower orientation tracking is an explicit control tradeoff.
 
@@ -557,11 +557,11 @@ To isolate the role of the 6D error bound during fast retraction, the following 
 <details>
 <summary>Animated preview (click to expand)</summary>
 
-<a href="videos/fast_retract_frame_error_bound_comparison.mp4"><img src="assets/video_previews/fast_retract_frame_error_bound_comparison.webp" alt="Animated video preview" width="900"></a>
+<a href="assets/video_previews/fast_retract_frame_error_bound_comparison.webp"><img src="assets/video_previews/fast_retract_frame_error_bound_comparison.webp" alt="Animated video preview" width="900"></a>
 
 </details>
 
-[Open high-resolution preview](assets/video_previews/fast_retract_frame_error_bound_comparison.webp) · [Download MP4](videos/fast_retract_frame_error_bound_comparison.mp4)
+[Open high-resolution preview](assets/video_previews/fast_retract_frame_error_bound_comparison.webp) · [Download MP4](videos/fast_retract_frame_error_bound_comparison.mp4?raw=1)
 
 ### 5.2 Redundancy and Singularity
 
@@ -592,11 +592,11 @@ Y-Z is the actual elbow path in the `arm_origin` plane, and `y-y0` is displaceme
 <details>
 <summary>Animated preview (click to expand)</summary>
 
-<a href="videos/fast_retract_posture_regulation_comparison.mp4"><img src="assets/video_previews/fast_retract_posture_regulation_comparison.webp" alt="Animated video preview" width="760"></a>
+<a href="assets/video_previews/fast_retract_posture_regulation_comparison.webp"><img src="assets/video_previews/fast_retract_posture_regulation_comparison.webp" alt="Animated video preview" width="760"></a>
 
 </details>
 
-[Open high-resolution preview](assets/video_previews/fast_retract_posture_regulation_comparison.webp) · [Download MP4](videos/fast_retract_posture_regulation_comparison.mp4)
+[Open high-resolution preview](assets/video_previews/fast_retract_posture_regulation_comparison.webp) · [Download MP4](videos/fast_retract_posture_regulation_comparison.mp4?raw=1)
 
 With `posture_cost=0.003/0.01/0.03`, elbow lateral ranges are `17.60/17.61/17.76 cm`; none forms a branch constraint equivalent to exact-nullspace regulation. Exact-nullspace regulation accepts approximately `3 mm` additional position RMSE to reduce elbow excursion by approximately `13.6 cm`, without applying the home preference directly in all joint-space directions.
 
@@ -609,11 +609,11 @@ The preceding experiment changes only the secondary posture task. The following 
 <details>
 <summary>Animated preview (click to expand)</summary>
 
-<a href="videos/fast_retract_controller_comparison.mp4"><img src="assets/video_previews/fast_retract_controller_comparison.webp" alt="Animated video preview" width="980"></a>
+<a href="assets/video_previews/fast_retract_controller_comparison.webp"><img src="assets/video_previews/fast_retract_controller_comparison.webp" alt="Animated video preview" width="980"></a>
 
 </details>
 
-[Open high-resolution preview](assets/video_previews/fast_retract_controller_comparison.webp) · [Download MP4](videos/fast_retract_controller_comparison.mp4)
+[Open high-resolution preview](assets/video_previews/fast_retract_controller_comparison.webp) · [Download MP4](videos/fast_retract_controller_comparison.mp4?raw=1)
 
 #### 5.2.2 Singularity-Approach Limit During Extension and Retraction
 
@@ -639,11 +639,11 @@ The video uses a deep-start variant with the same farthest target. Its start and
 <details>
 <summary>Animated preview (click to expand)</summary>
 
-<a href="videos/straight_reach_singularity_limit_comparison.mp4"><img src="assets/video_previews/straight_reach_singularity_limit_comparison.webp" alt="Animated video preview" width="900"></a>
+<a href="assets/video_previews/straight_reach_singularity_limit_comparison.webp"><img src="assets/video_previews/straight_reach_singularity_limit_comparison.webp" alt="Animated video preview" width="900"></a>
 
 </details>
 
-[Open high-resolution preview](assets/video_previews/straight_reach_singularity_limit_comparison.webp) · [Download MP4](videos/straight_reach_singularity_limit_comparison.mp4)
+[Open high-resolution preview](assets/video_previews/straight_reach_singularity_limit_comparison.webp) · [Download MP4](videos/straight_reach_singularity_limit_comparison.mp4?raw=1)
 
 ### 5.3 Joint Safety Envelope
 
@@ -692,7 +692,7 @@ This term does not compute torque commands and includes no gravity compensation,
 
 This section compares velocity limits inside the QP and in the driver. If the QP envelope is disabled, does per-axis driver clipping alter Cartesian and secondary-task paths rather than merely slowing the same path uniformly? This is a separately designed A/B experiment, not one of the upstream limitations listed in Section 1.4.
 
-The experiment uses `1` target trajectory and `3` limit profiles. The target is the right-arm **Fast diagonal retract: lateral +** from the [reference trajectory-catalog video](videos/ideal_reference_trajectory_catalog.mp4), with peak linear speed `0.8 m/s`. Profiles are PR default, PR w/o IK velocity limits, and PR w/o velocity limits:
+The experiment uses `1` target trajectory and `3` limit profiles. The target is the right-arm **Fast diagonal retract: lateral +** from the [reference trajectory-catalog preview](assets/video_previews/ideal_reference_trajectory_catalog.webp), with peak linear speed `0.8 m/s`. Profiles are PR default, PR w/o IK velocity limits, and PR w/o velocity limits:
 
 | Profile | Position RMSE | Actual joint acceleration p99 | Elbow acceleration p99 | Elbow lateral range |
 |---|---:|---:|---:|---:|
@@ -715,11 +715,11 @@ Maximum absolute along-track lag over the full run increases from `2.57 cm` unde
 <details>
 <summary>Animated preview (click to expand)</summary>
 
-<a href="videos/fast_retract_ik_velocity_limit_comparison.mp4"><img src="assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp" alt="Animated video preview" width="900"></a>
+<a href="assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp"><img src="assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp" alt="Animated video preview" width="900"></a>
 
 </details>
 
-[Open high-resolution preview](assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp) · [Download MP4](videos/fast_retract_ik_velocity_limit_comparison.mp4)
+[Open high-resolution preview](assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp) · [Download MP4](videos/fast_retract_ik_velocity_limit_comparison.mp4?raw=1)
 
 ## 6. Parameters, Correctness, and Performance
 
@@ -746,11 +746,11 @@ To test generalization, the next figure cross-validates candidates on `11` direc
 <details>
 <summary>Animated preview (click to expand)</summary>
 
-<a href="videos/fast_retract_nullspace_parameter_comparison.mp4"><img src="assets/video_previews/fast_retract_nullspace_parameter_comparison.webp" alt="Animated video preview" width="760"></a>
+<a href="assets/video_previews/fast_retract_nullspace_parameter_comparison.webp"><img src="assets/video_previews/fast_retract_nullspace_parameter_comparison.webp" alt="Animated video preview" width="760"></a>
 
 </details>
 
-[Open high-resolution preview](assets/video_previews/fast_retract_nullspace_parameter_comparison.webp) · [Download MP4](videos/fast_retract_nullspace_parameter_comparison.mp4)
+[Open high-resolution preview](assets/video_previews/fast_retract_nullspace_parameter_comparison.webp) · [Download MP4](videos/fast_retract_nullspace_parameter_comparison.mp4?raw=1)
 
 Visual differences are modest.
 

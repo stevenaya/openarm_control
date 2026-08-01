@@ -56,7 +56,7 @@ Upstream baseline：`d543cedeec5f`（upstream `main` branch、tag `0.2.0`）<br>
 | 追加の個別軌道 | `28` 本。全体の和集合は `70` unique target | 左右 mirror、追加速度・方向、胸前高速手首回転、joint braking、記録 command replay、deep-start singularity motion |
 | 動作例動画 | `70` target から選んだ `21` clip | 目標運動と代表的応答を表示。別の定量データセットではない |
 
-13 個の動的実験 group で、`119` controller profile に対する `1,921` 回の controller-profile × target-trajectory simulation を実行し、QP solver failure は 0 件だった。別の静的 suite には `378` 個の joint-boundary condition がある。動作 family の内訳、21 clip の名称、suite 一覧は[実験・アセット索引](experiment_index.ja.md#3-目標軌道)を参照。[Catalog のアニメーションプレビュー](assets/video_previews/ideal_reference_trajectory_catalog.webp)では動作をすばやく確認でき、[元の MP4](videos/ideal_reference_trajectory_catalog.mp4)も利用できる。
+13 個の動的実験 group で、`119` controller profile に対する `1,921` 回の controller-profile × target-trajectory simulation を実行し、QP solver failure は 0 件だった。別の静的 suite には `378` 個の joint-boundary condition がある。動作 family の内訳、21 clip の名称、suite 一覧は[実験・アセット索引](experiment_index.ja.md#3-目標軌道)を参照。[Catalog のアニメーションプレビュー](assets/video_previews/ideal_reference_trajectory_catalog.webp)では動作をすばやく確認でき、[元の MP4 をダウンロード](videos/ideal_reference_trajectory_catalog.mp4?raw=1)できる。
 
 2 本の重点 target は実機 command 記録から作成し、共通 target、MuJoCo plant、driver velocity limit を使って replay する。
 
@@ -109,7 +109,7 @@ Target の並進は約 `4.8 cm` にすぎないが、最大角速度は `12.02 r
 
 ![図 4: 実機記録から作成した胸前高速手首回転の simulation replay。PR default は一時的な orientation lag と引き換えに、最大 position deviation と actual joint acceleration を抑える](assets/34_chest_flip_benchmark_timeseries_and_path.png)
 
-[3 controller のアニメーションプレビュー](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp) · [MP4 をダウンロード](videos/near_chest_fast_wrist_roll_controller_comparison.mp4) · [胸前 stress-test A/B](detailed_report.ja.md#511-胸前-stress-test)
+[3 controller のアニメーションプレビュー](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp) · [MP4 をダウンロード](videos/near_chest_fast_wrist_roll_controller_comparison.mp4?raw=1) · [胸前 stress-test A/B](detailed_report.ja.md#511-胸前-stress-test)
 
 ### 2. 高速 retract: Exact-nullspace branch regulation
 
@@ -139,7 +139,7 @@ QP は $\rho$ をさらに低下させる関節運動だけを制限し、特異
 
 ![図 6: Singularity-approach limit は伸展 phase だけを変化させ、retract 時には自動的に解除される](assets/09_singularity_reach_timeseries.png)
 
-[伸展 singularity A/B プレビュー](assets/video_previews/straight_reach_singularity_limit_comparison.webp) · [MP4 をダウンロード](videos/straight_reach_singularity_limit_comparison.mp4)
+[伸展 singularity A/B プレビュー](assets/video_previews/straight_reach_singularity_limit_comparison.webp) · [MP4 をダウンロード](videos/straight_reach_singularity_limit_comparison.mp4?raw=1)
 
 ## その他の主要検証
 

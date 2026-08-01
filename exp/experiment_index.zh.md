@@ -75,7 +75,7 @@ Screening 实验组使用 `42` 条固定对比轨迹。其他实验组为专项�
 
 速度档位取自 `0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8 m/s` 和 `2, 4, 6, 8, 10, 12 rad/s`，各轨迹使用其中适用的组合。`42` 条固定对比轨迹含 `40` 条右臂目标和 `2` 条双臂目标。
 
-[视频：21 个几何参考动作](videos/ideal_reference_trajectory_catalog.mp4)仅用于目录预览。每段压缩至 `2.5 s`；左上角显示倍率，第二行显示所属动作族在 `42/70` 条目标中的数量。该播放速度不代表 `1,921` 次仿真的实际速度。
+[动画：21 个几何参考动作](assets/video_previews/ideal_reference_trajectory_catalog.webp)仅用于目录预览。每段压缩至 `2.5 s`；左上角显示倍率，第二行显示所属动作族在 `42/70` 条目标中的数量。该播放速度不代表 `1,921` 次仿真的实际速度。
 
 ### 3.2 实机记录派生基准
 
@@ -141,15 +141,15 @@ Screening 实验组使用 `42` 条固定对比轨迹。其他实验组为专项�
 
 | 视频 | 类型 | 倍率 | 内容 |
 |---|---|---:|---|
-| [参考动作目录预览](assets/video_previews/ideal_reference_trajectory_catalog.webp) ([GIF 兼容版](assets/video_previews/ideal_reference_trajectory_catalog.gif), [MP4](videos/ideal_reference_trajectory_catalog.mp4)) | 目标目录 | 分段显示 | 21 个代表片段；标明动作族在 42/70 条目标中的数量；非控制器 A/B |
-| [胸前控制器对照预览](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp) ([GIF 兼容版](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif), [MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)) | 单条记录派生轨迹 | 0.5x | PR default / Mainline baseline / PR w/o 6D error bound |
-| [快速回缩 6D 误差上限预览](assets/video_previews/fast_retract_frame_error_bound_comparison.webp) ([GIF 兼容版](assets/video_previews/fast_retract_frame_error_bound_comparison.gif), [MP4](videos/fast_retract_frame_error_bound_comparison.mp4)) | `2x` 时间压缩的记录派生路径 | 0.5x | PR default / PR w/o 6D error bound，双栏 |
-| [胸前翻腕伴随斜向平移预览](assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp) ([GIF 兼容版](assets/video_previews/near_chest_roll_translation_error_bound_comparison.gif), [MP4](videos/near_chest_roll_translation_error_bound_comparison.mp4)) | 单条合成轨迹 | 0.5x | PR default / PR w/o 6D error bound |
-| [快速回缩控制器对照预览](assets/video_previews/fast_retract_controller_comparison.webp) ([GIF 兼容版](assets/video_previews/fast_retract_controller_comparison.gif), [MP4](videos/fast_retract_controller_comparison.mp4)) | 单条记录派生轨迹 | 0.5x | PR default / Mainline baseline / PR w/o posture regulation，双视角 |
-| [姿态正则对照预览](assets/video_previews/fast_retract_posture_regulation_comparison.webp) ([GIF 兼容版](assets/video_previews/fast_retract_posture_regulation_comparison.gif), [MP4](videos/fast_retract_posture_regulation_comparison.mp4)) | 单条记录派生轨迹 | 0.5x | PR default / PR w/o posture regulation / PR: full-home posture 0.01 / 0.03 |
-| [零空间参数 2x2预览](assets/video_previews/fast_retract_nullspace_parameter_comparison.webp) ([GIF 兼容版](assets/video_previews/fast_retract_nullspace_parameter_comparison.gif), [MP4](videos/fast_retract_nullspace_parameter_comparison.mp4)) | 单条记录派生轨迹 | 0.5x | PR default 与 3 个零空间候选 |
-| [IK 速度上限预览](assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp) ([GIF 兼容版](assets/video_previews/fast_retract_ik_velocity_limit_comparison.gif), [MP4](videos/fast_retract_ik_velocity_limit_comparison.mp4)) | 单条记录派生轨迹 | 0.5x | PR default / PR w/o IK velocity limits |
-| [伸直奇异点预览](assets/video_previews/straight_reach_singularity_limit_comparison.webp) ([GIF 兼容版](assets/video_previews/straight_reach_singularity_limit_comparison.gif), [MP4](videos/straight_reach_singularity_limit_comparison.mp4)) | 深起点肩高合成轨迹 | 0.5x | 起点后移 `0.10 m`、最远点不变；奇异点限速开/关；显示实际 J1 加速度 |
+| [参考动作目录预览](assets/video_previews/ideal_reference_trajectory_catalog.webp) ([GIF 兼容版](assets/video_previews/ideal_reference_trajectory_catalog.gif), [下载 MP4](videos/ideal_reference_trajectory_catalog.mp4?raw=1)) | 目标目录 | 分段显示 | 21 个代表片段；标明动作族在 42/70 条目标中的数量；非控制器 A/B |
+| [胸前控制器对照预览](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp) ([GIF 兼容版](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif), [下载 MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4?raw=1)) | 单条记录派生轨迹 | 0.5x | PR default / Mainline baseline / PR w/o 6D error bound |
+| [快速回缩 6D 误差上限预览](assets/video_previews/fast_retract_frame_error_bound_comparison.webp) ([GIF 兼容版](assets/video_previews/fast_retract_frame_error_bound_comparison.gif), [下载 MP4](videos/fast_retract_frame_error_bound_comparison.mp4?raw=1)) | `2x` 时间压缩的记录派生路径 | 0.5x | PR default / PR w/o 6D error bound，双栏 |
+| [胸前翻腕伴随斜向平移预览](assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp) ([GIF 兼容版](assets/video_previews/near_chest_roll_translation_error_bound_comparison.gif), [下载 MP4](videos/near_chest_roll_translation_error_bound_comparison.mp4?raw=1)) | 单条合成轨迹 | 0.5x | PR default / PR w/o 6D error bound |
+| [快速回缩控制器对照预览](assets/video_previews/fast_retract_controller_comparison.webp) ([GIF 兼容版](assets/video_previews/fast_retract_controller_comparison.gif), [下载 MP4](videos/fast_retract_controller_comparison.mp4?raw=1)) | 单条记录派生轨迹 | 0.5x | PR default / Mainline baseline / PR w/o posture regulation，双视角 |
+| [姿态正则对照预览](assets/video_previews/fast_retract_posture_regulation_comparison.webp) ([GIF 兼容版](assets/video_previews/fast_retract_posture_regulation_comparison.gif), [下载 MP4](videos/fast_retract_posture_regulation_comparison.mp4?raw=1)) | 单条记录派生轨迹 | 0.5x | PR default / PR w/o posture regulation / PR: full-home posture 0.01 / 0.03 |
+| [零空间参数 2x2预览](assets/video_previews/fast_retract_nullspace_parameter_comparison.webp) ([GIF 兼容版](assets/video_previews/fast_retract_nullspace_parameter_comparison.gif), [下载 MP4](videos/fast_retract_nullspace_parameter_comparison.mp4?raw=1)) | 单条记录派生轨迹 | 0.5x | PR default 与 3 个零空间候选 |
+| [IK 速度上限预览](assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp) ([GIF 兼容版](assets/video_previews/fast_retract_ik_velocity_limit_comparison.gif), [下载 MP4](videos/fast_retract_ik_velocity_limit_comparison.mp4?raw=1)) | 单条记录派生轨迹 | 0.5x | PR default / PR w/o IK velocity limits |
+| [伸直奇异点预览](assets/video_previews/straight_reach_singularity_limit_comparison.webp) ([GIF 兼容版](assets/video_previews/straight_reach_singularity_limit_comparison.gif), [下载 MP4](videos/straight_reach_singularity_limit_comparison.mp4?raw=1)) | 深起点肩高合成轨迹 | 0.5x | 起点后移 `0.10 m`、最远点不变；奇异点限速开/关；显示实际 J1 加速度 |
 
 ## 7. CSV 表索引
 

@@ -370,18 +370,18 @@ Control chain の各量は次を意味します。
 
 ![Reference target-trajectory catalog](assets/02_trajectory_catalog.png)
 
-GitHub は repository 内の MP4 を inline 再生しないため、本 report では `8-12 fps` の高解像度 animated WebP preview を、panel layout に応じて `760-980 px` で表示する。Preview をクリックすると元の MP4 にアクセスでき、動画索引には小容量の GIF 互換版も残している。
+GitHub は repository 内の MP4 を inline 再生しないため、本 report では `8-12 fps` の高解像度 animated WebP preview を、panel layout に応じて `760-980 px` で表示する。Preview をクリックすると full-size animation が開き、隣接する MP4 link から source video を download できる。動画索引には小容量の GIF 互換版も残している。
 
 **動画：21 reference-motion clip。画面内 label は 42 本の fixed set と全 70 target における各 family の本数を表示**
 
 <details>
 <summary>動画プレビュー（クリックして展開）</summary>
 
-<a href="videos/ideal_reference_trajectory_catalog.mp4"><img src="assets/video_previews/ideal_reference_trajectory_catalog.webp" alt="動画プレビュー" width="820"></a>
+<a href="assets/video_previews/ideal_reference_trajectory_catalog.webp"><img src="assets/video_previews/ideal_reference_trajectory_catalog.webp" alt="動画プレビュー" width="820"></a>
 
 </details>
 
-[高解像度プレビューを開く](assets/video_previews/ideal_reference_trajectory_catalog.webp) · [MP4 をダウンロード](videos/ideal_reference_trajectory_catalog.mp4)
+[高解像度プレビューを開く](assets/video_previews/ideal_reference_trajectory_catalog.webp) · [MP4 をダウンロード](videos/ideal_reference_trajectory_catalog.mp4?raw=1)
 
 #### 3.2.3 Experiment Suite と Run Count
 
@@ -486,7 +486,7 @@ Algorithm は第 2.2 節で定義しました。本節では、胸前の synthet
 
 #### 5.1.1 胸前 Stress Test
 
-この suite は `14` trajectory で構成されます。**Near-chest roll + diagonal translation** の `9` speed combination（`0.3/0.8/1.2 m/s` と `4/8/12 rad/s`）、peak `1.2 m/s + 8 rad/s` の forward/lateral/downward/diagonal direction variant `4` 本、**Near-chest wrist roll only** `1` 本です。名称は [reference trajectory-catalog video](videos/ideal_reference_trajectory_catalog.mp4) と一致します。Metric は各 trajectory 全体で計算してから `14` 本で平均します。
+この suite は `14` trajectory で構成されます。**Near-chest roll + diagonal translation** の `9` speed combination（`0.3/0.8/1.2 m/s` と `4/8/12 rad/s`）、peak `1.2 m/s + 8 rad/s` の forward/lateral/downward/diagonal direction variant `4` 本、**Near-chest wrist roll only** `1` 本です。名称は [reference trajectory-catalog preview](assets/video_previews/ideal_reference_trajectory_catalog.webp) と一致します。Metric は各 trajectory 全体で計算してから `14` 本で平均します。
 
 | Metric | PR default | PR w/o 6D error bound |
 |---|---:|---:|
@@ -515,11 +515,11 @@ $\max_i |\dot q_{i,\mathrm{actual}}|$ と $\max_i |\ddot q_{i,\mathrm{actual}}|$
 <details>
 <summary>動画プレビュー（クリックして展開）</summary>
 
-<a href="videos/near_chest_roll_translation_error_bound_comparison.mp4"><img src="assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp" alt="動画プレビュー" width="900"></a>
+<a href="assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp"><img src="assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp" alt="動画プレビュー" width="900"></a>
 
 </details>
 
-[高解像度プレビューを開く](assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp) · [MP4 をダウンロード](videos/near_chest_roll_translation_error_bound_comparison.mp4)
+[高解像度プレビューを開く](assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp) · [MP4 をダウンロード](videos/near_chest_roll_translation_error_bound_comparison.mp4?raw=1)
 
 #### 5.1.2 Hardware Record 由来の胸前 Simulation Replay
 
@@ -540,11 +540,11 @@ Mainline baseline は orientation RMSE が最小ですが、EEF position path �
 <details>
 <summary>動画プレビュー（クリックして展開）</summary>
 
-<a href="videos/near_chest_fast_wrist_roll_controller_comparison.mp4"><img src="assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp" alt="動画プレビュー" width="980"></a>
+<a href="assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp"><img src="assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp" alt="動画プレビュー" width="980"></a>
 
 </details>
 
-[高解像度プレビューを開く](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp) · [MP4 をダウンロード](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
+[高解像度プレビューを開く](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp) · [MP4 をダウンロード](videos/near_chest_fast_wrist_roll_controller_comparison.mp4?raw=1)
 
 この結果は、error modulation の主目的が orientation を急いで追従することではなく、高速 wrist rotation が引き起こす whole-arm instability の抑制であることを示します。遅い orientation tracking は明示的な control tradeoff です。
 
@@ -557,11 +557,11 @@ Mainline baseline は orientation RMSE が最小ですが、EEF position path �
 <details>
 <summary>動画プレビュー（クリックして展開）</summary>
 
-<a href="videos/fast_retract_frame_error_bound_comparison.mp4"><img src="assets/video_previews/fast_retract_frame_error_bound_comparison.webp" alt="動画プレビュー" width="900"></a>
+<a href="assets/video_previews/fast_retract_frame_error_bound_comparison.webp"><img src="assets/video_previews/fast_retract_frame_error_bound_comparison.webp" alt="動画プレビュー" width="900"></a>
 
 </details>
 
-[高解像度プレビューを開く](assets/video_previews/fast_retract_frame_error_bound_comparison.webp) · [MP4 をダウンロード](videos/fast_retract_frame_error_bound_comparison.mp4)
+[高解像度プレビューを開く](assets/video_previews/fast_retract_frame_error_bound_comparison.webp) · [MP4 をダウンロード](videos/fast_retract_frame_error_bound_comparison.mp4?raw=1)
 
 ### 5.2 Redundancy と Singularity
 
@@ -592,11 +592,11 @@ Y-Z は `arm_origin` plane における actual elbow path、`y-y0` は初期 lat
 <details>
 <summary>動画プレビュー（クリックして展開）</summary>
 
-<a href="videos/fast_retract_posture_regulation_comparison.mp4"><img src="assets/video_previews/fast_retract_posture_regulation_comparison.webp" alt="動画プレビュー" width="760"></a>
+<a href="assets/video_previews/fast_retract_posture_regulation_comparison.webp"><img src="assets/video_previews/fast_retract_posture_regulation_comparison.webp" alt="動画プレビュー" width="760"></a>
 
 </details>
 
-[高解像度プレビューを開く](assets/video_previews/fast_retract_posture_regulation_comparison.webp) · [MP4 をダウンロード](videos/fast_retract_posture_regulation_comparison.mp4)
+[高解像度プレビューを開く](assets/video_previews/fast_retract_posture_regulation_comparison.webp) · [MP4 をダウンロード](videos/fast_retract_posture_regulation_comparison.mp4?raw=1)
 
 `posture_cost=0.003/0.01/0.03` の elbow lateral range は `17.60/17.61/17.76 cm` で、いずれも exact-nullspace regulation と等価な branch constraint を形成しません。Exact-nullspace regulation は約 `3 mm` の追加 position RMSE を受け入れ、elbow excursion を約 `13.6 cm` 減らします。また、home preference を joint-space の全方向へ直接加えません。
 
@@ -609,11 +609,11 @@ Y-Z は `arm_origin` plane における actual elbow path、`y-y0` は初期 lat
 <details>
 <summary>動画プレビュー（クリックして展開）</summary>
 
-<a href="videos/fast_retract_controller_comparison.mp4"><img src="assets/video_previews/fast_retract_controller_comparison.webp" alt="動画プレビュー" width="980"></a>
+<a href="assets/video_previews/fast_retract_controller_comparison.webp"><img src="assets/video_previews/fast_retract_controller_comparison.webp" alt="動画プレビュー" width="980"></a>
 
 </details>
 
-[高解像度プレビューを開く](assets/video_previews/fast_retract_controller_comparison.webp) · [MP4 をダウンロード](videos/fast_retract_controller_comparison.mp4)
+[高解像度プレビューを開く](assets/video_previews/fast_retract_controller_comparison.webp) · [MP4 をダウンロード](videos/fast_retract_controller_comparison.mp4?raw=1)
 
 #### 5.2.2 Extension と Retract における Singularity-Approach Limit
 
@@ -639,11 +639,11 @@ Limit を有効にすると、blue の extension segment が yellow slow zone �
 <details>
 <summary>動画プレビュー（クリックして展開）</summary>
 
-<a href="videos/straight_reach_singularity_limit_comparison.mp4"><img src="assets/video_previews/straight_reach_singularity_limit_comparison.webp" alt="動画プレビュー" width="900"></a>
+<a href="assets/video_previews/straight_reach_singularity_limit_comparison.webp"><img src="assets/video_previews/straight_reach_singularity_limit_comparison.webp" alt="動画プレビュー" width="900"></a>
 
 </details>
 
-[高解像度プレビューを開く](assets/video_previews/straight_reach_singularity_limit_comparison.webp) · [MP4 をダウンロード](videos/straight_reach_singularity_limit_comparison.mp4)
+[高解像度プレビューを開く](assets/video_previews/straight_reach_singularity_limit_comparison.webp) · [MP4 をダウンロード](videos/straight_reach_singularity_limit_comparison.mp4?raw=1)
 
 ### 5.3 Joint Safety Envelope
 
@@ -692,7 +692,7 @@ Mass-matrix regularizer の定義と範囲は第 2.7 節にあります。PR def
 
 本節は QP 内と driver の velocity limit を比較します。QP envelope を無効にした場合、driver の per-axis clipping は同じ path を一様に遅くするだけなのか、それとも Cartesian task と secondary task の path を変えるのかを検証します。これは独立に設計した A/B であり、第 1.4 節の upstream limitation には含めません。
 
-実験は `1` target trajectory と `3` limit profile を使用します。Target は [reference trajectory-catalog video](videos/ideal_reference_trajectory_catalog.mp4) の右腕 **Fast diagonal retract: lateral +** で、peak linear speed は `0.8 m/s` です。Profile は PR default、PR w/o IK velocity limits、PR w/o velocity limits です。
+実験は `1` target trajectory と `3` limit profile を使用します。Target は [reference trajectory-catalog preview](assets/video_previews/ideal_reference_trajectory_catalog.webp) の右腕 **Fast diagonal retract: lateral +** で、peak linear speed は `0.8 m/s` です。Profile は PR default、PR w/o IK velocity limits、PR w/o velocity limits です。
 
 | Profile | Position RMSE | Actual joint acceleration p99 | Elbow acceleration p99 | Elbow lateral range |
 |---|---:|---:|---:|---:|
@@ -715,11 +715,11 @@ QP と driver は同じ per-joint numerical limit を使いますが、役割は
 <details>
 <summary>動画プレビュー（クリックして展開）</summary>
 
-<a href="videos/fast_retract_ik_velocity_limit_comparison.mp4"><img src="assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp" alt="動画プレビュー" width="900"></a>
+<a href="assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp"><img src="assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp" alt="動画プレビュー" width="900"></a>
 
 </details>
 
-[高解像度プレビューを開く](assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp) · [MP4 をダウンロード](videos/fast_retract_ik_velocity_limit_comparison.mp4)
+[高解像度プレビューを開く](assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp) · [MP4 をダウンロード](videos/fast_retract_ik_velocity_limit_comparison.mp4?raw=1)
 
 ## 6. パラメータ、正しさ、性能
 
@@ -746,11 +746,11 @@ Generalization を確認するため、次図は七つの motion type にまた�
 <details>
 <summary>動画プレビュー（クリックして展開）</summary>
 
-<a href="videos/fast_retract_nullspace_parameter_comparison.mp4"><img src="assets/video_previews/fast_retract_nullspace_parameter_comparison.webp" alt="動画プレビュー" width="760"></a>
+<a href="assets/video_previews/fast_retract_nullspace_parameter_comparison.webp"><img src="assets/video_previews/fast_retract_nullspace_parameter_comparison.webp" alt="動画プレビュー" width="760"></a>
 
 </details>
 
-[高解像度プレビューを開く](assets/video_previews/fast_retract_nullspace_parameter_comparison.webp) · [MP4 をダウンロード](videos/fast_retract_nullspace_parameter_comparison.mp4)
+[高解像度プレビューを開く](assets/video_previews/fast_retract_nullspace_parameter_comparison.webp) · [MP4 をダウンロード](videos/fast_retract_nullspace_parameter_comparison.mp4?raw=1)
 
 見た目の差は小さい結果です。
 

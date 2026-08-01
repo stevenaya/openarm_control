@@ -32,7 +32,7 @@ def _markdown_targets(path: Path) -> set[Path]:
         raw = match.group(1).strip().split(" ", 1)[0].strip("<>")
         if raw.startswith(("http://", "https://", "#", "mailto:")):
             continue
-        raw = raw.partition("#")[0]
+        raw = raw.partition("#")[0].partition("?")[0]
         if not raw:
             continue
         targets.add((path.parent / raw).resolve())
