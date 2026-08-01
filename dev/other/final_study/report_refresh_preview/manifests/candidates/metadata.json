@@ -1,0 +1,1427 @@
+{
+  "revision": "d006ece506f2c4965c390d897b1f5e7d0ea74cae",
+  "worktree": {
+    "dirty": true,
+    "tracked_diff_sha256": "0ef6a402a7636d436b19c231c2b1fa9603bf139f36d698497314d004590ad90f"
+  },
+  "study_revision": "a636f584bde80284",
+  "generated_at": "2026-07-31T21:54:36+0900",
+  "command": [
+    "/home/hilab/workdir.evaluation/openarm_control/.venv/bin/python3",
+    "dev/final_study/report_refresh_study.py",
+    "--suite",
+    "all",
+    "--workers",
+    "8",
+    "--output-dir",
+    "dev/final_study/results/report_refresh_20260731"
+  ],
+  "environment": {
+    "python": "3.14.6 (main, Jun 23 2026, 15:18:23) [Clang 22.1.3 ]",
+    "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.39",
+    "mujoco": "3.11.0",
+    "mink": "1.1.0",
+    "daqp": "0.7.2",
+    "openarm_mujoco": "2.0.1"
+  },
+  "sampling": {
+    "random_sampling": false,
+    "random_seed": 0
+  },
+  "control_dt": 0.004,
+  "model_xml": "/home/hilab/workdir.evaluation/openarm_control/.venv/share/openarm_mujoco/v2/cell.xml",
+  "model_xml_sha256": "cb0322c264b2acd781ea08e873970ef21dd1db491e64ed0c02844aa8c1a3bfa7",
+  "current_deployment_parameters": {
+    "position_cost": 12.0,
+    "orientation_cost": 1.5,
+    "lm_damping": 0.01,
+    "damping": 0.1,
+    "posture_cost": 0.0,
+    "dt": 0.004,
+    "max_iters": 5,
+    "frame_position_error_limit": 0.02,
+    "frame_orientation_error_limit": 0.25,
+    "target_linear_speed_slow": 0.6,
+    "target_linear_speed_fast": 0.9,
+    "position_error_latch_threshold": 0.006,
+    "joint_limit_gain": 0.95,
+    "joint_braking": true,
+    "joint_braking_distance": 0.2,
+    "joint_braking_exponent": 2.0,
+    "joint_braking_distance_buffer": 0.01,
+    "jacobian_characteristic_length": 0.3,
+    "nullspace_cost": 8.5,
+    "nullspace_return_rate": 1.6,
+    "nullspace_max_speed": 1.0,
+    "nullspace_ratio_low": 0.02,
+    "nullspace_ratio_high": 0.05,
+    "singularity_ratio_stop": 0.02,
+    "singularity_ratio_slow": 0.08,
+    "singularity_max_approach_rate": 0.25,
+    "singularity_braking_exponent": 2.0,
+    "singularity_gradient_epsilon": 0.0001,
+    "kinetic_energy_cost": 2e-05
+  },
+  "matrix": {
+    "profile_count": 5,
+    "scenario_count": 42,
+    "controller_trajectory_runs": 210
+  },
+  "scenario_inventory": {
+    "independent_target_trajectories": 42,
+    "family_counts": {
+      "chest_wrist_outward": 9,
+      "extended_axis": 8,
+      "extended_translation": 3,
+      "extended_wrist": 3,
+      "normal_workspace": 5,
+      "normal_wrist": 3,
+      "reach": 5,
+      "retract": 6
+    },
+    "mode_counts": {
+      "bimanual": 2,
+      "right": 40
+    },
+    "speed_values": [
+      0.1,
+      0.15,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.8,
+      2.0,
+      4.0,
+      6.0,
+      8.0,
+      10.0,
+      12.0
+    ]
+  },
+  "profiles": [
+    {
+      "name": "current_deployment",
+      "overrides": {},
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Current deployment profile mirrored from evaluation-ui dataflow: bounded 6D frame error, recoverable joint limits and braking, exact-nullspace home regulation, singularity-approach limiting, and weak kinetic-energy regularization."
+    },
+    {
+      "name": "ori0p20_sing0p18",
+      "overrides": {
+        "frame_orientation_error_limit": 0.2,
+        "singularity_max_approach_rate": 0.18
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Only tighten the orientation budget and singularity approach rate; retain all other PR defaults."
+    },
+    {
+      "name": "ori0p20_null10_sing0p18_brake0p12_energy3em5",
+      "overrides": {
+        "frame_orientation_error_limit": 0.2,
+        "nullspace_cost": 10.0,
+        "singularity_max_approach_rate": 0.18,
+        "joint_braking_distance": 0.12,
+        "kinetic_energy_cost": 3e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Balanced combination selected from the one-factor plateaus."
+    },
+    {
+      "name": "ori0p15_null12_sing0p18_brake0p12_energy5em5",
+      "overrides": {
+        "frame_orientation_error_limit": 0.15,
+        "nullspace_cost": 12.0,
+        "singularity_max_approach_rate": 0.18,
+        "joint_braking_distance": 0.12,
+        "kinetic_energy_cost": 5e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "More conservative branch and acceleration tuning with additional permitted orientation lag."
+    },
+    {
+      "name": "ori0p25_null10_sing0p18_brake0p12_energy3em5",
+      "overrides": {
+        "frame_orientation_error_limit": 0.25,
+        "nullspace_cost": 10.0,
+        "singularity_max_approach_rate": 0.18,
+        "joint_braking_distance": 0.12,
+        "kinetic_energy_cost": 3e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "limit_style": "recoverable",
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "use_measured_state": true,
+      "gravity_compensation": false,
+      "state_delay_s": 0.0,
+      "command_delay_s": 0.0,
+      "state_rate_hz": 250.0,
+      "state_dropout_start_s": -1.0,
+      "state_dropout_duration_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "description": "Retain the current orientation budget while tuning the secondary mechanisms."
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "reach_right_p0p00_v0p10",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.1,
+      "sample_count": 2614,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "4077acf94b49eef9cd808065dc760d1a399c9077363b352aa2307a5b6512e914"
+    },
+    {
+      "name": "reach_right_p0p00_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 926,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "fdb5ed3b26791c4a8d38457d922844eba1d6c93c1f78f83ad25374874911e6ab"
+    },
+    {
+      "name": "reach_right_p0p00_v0p80",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 644,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "971c9123488d52dc3f9de2af12b9638859b4757deaa00c3229eae31deb8bb315"
+    },
+    {
+      "name": "reach_right_m0p10_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 956,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "f19d318b5c19c3f826b2c0521981ac48c003fa8b5c641d0cce8133b9243c3419"
+    },
+    {
+      "name": "retract_diag_m0p10_v0p10",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.1,
+      "sample_count": 1249,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "78b6436a1278c6b5afc57c5b9f079052178c64a4324627a7e7ad327aa661e1dd"
+    },
+    {
+      "name": "retract_diag_m0p10_v0p40",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 490,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "0edad829399f19da47197247ca08a82593c6c3b6f71b7e28ed56ca37e3d2e7cf"
+    },
+    {
+      "name": "retract_diag_m0p10_v0p80",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 364,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "18518999dd5d8b930daa9e486a9fc6f4b87ebff3c5ef2740f03215c06bfe4302"
+    },
+    {
+      "name": "reach_right_p0p10_v0p40",
+      "family": "reach",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 956,
+      "description": "Shoulder-height reach beyond workspace, hold, and retract.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.7,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "dbcb4ac1708d315b509d9f4ce7ff7ec2f1f28880ac4f00e35a4097c91db2566d"
+    },
+    {
+      "name": "retract_diag_p0p10_v0p10",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.1,
+      "sample_count": 1249,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "db40bb06f342bc8b29164e25a6f6d199b177b95f4ec22ab93d259dc03725a80a"
+    },
+    {
+      "name": "retract_diag_p0p10_v0p40",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 490,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "18a5ee4d76ca4a74ec9eeec1d51d20bd2b4bed6e4e3e31f3ed9e8b54199eb9e3"
+    },
+    {
+      "name": "retract_diag_p0p10_v0p80",
+      "family": "retract",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 364,
+      "description": "Fast diagonal retraction from an extended weak configuration.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        0.0,
+        0.0,
+        0.0,
+        1.5707963267948966,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "155fc100c680f231bf3c20f9761f8ceaa28d5a31d51408d48210516e9b58e614"
+    },
+    {
+      "name": "extended_circle_right_v0p15",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.15,
+      "sample_count": 659,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "31a84bba069b868c9edec6d9d35a14fb963ded2685aa5c12fad3d01f92e4fa3f"
+    },
+    {
+      "name": "extended_circle_right_v0p40",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.4,
+      "sample_count": 364,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "35968d8accb12613ffdbd7162e1221beb2ef93409b867974c64ec083b3e48119"
+    },
+    {
+      "name": "extended_circle_right_v0p80",
+      "family": "extended_translation",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 276,
+      "description": "Two vertical-lateral circles from rho approximately 0.033.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "1cfc33189ffcc27287b5b67fa991fbf1f31df60e8019250666956c02e78dc306"
+    },
+    {
+      "name": "extended_up_right_v0p20",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.2,
+      "sample_count": 537,
+      "description": "Nearly extended up translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "289127736b6bc251d81cb95a06d165ff1fdae2882cbb7823dd1a5e14db5ed405"
+    },
+    {
+      "name": "extended_up_right_v0p80",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 312,
+      "description": "Nearly extended up translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "00de30159a3affd1c52979be3a3b02e7425f11e123bce7d4a06f5d3e90daef5c"
+    },
+    {
+      "name": "extended_down_right_v0p20",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.2,
+      "sample_count": 536,
+      "description": "Nearly extended down translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "7e736d849318ad085a072681cbde17dc97a152f46621ba1e46429d98a09d7075"
+    },
+    {
+      "name": "extended_down_right_v0p80",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 312,
+      "description": "Nearly extended down translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "1984d3d732a14a8553fa8bf627fbec68caac1455461d5779c804b81db9dbff89"
+    },
+    {
+      "name": "extended_left_right_v0p20",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.2,
+      "sample_count": 536,
+      "description": "Nearly extended left translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "42c6197c108784ce5f9bf71db2b582bd3279371d05202b6058874c05b184aefa"
+    },
+    {
+      "name": "extended_left_right_v0p80",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 312,
+      "description": "Nearly extended left translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "e98cf3515bd99b469d30df3752280180b7a69091a568c7afde50ffc14bba3d7c"
+    },
+    {
+      "name": "extended_right_right_v0p20",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.2,
+      "sample_count": 536,
+      "description": "Nearly extended right translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "a033cc282b400d281d3860d92bf20c56e05510a4b450f9884fc30167822a0e90"
+    },
+    {
+      "name": "extended_right_right_v0p80",
+      "family": "extended_axis",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 312,
+      "description": "Nearly extended right translation and return.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "bae67c4947e265e54d44577d3fe3b7931e0378d83ae56b5d0442b9e45f3566f5"
+    },
+    {
+      "name": "extended_wrist_right_w2p0",
+      "family": "extended_wrist",
+      "mode": "right",
+      "speed": 2.0,
+      "sample_count": 1087,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "0c73654808f99e51c1683abbf5affc815aa168e93c1c17fba9d87b1c14383241"
+    },
+    {
+      "name": "normal_wrist_right_w2p0",
+      "family": "normal_wrist",
+      "mode": "right",
+      "speed": 2.0,
+      "sample_count": 1090,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "26f32f51f73b709b4a55694ed7ccd6bf23fbcfbe7e49753e8caf4694ea394085"
+    },
+    {
+      "name": "extended_wrist_right_w6p0",
+      "family": "extended_wrist",
+      "mode": "right",
+      "speed": 6.0,
+      "sample_count": 487,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "12c0ce6639e6a256605e530c5bc5fcb9a0c052b4f60b5c8e96b1b6e5884c05b2"
+    },
+    {
+      "name": "normal_wrist_right_w6p0",
+      "family": "normal_wrist",
+      "mode": "right",
+      "speed": 6.0,
+      "sample_count": 490,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "8b290a43ec6a6a776b105e944571f8b0758dc967c8aa972a8695e1c73080646f"
+    },
+    {
+      "name": "extended_wrist_right_w10p0",
+      "family": "extended_wrist",
+      "mode": "right",
+      "speed": 10.0,
+      "sample_count": 367,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "initial_left": [
+        -1.224145,
+        0.0,
+        0.0,
+        0.25,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "trajectory_sha256": "1e1cc5579c29d3ab9634f4667ddffa6055f23450041ad97eaceffc558e07e6e8"
+    },
+    {
+      "name": "normal_wrist_right_w10p0",
+      "family": "normal_wrist",
+      "mode": "right",
+      "speed": 10.0,
+      "sample_count": 370,
+      "description": "Local wrist roll with fixed end-effector position.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "abb81df223889bad9ceef8b862d499a8c4faf2d8375149030a73c4467d6a8834"
+    },
+    {
+      "name": "normal_right_v0p20",
+      "family": "normal_workspace",
+      "mode": "right",
+      "speed": 0.2,
+      "sample_count": 1677,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "32727e25d24dddde1e94ef5623082c4b0624edc8470bd7630fb5d9af9fb5b3a0"
+    },
+    {
+      "name": "normal_right_v0p50",
+      "family": "normal_workspace",
+      "mode": "right",
+      "speed": 0.5,
+      "sample_count": 783,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "256199e7959e1b277e9b9c1ca1c7b68251f51a6e05728e3199604faa6f874862"
+    },
+    {
+      "name": "normal_right_v0p80",
+      "family": "normal_workspace",
+      "mode": "right",
+      "speed": 0.8,
+      "sample_count": 560,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "0a7c780e1397a0c8fafe13e9113882b63481f0cf284ef3fe30c460a03efa987d"
+    },
+    {
+      "name": "normal_bimanual_v0p30",
+      "family": "normal_workspace",
+      "mode": "bimanual",
+      "speed": 0.3,
+      "sample_count": 1180,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "7935540b9911147b0a422906f9d5ede5db04a890daa1953b8fb6dc8bd834662d"
+    },
+    {
+      "name": "normal_bimanual_v0p60",
+      "family": "normal_workspace",
+      "mode": "bimanual",
+      "speed": 0.6,
+      "sample_count": 684,
+      "description": "Normal-workspace Lissajous translation and moderate orientation.",
+      "initial_right": [
+        -0.24633651,
+        0.12070639,
+        0.30554437,
+        2.1537668,
+        0.44992149,
+        -0.02483132,
+        0.68082729
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "60c08c884c36f159877e899a00c2bed21173898a75783aab8a16f08d8f0b178f"
+    },
+    {
+      "name": "chest_outward_flip_right_v0p30_w4p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 4.0,
+      "sample_count": 495,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "835fd9b2258691002b3299c74d4e8e202289558a3b2b04cc14286235a702e621"
+    },
+    {
+      "name": "chest_outward_flip_right_v0p30_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "3f8ca84bef88e8dd0f0e1402c42f83880669d0f41d08cd8508e2cfce63d6e76d"
+    },
+    {
+      "name": "chest_outward_flip_right_v0p30_w12p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 12.0,
+      "sample_count": 299,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "40e3075d0d5941e9449403fbf3b4ae8fd60796156a0572bac792977a6c245af2"
+    },
+    {
+      "name": "chest_outward_flip_right_v0p80_w4p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 4.0,
+      "sample_count": 495,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "efe4ddc42d8c2919162d12b6bae6d6c14778803906d2176e880796d4f5f790aa"
+    },
+    {
+      "name": "chest_outward_flip_right_v0p80_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "92a6f91c6b1a6a49ad5419b54471ab5a968330596e3a8a89dd2122c52d8c14a0"
+    },
+    {
+      "name": "chest_outward_flip_right_v0p80_w12p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 12.0,
+      "sample_count": 299,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "5dedc84179ef4d5357b078b5817cbfcd53073679bb9792dd9d1dcc2f5c6dc43d"
+    },
+    {
+      "name": "chest_outward_flip_right_v1p20_w4p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 4.0,
+      "sample_count": 495,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "b478b564e321a031cfd6cd00a80741e45714ea48016dc83c73600a687fcec6c6"
+    },
+    {
+      "name": "chest_outward_flip_right_v1p20_w8p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 8.0,
+      "sample_count": 348,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "fe432fcac76d16bfa544c0154cf567ae35089c8ac7278f4a86aff1aa98a3909b"
+    },
+    {
+      "name": "chest_outward_flip_right_v1p20_w12p0",
+      "family": "chest_wrist_outward",
+      "mode": "right",
+      "speed": 12.0,
+      "sample_count": 299,
+      "description": "Chest-region pi wrist roll combined with an outward/lateral position step.",
+      "initial_right": [
+        1.02,
+        0.74,
+        -1.5,
+        1.34,
+        -1.57,
+        0.79,
+        -1.09
+      ],
+      "initial_left": [
+        0.31404758,
+        -0.30474089,
+        -0.33635407,
+        2.195766,
+        -0.39094594,
+        0.1,
+        -0.685755
+      ],
+      "trajectory_sha256": "d354bcad112b96d3ffde5a6cfbc54a0c6f299df3ab98e19727bb007aabd610bd"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "status": "superseded_invalid_baseline",
+  "superseded_by": "../../../../../../note/openarm_control/final_report/bimanual_circle_case_selection_correction_20260731.md",
+  "invalid_reason": "The mainline profile reused the PR recoverable joint limit and braking path, and the selected 3D elbow separation was not visually clear in the rendered view.",
+  "selected_case": {
+    "name": "ep89_rank07",
+    "episode": 89,
+    "episode_source": "intervention",
+    "episode_timestamp": "2026-07-31T09:06:04",
+    "continued_from": 88,
+    "source_start_s": 18.848,
+    "source_end_s": 30.848,
+    "scenario": "recorded_bimanual_circle_ep89_rank07",
+    "frozen_scenario": "../../bimanual_circle_latest_ep89_20260731/similar/frozen_scenarios/recorded_bimanual_circle_ep89_rank07.npz",
+    "initialization": "Each arm starts directly from the first command qpos in the selected window. No earlier recorded motion is replayed as warm-up.",
+    "target_semantics": "Synchronized bimanual FK(action) proxy from the recorded IK command. No additional path smoothing or geometric replacement was applied.",
+    "reason": "The clearest episode-89 improvement case: the mainline right elbow remains on a visibly higher branch for about 2.24 seconds while PR tracking error stays lower."
+  },
+  "comparison": {
+    "pr_profile": "pr_current_dataflow",
+    "mainline_profile": "mainline_with_ik_velocity",
+    "mainline_semantics": "Mainline FrameTask + PostureTask(0.01) + damping(0.1), retaining the same recoverable IK velocity and braking envelope as the PR.",
+    "ik_velocity_caps_rad_s": [2.0, 2.0, 3.14, 3.14, 6.3, 6.3, 6.3],
+    "driver_velocity_caps_rad_s": [2.0, 2.0, 3.14, 3.14, 12.6, 12.6, 12.6],
+    "right_peak_aligned_mainline_minus_pr_elbow_height_m": 0.07100258266277026,
+    "right_peak_difference_time_s": 11.924,
+    "left_peak_aligned_mainline_minus_pr_elbow_height_m": 0.026497301230570258,
+    "left_peak_difference_time_s": 10.712,
+    "right_elbow_3d_separation_p95_m": 0.07564043069669257,
+    "right_elbow_3d_separation_max_m": 0.10993152560029902,
+    "right_elbow_separation_over_5cm_fraction": 0.18633333333333332,
+    "right_eef_separation_p95_m": 0.025127768132510213,
+    "pr_max_position_error_m": 0.0359123846397256,
+    "mainline_max_position_error_m": 0.06730354667556628
+  },
+  "rendering": {
+    "path_trail_seconds": 1.0,
+    "fade_exponent": 2.0,
+    "fading_paths": ["command", "state", "right_elbow", "left_elbow"],
+    "elbow_paths_drawn_on_top": true,
+    "focus_clip_semantics": "Display-only trim of replay time 8.5-13.0 seconds from the full rendered video. The simulation and controller history are unchanged."
+  },
+  "artifacts": {
+    "full_video": "../../../../../../note/openarm_control/final_report/videos/bimanual_circle_ep89_rank07_visible_improvement_v5.mp4",
+    "focus_video": "../../../../../../note/openarm_control/final_report/videos/bimanual_circle_ep89_rank07_visible_improvement_v5_focus.mp4",
+    "separation_onset_frame": "../../../../../../note/openarm_control/final_report/videos/bimanual_circle_ep89_rank07_visible_improvement_v5_preview_10.80s.png",
+    "right_peak_frame": "../../../../../../note/openarm_control/final_report/videos/bimanual_circle_ep89_rank07_visible_improvement_v5_preview_11.92s.png",
+    "candidate_scan": "../../bimanual_circle_latest_ep89_20260731/candidate_scan.csv",
+    "controller_ranking": "../../bimanual_circle_latest_ep89_20260731/similar/similar_ranking.csv",
+    "persistent_branch_ranking": "../../bimanual_circle_latest_ep89_20260731/persistent_branch_ranking.csv"
+  }
+}

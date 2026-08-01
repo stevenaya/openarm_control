@@ -1,0 +1,50 @@
+{
+  "episode": 75,
+  "events": [
+    5,
+    41
+  ],
+  "profiles": [
+    {
+      "name": "nominal_no_gc",
+      "gravity_compensation": false,
+      "command_delay_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "driver_velocity_limit": true
+    },
+    {
+      "name": "no_driver_cap",
+      "gravity_compensation": false,
+      "command_delay_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "driver_velocity_limit": false
+    },
+    {
+      "name": "delay_20ms",
+      "gravity_compensation": false,
+      "command_delay_s": 0.02,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "driver_velocity_limit": true
+    },
+    {
+      "name": "kp_050_kv_100",
+      "gravity_compensation": false,
+      "command_delay_s": 0.0,
+      "actuator_kp_scale": 0.5,
+      "actuator_kv_scale": 1.0,
+      "driver_velocity_limit": true
+    },
+    {
+      "name": "gravity_compensation",
+      "gravity_compensation": true,
+      "command_delay_s": 0.0,
+      "actuator_kp_scale": 1.0,
+      "actuator_kv_scale": 1.0,
+      "driver_velocity_limit": true
+    }
+  ],
+  "command_semantics": "recorded IK joint-position action"
+}

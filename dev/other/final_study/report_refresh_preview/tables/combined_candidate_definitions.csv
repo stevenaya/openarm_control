@@ -1,0 +1,6 @@
+code,profile,parameter_changes
+DEPLOY,current_deployment,Current deployment
+A,ori0p20_sing0p18,"orientation=0.20 rad, singularity rate=0.18"
+B,ori0p20_null10_sing0p18_brake0p12_energy3em5,"orientation=0.20, nullspace=10, singularity=0.18, braking=0.12, kinetic=3e-5"
+C,ori0p15_null12_sing0p18_brake0p12_energy5em5,"orientation=0.15, nullspace=12, singularity=0.18, braking=0.12, kinetic=5e-5"
+D,ori0p25_null10_sing0p18_brake0p12_energy3em5,"orientation=0.25, nullspace=10, singularity=0.18, braking=0.12, kinetic=3e-5"

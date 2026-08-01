@@ -1,0 +1,207 @@
+{
+  "dataset": "/hdd_data/rollout/pillow_0702_tune_llm",
+  "episodes_scanned": [
+    73,
+    75,
+    77,
+    79,
+    81,
+    83
+  ],
+  "replay_windows": [
+    [
+      "ep77_long",
+      77,
+      184.0,
+      216.0
+    ],
+    [
+      "ep77_skyward",
+      77,
+      207.3,
+      214.3
+    ],
+    [
+      "ep81_all",
+      81,
+      0.0,
+      13.5
+    ],
+    [
+      "ep81_dense",
+      81,
+      3.8,
+      12.8
+    ],
+    [
+      "ep83_early_long",
+      83,
+      0.0,
+      22.0
+    ],
+    [
+      "ep83_early",
+      83,
+      3.9,
+      16.9
+    ],
+    [
+      "ep83_late",
+      83,
+      26.8,
+      39.45
+    ],
+    [
+      "ep79_regular",
+      79,
+      303.5,
+      310.55
+    ],
+    [
+      "ep79_mid",
+      79,
+      250.9,
+      262.05
+    ]
+  ],
+  "target_semantics": "Bimanual FK(action) proxy from the recorded command; no extra path smoothing or geometric replacement.",
+  "profiles": [
+    {
+      "name": "pr_current_dataflow",
+      "overrides": {
+        "position_cost": 12.0,
+        "orientation_cost": 1.5,
+        "lm_damping": 0.01,
+        "damping": 0.1,
+        "posture_cost": 0.0,
+        "frame_position_error_limit": 0.02,
+        "frame_orientation_error_limit": 0.25,
+        "nullspace_cost": 8.5,
+        "nullspace_return_rate": 1.6,
+        "joint_braking": true,
+        "joint_braking_distance": 0.2,
+        "singularity_max_approach_rate": 0.25,
+        "kinetic_energy_cost": 2e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable"
+    },
+    {
+      "name": "pr_current_no_nullspace",
+      "overrides": {
+        "position_cost": 12.0,
+        "orientation_cost": 1.5,
+        "lm_damping": 0.01,
+        "damping": 0.1,
+        "posture_cost": 0.0,
+        "frame_position_error_limit": 0.02,
+        "frame_orientation_error_limit": 0.25,
+        "nullspace_cost": 0.0,
+        "nullspace_return_rate": 1.6,
+        "joint_braking": true,
+        "joint_braking_distance": 0.2,
+        "singularity_max_approach_rate": 0.25,
+        "kinetic_energy_cost": 2e-05
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable"
+    },
+    {
+      "name": "mainline_with_ik_velocity",
+      "overrides": {
+        "position_cost": 1.0,
+        "orientation_cost": 1.0,
+        "lm_damping": 0.01,
+        "damping": 0.1,
+        "posture_cost": 0.01,
+        "frame_position_error_limit": 0.0,
+        "frame_orientation_error_limit": 0.0,
+        "nullspace_cost": 0.0,
+        "joint_braking": true,
+        "joint_braking_distance": 0.2,
+        "singularity_max_approach_rate": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        6.3,
+        6.3,
+        6.3
+      ],
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "recoverable"
+    },
+    {
+      "name": "mainline_no_ik_velocity",
+      "overrides": {
+        "position_cost": 1.0,
+        "orientation_cost": 1.0,
+        "lm_damping": 0.01,
+        "damping": 0.1,
+        "posture_cost": 0.01,
+        "frame_position_error_limit": 0.0,
+        "frame_orientation_error_limit": 0.0,
+        "nullspace_cost": 0.0,
+        "joint_braking": false,
+        "singularity_max_approach_rate": 0.0,
+        "kinetic_energy_cost": 0.0
+      },
+      "velocity_caps": null,
+      "driver_velocity_caps": [
+        2.0,
+        2.0,
+        3.14,
+        3.14,
+        12.6,
+        12.6,
+        12.6
+      ],
+      "limit_style": "configuration_only"
+    }
+  ]
+}

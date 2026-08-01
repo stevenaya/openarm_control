@@ -1,0 +1,12 @@
+{
+  "generated_by": "/home/hilab/workdir.evaluation/openarm_control/dev/final_study/report_refresh_study.py",
+  "condition_count": 378,
+  "joint_count": 7,
+  "bound_sides": 2,
+  "offset_count": 9,
+  "profile_count": 3,
+  "random_sampling": false,
+  "random_seed": 0,
+  "position_limit_excess_field": "remaining_violation_rad",
+  "position_limit_excess_definition": "Distance in radians still outside the position bound after one solve."
+}

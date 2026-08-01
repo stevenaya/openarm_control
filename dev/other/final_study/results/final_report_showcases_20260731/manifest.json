@@ -1,0 +1,86 @@
+{
+  "control_period_s": 0.004,
+  "qp_substeps": 5,
+  "qp_substep_s": 0.0008,
+  "driver_velocity_caps_rad_s": [
+    2.0,
+    2.0,
+    3.14,
+    3.14,
+    12.6,
+    12.6,
+    12.6
+  ],
+  "ik_velocity_caps_rad_s": [
+    2.0,
+    2.0,
+    3.14,
+    3.14,
+    6.3,
+    6.3,
+    6.3
+  ],
+  "mainline_definition": {
+    "name": "ori_main_defaults_with_pr_joint_limits",
+    "overrides": {
+      "position_cost": 1.0,
+      "orientation_cost": 1.0,
+      "lm_damping": 0.01,
+      "damping": 0.25,
+      "posture_cost": 0.01,
+      "frame_position_error_limit": 0.0,
+      "frame_orientation_error_limit": 0.0,
+      "nullspace_cost": 0.0,
+      "joint_braking": false,
+      "singularity_max_approach_rate": 0.0,
+      "kinetic_energy_cost": 0.0
+    },
+    "velocity_caps": [
+      2.0,
+      2.0,
+      3.14,
+      3.14,
+      6.3,
+      6.3,
+      6.3
+    ],
+    "limit_style": "recoverable",
+    "driver_velocity_caps": [
+      2.0,
+      2.0,
+      3.14,
+      3.14,
+      12.6,
+      12.6,
+      12.6
+    ],
+    "use_measured_state": false,
+    "gravity_compensation": false,
+    "state_delay_s": 0.0,
+    "command_delay_s": 0.0,
+    "state_rate_hz": 250.0,
+    "state_dropout_start_s": -1.0,
+    "state_dropout_duration_s": 0.0,
+    "actuator_kp_scale": 1.0,
+    "actuator_kv_scale": 1.0,
+    "description": "ori/main task defaults using the PR recoverable position/velocity limit and current physical velocity caps. Joint braking and measured-state safety are disabled."
+  },
+  "scenarios": {
+    "episode73_triphasic_98s_straight_position": {
+      "source": "/home/hilab/workdir.evaluation/openarm_control/dev/final_study/results/pr_showcase_selection_20260731/selected/chest_ep73_triphasic98_v1.npz",
+      "description": "Episode-73 recorded wrist orientation with a smooth start-to-end position path.",
+      "samples": 986,
+      "duration_s": 3.94,
+      "peak_target_linear_speed_m_s": 0.027388268833714452,
+      "peak_target_angular_speed_rad_s": 12.022554001935186
+    },
+    "recorded_ep75_right_retract30_straight_retract": {
+      "source": "/home/hilab/workdir.evaluation/openarm_control/dev/final_study/results/corrected_retract_showcase_screen_20260731/frozen_scenarios/recorded_ep75_right_retract30_straight_retract.npz",
+      "description": "Episode-75 event-30 smooth retract chord with recorded wrist orientation.",
+      "samples": 732,
+      "duration_s": 2.924,
+      "peak_target_linear_speed_m_s": 0.5889998211057869,
+      "peak_target_angular_speed_rad_s": 6.248785732334673
+    }
+  }
+}

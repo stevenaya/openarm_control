@@ -1,0 +1,30 @@
+asset,type,source_suite,source_table_or_scenario,profiles_or_condition
+assets/01_control_layers.png,figure,schematic,Current control architecture,Current deployment
+assets/02_trajectory_catalog.png,figure,target_generator,21 geometric modes,target only
+assets/03_headline_baseline_comparison.png,figure,screening,tables/headline_baseline_means.csv,current;driver-only;strict-mainline;full-home-0.01
+assets/04_feature_ablation_heatmap.png,figure,screening,tables/ablation_relative_effects_percent.csv,single-feature removals
+assets/05_feature_effect_by_trajectory_family.png,figure,screening,tables/ablation_ddq_delta_by_family.csv;tables/ablation_elbow_delta_by_family_cm.csv,single-feature removals by family
+assets/06_chest_wrist_error_modulation_timeseries.png,figure,chest,chest_diagonal_v1p20_w8p00,current;no-frame-bounds
+assets/07_chest_wrist_eef_paths.png,figure,chest,chest stress representative paths,current;no-position;no-orientation;no-frame
+assets/08_nullspace_branch_control.png,figure,frozen,tables/branch_regulation_frozen_metrics.csv,exact-nullspace;none;full-home-0.01
+assets/09_singularity_reach_timeseries.png,figure,screening,reach_right_p0p00_v0p80,current;no-singularity-limit
+assets/10_driver_limit_coupling_timeseries.png,figure,driver,synthetic diagonal retract,current;driver-only;no-velocity-caps
+assets/11_recoverable_joint_limit.png,figure,boundary,tables/boundary_recovery_solved_counts.csv,recoverable;native-position-plus-velocity;position-only
+assets/12_joint_braking_envelope.png,figure,braking,tables/braking_profile_means.csv,braking distance sweep;no-braking;no-IK-velocity
+assets/13_parameter_sweep_summary.png,figure,parameters,tables/parameter_profile_means.csv,54 single-parameter profiles
+assets/14_combined_tuning_candidates.png,figure,candidates,tables/combined_candidate_means.csv;tables/combined_candidate_relative_percent.csv,current;A;B;C;D
+assets/15_symmetry_and_robustness.png,figure,symmetry;robustness,tables/exact_mirror_side_means.csv;tables/robustness_profile_means.csv,mirror and plant perturbations
+assets/16_solver_timing.png,figure,screening,tables/solver_timing_means.csv,current;driver-only;no-frame;strict-mainline
+assets/17_nullspace_targeted_tuning.png,figure,nullspace_sweep,tables/nullspace_cost_return_grid.csv;tables/nullspace_frozen_sweep_metrics.csv,44 frozen nullspace profiles
+assets/18_nullspace_cross_validation.png,figure,nullspace_validation,tables/nullspace_cross_validation_deltas.csv,6 profiles across 11 scenarios
+assets/33_final_showcase_controller_comparison.png,figure,frozen,near-chest and fast-retract frozen targets,current and controller baselines
+assets/34_chest_flip_benchmark_timeseries_and_path.png,figure,frozen,tables/near_chest_frozen_controller_metrics.csv,current;strict-mainline;no-frame
+assets/35_fast_retract_benchmark_timeseries_and_path.png,figure,frozen,tables/fast_retract_frozen_controller_metrics.csv,current;strict-mainline;no-branch
+videos/ideal_reference_trajectory_catalog.mp4,video,target_generator,21 geometric modes,target/raw-command catalog
+videos/near_chest_fast_wrist_roll_controller_comparison.mp4,video,frozen,near_chest_fast_wrist_roll,current;strict-mainline;no-frame
+videos/near_chest_roll_translation_error_bound_comparison.mp4,video,chest,chest_diagonal_v1p20_w8p00,current;no-frame
+videos/fast_retract_controller_comparison.mp4,video,frozen,fast_retract_elbow_branch,current;strict-mainline;no-branch
+videos/fast_retract_branch_regulator_comparison.mp4,video,frozen,fast_retract_elbow_branch,exact;none;full-home-0.01;full-home-0.03
+videos/fast_retract_nullspace_parameter_comparison.mp4,video,nullspace_sweep,fast_retract_elbow_branch,current and three nullspace candidates
+videos/fast_retract_ik_velocity_limit_comparison.mp4,video,frozen,fast_retract_elbow_branch,IK-plus-driver;driver-only
+videos/straight_reach_singularity_limit_comparison.mp4,video,screening,reach_right_p0p00_v0p80,current;no-singularity-limit

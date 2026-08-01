@@ -1,0 +1,42 @@
+{
+  "status": "selected_corrected_baseline",
+  "selected_case": {
+    "name": "ep77_direct_198_214",
+    "episode": 77,
+    "source_start_s": 198.0,
+    "source_end_s": 214.0,
+    "scenario": "recorded_bimanual_circle_ep77_direct_198_214",
+    "frozen_scenario": "frozen_scenarios/recorded_bimanual_circle_ep77_direct_198_214.npz",
+    "initialization": "Starts directly from the first command qpos in the selected window, with a 0.4 s first-frame hold and no earlier recorded warm-up.",
+    "reason": "The corrected ori/main comparison raises the left elbow about 8 cm above the PR branch while p95 end-effector separation remains about 1.2 cm."
+  },
+  "comparison": {
+    "pr_profile": "pr_current_dataflow",
+    "mainline_profile": "ori_main_same_ik_velocity",
+    "mainline_semantics": "ori/main FrameTask and PostureTask(0.01), standard configuration and Mink velocity limits, no PR braking or state-aware safety features, and a full 4 ms integration period for each of five iterations.",
+    "ik_velocity_caps_rad_s": [2.0, 2.0, 3.14, 3.14, 6.3, 6.3, 6.3],
+    "driver_velocity_caps_rad_s": [2.0, 2.0, 3.14, 3.14, 12.6, 12.6, 12.6],
+    "left_elbow_3d_separation_p95_m": 0.05902013529889897,
+    "left_elbow_3d_separation_max_m": 0.09290510571143493,
+    "left_elbow_separation_over_5cm_duration_s": 0.94,
+    "left_peak_mainline_minus_pr_elbow_height_m": 0.08010003435243917,
+    "left_peak_difference_time_s": 8.128,
+    "left_eef_separation_p95_m": 0.012193773100078604,
+    "pr_left_position_error_max_m": 0.0366583316010461,
+    "mainline_left_position_error_max_m": 0.039779692827361814
+  },
+  "rendering": {
+    "full_video_playback_rate": 1.0,
+    "focus_video_source_start_s": 6.5,
+    "focus_video_source_end_s": 10.5,
+    "focus_video_playback_rate": 0.5,
+    "path_trail_seconds": 1.0,
+    "fade_exponent": 2.0
+  },
+  "artifacts": {
+    "full_video": "../../../../../../note/openarm_control/final_report/videos/bimanual_circle_ep77_direct_198_214_pr_vs_true_ori_main_v1.mp4",
+    "focus_video": "../../../../../../note/openarm_control/final_report/videos/bimanual_circle_ep77_direct_198_214_pr_vs_true_ori_main_v1_focus_0p5x.mp4",
+    "peak_frame": "../../../../../../note/openarm_control/final_report/videos/bimanual_circle_ep77_direct_198_214_pr_vs_true_ori_main_v1_preview_8.28s.png",
+    "correction_report": "../../../../../../note/openarm_control/final_report/bimanual_circle_case_selection_correction_20260731.md"
+  }
+}
