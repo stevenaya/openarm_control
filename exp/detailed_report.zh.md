@@ -370,18 +370,18 @@ $$
 
 ![参考目标轨迹目录](assets/02_trajectory_catalog.png)
 
-GitHub 不会内嵌播放仓库中的 MP4 文件，因此本报告直接显示 GIF 动画预览；点击预览图或相邻链接可访问原始 MP4。
+GitHub 不会内嵌播放仓库中的 MP4 文件，因此本报告使用 `8-12 fps` 的高分辨率 WebP 动画，并根据分栏布局按 `760-980 px` 显示。点击预览图可访问原始 MP4；视频索引另保留紧凑的 GIF 兼容版本。
 
 **视频：21 个参考动作片段；画面文字标出所属动作组在 42 条固定对比轨迹和 70 条全部目标中的数量**
 
 <details>
 <summary>动画预览（点击展开）</summary>
 
-[![动画视频预览](assets/video_previews/ideal_reference_trajectory_catalog.gif)](videos/ideal_reference_trajectory_catalog.mp4)
+<a href="videos/ideal_reference_trajectory_catalog.mp4"><img src="assets/video_previews/ideal_reference_trajectory_catalog.webp" alt="动画视频预览" width="820"></a>
 
 </details>
 
-[下载 MP4](videos/ideal_reference_trajectory_catalog.mp4)
+[打开高清动画预览](assets/video_previews/ideal_reference_trajectory_catalog.webp) · [下载 MP4](videos/ideal_reference_trajectory_catalog.mp4)
 
 #### 3.2.3 实验组与运行次数
 
@@ -515,11 +515,11 @@ $\max_i |\dot q_{i,\mathrm{actual}}|$ 和 $\max_i |\ddot q_{i,\mathrm{actual}}|$
 <details>
 <summary>动画预览（点击展开）</summary>
 
-[![动画视频预览](assets/video_previews/near_chest_roll_translation_error_bound_comparison.gif)](videos/near_chest_roll_translation_error_bound_comparison.mp4)
+<a href="videos/near_chest_roll_translation_error_bound_comparison.mp4"><img src="assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp" alt="动画视频预览" width="900"></a>
 
 </details>
 
-[下载 MP4](videos/near_chest_roll_translation_error_bound_comparison.mp4)
+[打开高清动画预览](assets/video_previews/near_chest_roll_translation_error_bound_comparison.webp) · [下载 MP4](videos/near_chest_roll_translation_error_bound_comparison.mp4)
 
 #### 5.1.2 实机记录派生的胸前仿真回放
 
@@ -540,11 +540,11 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 <details>
 <summary>动画预览（点击展开）</summary>
 
-[![动画视频预览](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif)](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
+<a href="videos/near_chest_fast_wrist_roll_controller_comparison.mp4"><img src="assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp" alt="动画视频预览" width="980"></a>
 
 </details>
 
-[下载 MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
+[打开高清动画预览](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp) · [下载 MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
 
 该结果表明，误差调制的首要目标是抑制快速翻腕引发的整臂不稳定，而非优先追赶朝向。朝向跟踪变慢是明确的控制取舍。
 
@@ -557,11 +557,11 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 <details>
 <summary>动画预览（点击展开）</summary>
 
-[![动画视频预览](assets/video_previews/fast_retract_frame_error_bound_comparison.gif)](videos/fast_retract_frame_error_bound_comparison.mp4)
+<a href="videos/fast_retract_frame_error_bound_comparison.mp4"><img src="assets/video_previews/fast_retract_frame_error_bound_comparison.webp" alt="动画视频预览" width="900"></a>
 
 </details>
 
-[下载 MP4](videos/fast_retract_frame_error_bound_comparison.mp4)
+[打开高清动画预览](assets/video_previews/fast_retract_frame_error_bound_comparison.webp) · [下载 MP4](videos/fast_retract_frame_error_bound_comparison.mp4)
 
 ### 5.2 冗余与奇异点
 
@@ -592,11 +592,11 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 <details>
 <summary>动画预览（点击展开）</summary>
 
-[![动画视频预览](assets/video_previews/fast_retract_posture_regulation_comparison.gif)](videos/fast_retract_posture_regulation_comparison.mp4)
+<a href="videos/fast_retract_posture_regulation_comparison.mp4"><img src="assets/video_previews/fast_retract_posture_regulation_comparison.webp" alt="动画视频预览" width="760"></a>
 
 </details>
 
-[下载 MP4](videos/fast_retract_posture_regulation_comparison.mp4)
+[打开高清动画预览](assets/video_previews/fast_retract_posture_regulation_comparison.webp) · [下载 MP4](videos/fast_retract_posture_regulation_comparison.mp4)
 
 `posture_cost=0.003/0.01/0.03` 时，肘横向范围分别为 `17.60/17.61/17.76 cm`，均未形成与精确零空间正则等价的分支约束。精确零空间正则以约 `3 mm` 的额外位置 RMSE，将肘横移减少约 `13.6 cm`，且不把 home 偏好直接施加到全部关节方向。
 
@@ -609,11 +609,11 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 <details>
 <summary>动画预览（点击展开）</summary>
 
-[![动画视频预览](assets/video_previews/fast_retract_controller_comparison.gif)](videos/fast_retract_controller_comparison.mp4)
+<a href="videos/fast_retract_controller_comparison.mp4"><img src="assets/video_previews/fast_retract_controller_comparison.webp" alt="动画视频预览" width="980"></a>
 
 </details>
 
-[下载 MP4](videos/fast_retract_controller_comparison.mp4)
+[打开高清动画预览](assets/video_previews/fast_retract_controller_comparison.webp) · [下载 MP4](videos/fast_retract_controller_comparison.mp4)
 
 #### 5.2.2 奇异点接近限速：伸直与回缩
 
@@ -641,11 +641,11 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 <details>
 <summary>动画预览（点击展开）</summary>
 
-[![动画视频预览](assets/video_previews/straight_reach_singularity_limit_comparison.gif)](videos/straight_reach_singularity_limit_comparison.mp4)
+<a href="videos/straight_reach_singularity_limit_comparison.mp4"><img src="assets/video_previews/straight_reach_singularity_limit_comparison.webp" alt="动画视频预览" width="900"></a>
 
 </details>
 
-[下载 MP4](videos/straight_reach_singularity_limit_comparison.mp4)
+[打开高清动画预览](assets/video_previews/straight_reach_singularity_limit_comparison.webp) · [下载 MP4](videos/straight_reach_singularity_limit_comparison.mp4)
 
 ### 5.3 关节安全包络
 
@@ -717,11 +717,11 @@ PR w/o velocity limits 的跟踪更好，但实际动态明显更激进。PR w/o
 <details>
 <summary>动画预览（点击展开）</summary>
 
-[![动画视频预览](assets/video_previews/fast_retract_ik_velocity_limit_comparison.gif)](videos/fast_retract_ik_velocity_limit_comparison.mp4)
+<a href="videos/fast_retract_ik_velocity_limit_comparison.mp4"><img src="assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp" alt="动画视频预览" width="900"></a>
 
 </details>
 
-[下载 MP4](videos/fast_retract_ik_velocity_limit_comparison.mp4)
+[打开高清动画预览](assets/video_previews/fast_retract_ik_velocity_limit_comparison.webp) · [下载 MP4](videos/fast_retract_ik_velocity_limit_comparison.mp4)
 
 ## 6. 参数、正确性与性能
 
@@ -748,11 +748,11 @@ PR w/o velocity limits 的跟踪更好，但实际动态明显更激进。PR w/o
 <details>
 <summary>动画预览（点击展开）</summary>
 
-[![动画视频预览](assets/video_previews/fast_retract_nullspace_parameter_comparison.gif)](videos/fast_retract_nullspace_parameter_comparison.mp4)
+<a href="videos/fast_retract_nullspace_parameter_comparison.mp4"><img src="assets/video_previews/fast_retract_nullspace_parameter_comparison.webp" alt="动画视频预览" width="760"></a>
 
 </details>
 
-[下载 MP4](videos/fast_retract_nullspace_parameter_comparison.mp4)
+[打开高清动画预览](assets/video_previews/fast_retract_nullspace_parameter_comparison.webp) · [下载 MP4](videos/fast_retract_nullspace_parameter_comparison.mp4)
 
 可见效果差异不明显。
 

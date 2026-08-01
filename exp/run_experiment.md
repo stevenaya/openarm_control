@@ -95,7 +95,7 @@ Required:
 - Linux x86_64;
 - `uv` (the report used `uv 0.11.24`);
 - an OpenGL/EGL environment capable of MuJoCo offscreen rendering;
-- `ffmpeg`, required only for video generation;
+- `ffmpeg` with the `libwebp_anim` encoder, required only for video generation;
 - the DejaVu Sans font, to reproduce the same figure and video typography.
 
 Python and Python packages do not need to be installed manually.
@@ -289,9 +289,9 @@ uv run --project exp/src --frozen python exp/src/build_videos.py \
 ```
 
 The renderer uses `MUJOCO_GL=egl` by default and streams RGB frames directly to
-FFmpeg without retaining an intermediate image sequence. It also writes compact
-animated GIF previews to `exp/assets/video_previews/`, because GitHub does not
-render repository MP4 files inline.
+FFmpeg without retaining an intermediate image sequence. Because GitHub does
+not render repository MP4 files inline, it also writes high-resolution animated
+WebP previews and compact GIF fallbacks to `exp/assets/video_previews/`.
 
 ## 9. Update and Validate the Published Report
 

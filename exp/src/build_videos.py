@@ -14,20 +14,64 @@ HERE = Path(__file__).resolve().parent
 DEFAULT_RESULTS = HERE.parent / "results" / "final_report_20260801"
 DEFAULT_OUTPUT = HERE.parent / "videos"
 DEFAULT_PREVIEW_OUTPUT = HERE.parent / "assets" / "video_previews"
+WIDE_PREVIEWS = {
+    "fast_retract_controller_comparison",
+    "near_chest_fast_wrist_roll_controller_comparison",
+}
+GRID_PREVIEWS = {
+    "fast_retract_nullspace_parameter_comparison",
+    "fast_retract_posture_regulation_comparison",
+}
 
 
 def animated_previews(video_dir: Path, output: Path) -> tuple[Path, ...]:
-    """Generate compact GitHub-renderable previews for the public MP4 files."""
+    """Generate high-quality WebP previews and compact GIF fallbacks."""
     output.mkdir(parents=True, exist_ok=True)
     paths: list[Path] = []
     for source in sorted(video_dir.glob("*.mp4")):
         catalog = source.name == "ideal_reference_trajectory_catalog.mp4"
-        fps = 4 if catalog else 6
-        width = 600 if catalog else 720
+        webp_fps = 8 if catalog else 12
+        if catalog:
+            webp_width = 960
+        elif source.stem in WIDE_PREVIEWS:
+            webp_width = 1440
+        elif source.stem in GRID_PREVIEWS:
+            webp_width = 1000
+        else:
+            webp_width = 1200
+        webp_target = output / f"{source.stem}.webp"
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-loglevel",
+                "error",
+                "-i",
+                str(source),
+                "-vf",
+                f"fps={webp_fps},scale={webp_width}:-2:flags=lanczos",
+                "-loop",
+                "0",
+                "-c:v",
+                "libwebp_anim",
+                "-lossless",
+                "0",
+                "-quality",
+                "72",
+                "-compression_level",
+                "4",
+                str(webp_target),
+            ],
+            check=True,
+        )
+        paths.append(webp_target)
+
+        gif_fps = 4 if catalog else 6
+        gif_width = 600 if catalog else 720
         colors = 96 if catalog else 128
-        target = output / f"{source.stem}.gif"
+        gif_target = output / f"{source.stem}.gif"
         video_filter = (
-            f"fps={fps},scale={width}:-1:flags=lanczos,split[s0][s1];"
+            f"fps={gif_fps},scale={gif_width}:-1:flags=lanczos,split[s0][s1];"
             f"[s0]palettegen=max_colors={colors}[p];"
             "[s1][p]paletteuse=dither=bayer:bayer_scale=5"
         )
@@ -43,11 +87,11 @@ def animated_previews(video_dir: Path, output: Path) -> tuple[Path, ...]:
                 video_filter,
                 "-loop",
                 "0",
-                str(target),
+                str(gif_target),
             ],
             check=True,
         )
-        paths.append(target)
+        paths.append(gif_target)
     return tuple(paths)
 
 
@@ -324,7 +368,7 @@ def main() -> None:
         "--preview-dir",
         type=Path,
         default=DEFAULT_PREVIEW_OUTPUT,
-        help="Output directory for GitHub-renderable GIF previews.",
+        help="Output directory for animated WebP previews and GIF fallbacks.",
     )
     args = parser.parse_args()
     root = args.results.resolve()

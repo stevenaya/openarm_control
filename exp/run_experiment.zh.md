@@ -82,7 +82,7 @@ IK 数值直接来自受测版本的 `IKParams` 默认值，并记录在各级 m
 - Linux x86_64；
 - `uv`，本报告使用 `uv 0.11.24`；
 - 支持 MuJoCo EGL 离屏渲染的 OpenGL/EGL 环境；
-- `ffmpeg`，仅生成视频时需要；
+- 带 `libwebp_anim` 编码器的 `ffmpeg`，仅生成视频时需要；
 - DejaVu Sans 字体，用于复现相同的图表和视频排版。
 
 Python 和 Python 包不需要手动安装。
@@ -271,7 +271,8 @@ uv run --project exp/src --frozen python exp/src/build_videos.py \
 
 渲染脚本默认使用 `MUJOCO_GL=egl`，并将 RGB frame 直接输送给 FFmpeg，不
 保留中间图片序列。由于 GitHub 不会内嵌播放仓库中的 MP4，脚本还会在
-`exp/assets/video_previews/` 下生成小体积 GIF 动画预览。
+`exp/assets/video_previews/` 下生成高分辨率 WebP 动画预览和紧凑的 GIF
+兼容版本。
 
 ## 9. 更新和校验公开报告
 

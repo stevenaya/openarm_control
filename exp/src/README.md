@@ -17,7 +17,7 @@ step-by-step workflow is documented in
 | `trajectory_catalog.py` | Enumerate and validate every target generator without writing trajectory arrays |
 | `TRAJECTORIES.md` | Generated catalog of the 70 unique targets, builders, suites, and hashes |
 | `build_figures.py` | Regenerate report figures and CSV tables from retained results |
-| `build_videos.py` | Regenerate public MP4 videos and GitHub-renderable GIF previews from retained traces |
+| `build_videos.py` | Regenerate public MP4 videos, high-resolution WebP previews, and compact GIF fallbacks from retained traces |
 | `validate_report.py` | Validate links, parameters, manifests, inputs, and asset checksums |
 | `study.py` | Shared MuJoCo plant, trajectories, profiles, metrics, and matrix runner |
 | `targeted_study.py` | Chest, braking, and robustness scenarios |
@@ -47,8 +47,9 @@ Create the isolated environment with:
 uv sync --project exp/src --frozen
 ```
 
-The report videos additionally require FFmpeg. The published assets were
-rendered with `ffmpeg 6.1.1-3ubuntu5`, MuJoCo EGL rendering, and DejaVu Sans.
+The report videos additionally require FFmpeg with the `libwebp_anim` encoder.
+The published assets were rendered with `ffmpeg 6.1.1-3ubuntu5`, MuJoCo EGL
+rendering, and DejaVu Sans.
 Solver timing also depends on CPU, BLAS, and operating-system scheduling; the
 measured platform remains recorded in each suite manifest.
 

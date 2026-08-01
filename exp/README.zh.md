@@ -56,7 +56,7 @@
 | 额外专项轨迹 | `28` 条；与固定对比轨迹合计为 `70` 条唯一目标 | 测试左右镜像、额外速度与方向、胸前快速翻腕、关节制动、实机记录回放和深起点奇异动作 |
 | 动作示例视频 | 从 `70` 条目标中选取 `21` 个片段 | 展示目标运动和典型控制响应；视频不是额外的定量实验集 |
 
-13 个实验组共执行 `1,921` 次“控制器配置 × 目标轨迹”动态仿真，覆盖 `119` 种控制器配置，未出现 QP 求解失败。另有 `378` 个静态关节边界条件。完整动作族加总、21 个片段名称和实验组清单见[实验与资产索引](experiment_index.zh.md#3-目标轨迹)；[动画目录预览](assets/video_previews/ideal_reference_trajectory_catalog.gif)可用于快速浏览动作，也可下载[原始 MP4](videos/ideal_reference_trajectory_catalog.mp4)。
+13 个实验组共执行 `1,921` 次“控制器配置 × 目标轨迹”动态仿真，覆盖 `119` 种控制器配置，未出现 QP 求解失败。另有 `378` 个静态关节边界条件。完整动作族加总、21 个片段名称和实验组清单见[实验与资产索引](experiment_index.zh.md#3-目标轨迹)；[动画目录预览](assets/video_previews/ideal_reference_trajectory_catalog.webp)可用于快速浏览动作，也可下载[原始 MP4](videos/ideal_reference_trajectory_catalog.mp4)。
 
 其中两条重点轨迹由实机指令记录派生，并使用统一目标、MuJoCo 被控对象和驱动器速度上限进行仿真回放：
 
@@ -109,7 +109,7 @@
 
 ![图 4：实机记录派生的胸前快速翻腕回放。PR default 限制最大位置偏离和实际关节加速度，代价是暂态朝向滞后](assets/34_chest_flip_benchmark_timeseries_and_path.png)
 
-[查看三种控制方案动画预览](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif) · [下载 MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4) · [查看胸前压力测试 A/B](detailed_report.zh.md#511-胸前压力测试)
+[查看三种控制方案动画预览](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.webp) · [下载 MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4) · [查看胸前压力测试 A/B](detailed_report.zh.md#511-胸前压力测试)
 
 ### 2. 快速回缩：精确零空间分支约束
 
@@ -125,7 +125,7 @@
 
 精确零空间正则以约 `3 mm` 的额外位置 RMSE，将肘部横向范围减少约 `13.6 cm`。当 `posture_cost=0.003/0.01/0.03` 时，full-home `PostureTask` 的肘部横向范围均约为 `17.6 cm`，未形成等价的分支约束。
 
-[姿态正则动画预览](assets/video_previews/fast_retract_posture_regulation_comparison.gif) · [完整控制方案动画预览](assets/video_previews/fast_retract_controller_comparison.gif) · [MP4 文件](experiment_index.zh.md#6-视频索引)
+[姿态正则动画预览](assets/video_previews/fast_retract_posture_regulation_comparison.webp) · [完整控制方案动画预览](assets/video_previews/fast_retract_controller_comparison.webp) · [MP4 文件](experiment_index.zh.md#6-视频索引)
 
 ### 3. 向可达域外伸直：奇异点接近限速
 
@@ -139,7 +139,7 @@ QP 只限制使 $\rho$ 继续下降的关节运动；离开奇异点或沿等奇
 
 ![图 6：奇异点接近限速只改变伸直阶段，并在回缩时自动释放](assets/09_singularity_reach_timeseries.png)
 
-[查看伸直奇异区 A/B 动画预览](assets/video_previews/straight_reach_singularity_limit_comparison.gif) · [下载 MP4](videos/straight_reach_singularity_limit_comparison.mp4)
+[查看伸直奇异区 A/B 动画预览](assets/video_previews/straight_reach_singularity_limit_comparison.webp) · [下载 MP4](videos/straight_reach_singularity_limit_comparison.mp4)
 
 ## 其他关键验证
 

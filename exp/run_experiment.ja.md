@@ -93,7 +93,7 @@ manifest に記録します。simulation の downstream limiter は
 - Linux x86_64；
 - `uv`（本レポートでは `uv 0.11.24`）；
 - MuJoCo の offscreen rendering に対応する OpenGL/EGL 環境；
-- `ffmpeg`（動画生成時のみ）；
+- `libwebp_anim` encoder を含む `ffmpeg`（動画生成時のみ）；
 - 同じ図・動画の typography を再現する DejaVu Sans font。
 
 Python と Python package を手動で install する必要はありません。
@@ -282,7 +282,8 @@ uv run --project exp/src --frozen python exp/src/build_videos.py \
 
 renderer は既定で `MUJOCO_GL=egl` を使用し、中間画像列を保持せず RGB frame を
 FFmpeg に直接送ります。GitHub は repository 内の MP4 を inline 再生しないため、
-script は `exp/assets/video_previews/` に小容量の animated GIF preview も生成します。
+script は `exp/assets/video_previews/` に高解像度の animated WebP preview と、
+小容量の GIF 互換版も生成します。
 
 ## 9. 公開レポートの更新と検証
 
