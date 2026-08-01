@@ -374,7 +374,12 @@ GitHub は repository 内の MP4 を inline 再生しないため、本 report �
 
 **動画：21 reference-motion clip。画面内 label は 42 本の fixed set と全 70 target における各 family の本数を表示**
 
+<details>
+<summary>動画プレビュー（クリックして展開）</summary>
+
 [![動画プレビュー](assets/video_previews/ideal_reference_trajectory_catalog.gif)](videos/ideal_reference_trajectory_catalog.mp4)
+
+</details>
 
 [MP4 をダウンロード](videos/ideal_reference_trajectory_catalog.mp4)
 
@@ -507,7 +512,12 @@ $\max_i |\dot q_{i,\mathrm{actual}}|$ と $\max_i |\ddot q_{i,\mathrm{actual}}|$
 
 **動画：Near-chest roll + diagonal translation、0.5x playback**
 
+<details>
+<summary>動画プレビュー（クリックして展開）</summary>
+
 [![動画プレビュー](assets/video_previews/near_chest_roll_translation_error_bound_comparison.gif)](videos/near_chest_roll_translation_error_bound_comparison.mp4)
+
+</details>
 
 [MP4 をダウンロード](videos/near_chest_roll_translation_error_bound_comparison.mp4)
 
@@ -527,7 +537,12 @@ Mainline baseline は orientation RMSE が最小ですが、EEF position path �
 
 **動画：胸前高速 wrist rotation の controller comparison、hardware record 由来の単一 trajectory、0.5x playback**
 
+<details>
+<summary>動画プレビュー（クリックして展開）</summary>
+
 [![動画プレビュー](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif)](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
+
+</details>
 
 [MP4 をダウンロード](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
 
@@ -539,7 +554,12 @@ Mainline baseline は orientation RMSE が最小ですが、EEF position path �
 
 **動画：高速 retract の 6D error-bound side-by-side comparison、trajectory 2x、0.5x playback**
 
+<details>
+<summary>動画プレビュー（クリックして展開）</summary>
+
 [![動画プレビュー](assets/video_previews/fast_retract_frame_error_bound_comparison.gif)](videos/fast_retract_frame_error_bound_comparison.mp4)
+
+</details>
 
 [MP4 をダウンロード](videos/fast_retract_frame_error_bound_comparison.mp4)
 
@@ -569,7 +589,12 @@ Y-Z は `arm_origin` plane における actual elbow path、`y-y0` は初期 lat
 
 **動画：secondary-posture 4-way comparison、hardware record 由来の単一 trajectory、0.5x playback**
 
+<details>
+<summary>動画プレビュー（クリックして展開）</summary>
+
 [![動画プレビュー](assets/video_previews/fast_retract_posture_regulation_comparison.gif)](videos/fast_retract_posture_regulation_comparison.mp4)
+
+</details>
 
 [MP4 をダウンロード](videos/fast_retract_posture_regulation_comparison.mp4)
 
@@ -581,7 +606,12 @@ Y-Z は `arm_origin` plane における actual elbow path、`y-y0` は初期 lat
 
 **動画：高速 retract controller comparison、hardware record 由来の単一 trajectory、0.5x playback**
 
+<details>
+<summary>動画プレビュー（クリックして展開）</summary>
+
 [![動画プレビュー](assets/video_previews/fast_retract_controller_comparison.gif)](videos/fast_retract_controller_comparison.mp4)
+
+</details>
 
 [MP4 をダウンロード](videos/fast_retract_controller_comparison.mp4)
 
@@ -606,7 +636,12 @@ Limit を有効にすると、blue の extension segment が yellow slow zone �
 
 **動画：Extended-arm singular region の A/B、0.5x playback**
 
+<details>
+<summary>動画プレビュー（クリックして展開）</summary>
+
 [![動画プレビュー](assets/video_previews/straight_reach_singularity_limit_comparison.gif)](videos/straight_reach_singularity_limit_comparison.mp4)
+
+</details>
 
 [MP4 をダウンロード](videos/straight_reach_singularity_limit_comparison.mp4)
 
@@ -677,7 +712,12 @@ QP と driver は同じ per-joint numerical limit を使いますが、役割は
 
 **動画：高速 retract の QP velocity-limit A/B。両列で driver limit 有効、0.5x playback**
 
+<details>
+<summary>動画プレビュー（クリックして展開）</summary>
+
 [![動画プレビュー](assets/video_previews/fast_retract_ik_velocity_limit_comparison.gif)](videos/fast_retract_ik_velocity_limit_comparison.mp4)
+
+</details>
 
 [MP4 をダウンロード](videos/fast_retract_ik_velocity_limit_comparison.mp4)
 
@@ -703,7 +743,12 @@ Generalization を確認するため、次図は七つの motion type にまた�
 
 **動画：高速 retract の exact-nullspace parameter 2x2、hardware record 由来の単一 trajectory、0.5x playback**
 
+<details>
+<summary>動画プレビュー（クリックして展開）</summary>
+
 [![動画プレビュー](assets/video_previews/fast_retract_nullspace_parameter_comparison.gif)](videos/fast_retract_nullspace_parameter_comparison.mp4)
+
+</details>
 
 [MP4 をダウンロード](videos/fast_retract_nullspace_parameter_comparison.mp4)
 

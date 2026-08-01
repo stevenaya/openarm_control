@@ -374,7 +374,12 @@ GitHub 不会内嵌播放仓库中的 MP4 文件，因此本报告直接显示 G
 
 **视频：21 个参考动作片段；画面文字标出所属动作组在 42 条固定对比轨迹和 70 条全部目标中的数量**
 
+<details>
+<summary>动画预览（点击展开）</summary>
+
 [![动画视频预览](assets/video_previews/ideal_reference_trajectory_catalog.gif)](videos/ideal_reference_trajectory_catalog.mp4)
+
+</details>
 
 [下载 MP4](videos/ideal_reference_trajectory_catalog.mp4)
 
@@ -507,7 +512,12 @@ $\max_i |\dot q_{i,\mathrm{actual}}|$ 和 $\max_i |\ddot q_{i,\mathrm{actual}}|$
 
 **视频：Near-chest roll + diagonal translation，0.5x**
 
+<details>
+<summary>动画预览（点击展开）</summary>
+
 [![动画视频预览](assets/video_previews/near_chest_roll_translation_error_bound_comparison.gif)](videos/near_chest_roll_translation_error_bound_comparison.mp4)
+
+</details>
 
 [下载 MP4](videos/near_chest_roll_translation_error_bound_comparison.mp4)
 
@@ -527,7 +537,12 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 
 **视频：胸前快速翻腕控制器对照，单条实机记录派生轨迹，0.5x**
 
+<details>
+<summary>动画预览（点击展开）</summary>
+
 [![动画视频预览](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif)](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
+
+</details>
 
 [下载 MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
 
@@ -539,7 +554,12 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 
 **视频：快速回缩 6D 误差上限双栏对照，轨迹 2x 加速，0.5x 播放**
 
+<details>
+<summary>动画预览（点击展开）</summary>
+
 [![动画视频预览](assets/video_previews/fast_retract_frame_error_bound_comparison.gif)](videos/fast_retract_frame_error_bound_comparison.mp4)
+
+</details>
 
 [下载 MP4](videos/fast_retract_frame_error_bound_comparison.mp4)
 
@@ -569,7 +589,12 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 
 **视频：次级姿态正则四方对照，单条实机记录派生轨迹，0.5x**
 
+<details>
+<summary>动画预览（点击展开）</summary>
+
 [![动画视频预览](assets/video_previews/fast_retract_posture_regulation_comparison.gif)](videos/fast_retract_posture_regulation_comparison.mp4)
+
+</details>
 
 [下载 MP4](videos/fast_retract_posture_regulation_comparison.mp4)
 
@@ -581,7 +606,12 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 
 **视频：快速回缩控制器对照，单条实机记录派生轨迹，0.5x**
 
+<details>
+<summary>动画预览（点击展开）</summary>
+
 [![动画视频预览](assets/video_previews/fast_retract_controller_comparison.gif)](videos/fast_retract_controller_comparison.mp4)
+
+</details>
 
 [下载 MP4](videos/fast_retract_controller_comparison.mp4)
 
@@ -608,7 +638,12 @@ Mainline baseline 的朝向 RMSE 最小，但 EEF 位置路径先明显偏离目
 
 **视频：伸直奇异区 A/B，0.5x**
 
+<details>
+<summary>动画预览（点击展开）</summary>
+
 [![动画视频预览](assets/video_previews/straight_reach_singularity_limit_comparison.gif)](videos/straight_reach_singularity_limit_comparison.mp4)
+
+</details>
 
 [下载 MP4](videos/straight_reach_singularity_limit_comparison.mp4)
 
@@ -679,7 +714,12 @@ PR w/o velocity limits 的跟踪更好，但实际动态明显更激进。PR w/o
 
 **视频：快速回缩 QP 速度上限 A/B；驱动器限速均开启，0.5x**
 
+<details>
+<summary>动画预览（点击展开）</summary>
+
 [![动画视频预览](assets/video_previews/fast_retract_ik_velocity_limit_comparison.gif)](videos/fast_retract_ik_velocity_limit_comparison.mp4)
+
+</details>
 
 [下载 MP4](videos/fast_retract_ik_velocity_limit_comparison.mp4)
 
@@ -705,7 +745,12 @@ PR w/o velocity limits 的跟踪更好，但实际动态明显更激进。PR w/o
 
 **视频：快速回缩精确零空间参数 2x2，单条实机记录派生轨迹，0.5x**
 
+<details>
+<summary>动画预览（点击展开）</summary>
+
 [![动画视频预览](assets/video_previews/fast_retract_nullspace_parameter_comparison.gif)](videos/fast_retract_nullspace_parameter_comparison.mp4)
+
+</details>
 
 [下载 MP4](videos/fast_retract_nullspace_parameter_comparison.mp4)
 

@@ -374,7 +374,12 @@ GitHub does not render repository MP4 files inline. This report therefore embeds
 
 **Video: 21 reference-motion clips; on-screen labels show each family's counts in the 42-trajectory fixed set and all 70 targets**
 
+<details>
+<summary>Animated preview (click to expand)</summary>
+
 [![Animated video preview](assets/video_previews/ideal_reference_trajectory_catalog.gif)](videos/ideal_reference_trajectory_catalog.mp4)
+
+</details>
 
 [Download MP4](videos/ideal_reference_trajectory_catalog.mp4)
 
@@ -507,7 +512,12 @@ Without the 6D error bound, position error, elbow lateral motion, joint accelera
 
 **Video: Near-chest roll + diagonal translation, 0.5x playback**
 
+<details>
+<summary>Animated preview (click to expand)</summary>
+
 [![Animated video preview](assets/video_previews/near_chest_roll_translation_error_bound_comparison.gif)](videos/near_chest_roll_translation_error_bound_comparison.mp4)
+
+</details>
 
 [Download MP4](videos/near_chest_roll_translation_error_bound_comparison.mp4)
 
@@ -527,7 +537,12 @@ The Mainline baseline has the lowest orientation RMSE, but its EEF position path
 
 **Video: controller comparison for near-chest fast wrist rotation, one hardware-record-derived trajectory, 0.5x playback**
 
+<details>
+<summary>Animated preview (click to expand)</summary>
+
 [![Animated video preview](assets/video_previews/near_chest_fast_wrist_roll_controller_comparison.gif)](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
+
+</details>
 
 [Download MP4](videos/near_chest_fast_wrist_roll_controller_comparison.mp4)
 
@@ -539,7 +554,12 @@ To isolate the role of the 6D error bound during fast retraction, the following 
 
 **Video: side-by-side fast-retract 6D error-bound comparison, trajectory accelerated 2x and played at 0.5x**
 
+<details>
+<summary>Animated preview (click to expand)</summary>
+
 [![Animated video preview](assets/video_previews/fast_retract_frame_error_bound_comparison.gif)](videos/fast_retract_frame_error_bound_comparison.mp4)
+
+</details>
 
 [Download MP4](videos/fast_retract_frame_error_bound_comparison.mp4)
 
@@ -569,7 +589,12 @@ Y-Z is the actual elbow path in the `arm_origin` plane, and `y-y0` is displaceme
 
 **Video: four-way secondary-posture comparison, one hardware-record-derived trajectory, 0.5x playback**
 
+<details>
+<summary>Animated preview (click to expand)</summary>
+
 [![Animated video preview](assets/video_previews/fast_retract_posture_regulation_comparison.gif)](videos/fast_retract_posture_regulation_comparison.mp4)
+
+</details>
 
 [Download MP4](videos/fast_retract_posture_regulation_comparison.mp4)
 
@@ -581,7 +606,12 @@ The preceding experiment changes only the secondary posture task. The following 
 
 **Video: fast-retract controller comparison, one hardware-record-derived trajectory, 0.5x playback**
 
+<details>
+<summary>Animated preview (click to expand)</summary>
+
 [![Animated video preview](assets/video_previews/fast_retract_controller_comparison.gif)](videos/fast_retract_controller_comparison.mp4)
+
+</details>
 
 [Download MP4](videos/fast_retract_controller_comparison.mp4)
 
@@ -606,7 +636,12 @@ The video uses a deep-start variant with the same farthest target. Its start and
 
 **Video: A/B comparison in the extended-arm singular region, 0.5x playback**
 
+<details>
+<summary>Animated preview (click to expand)</summary>
+
 [![Animated video preview](assets/video_previews/straight_reach_singularity_limit_comparison.gif)](videos/straight_reach_singularity_limit_comparison.mp4)
+
+</details>
 
 [Download MP4](videos/straight_reach_singularity_limit_comparison.mp4)
 
@@ -677,7 +712,12 @@ Maximum absolute along-track lag over the full run increases from `2.57 cm` unde
 
 **Video: fast-retract QP velocity-limit A/B; driver limits enabled in both columns, 0.5x playback**
 
+<details>
+<summary>Animated preview (click to expand)</summary>
+
 [![Animated video preview](assets/video_previews/fast_retract_ik_velocity_limit_comparison.gif)](videos/fast_retract_ik_velocity_limit_comparison.mp4)
+
+</details>
 
 [Download MP4](videos/fast_retract_ik_velocity_limit_comparison.mp4)
 
@@ -703,7 +743,12 @@ To test generalization, the next figure cross-validates candidates on `11` direc
 
 **Video: 2x2 exact-nullspace parameters during fast retraction, one hardware-record-derived trajectory, 0.5x playback**
 
+<details>
+<summary>Animated preview (click to expand)</summary>
+
 [![Animated video preview](assets/video_previews/fast_retract_nullspace_parameter_comparison.gif)](videos/fast_retract_nullspace_parameter_comparison.mp4)
+
+</details>
 
 [Download MP4](videos/fast_retract_nullspace_parameter_comparison.mp4)
 
