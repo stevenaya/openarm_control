@@ -167,26 +167,18 @@ class BoundedFrameTask(mink.Task):
     def compute_qp_residual(
         self,
         configuration: mink.Configuration,
-    ) -> tuple[np.ndarray, np.ndarray, float] | None:
-        """Opt out of Mink's fused residual path so bounding is not bypassed.
+    ) -> tuple[np.ndarray, np.ndarray, float]:
+        """Return the bounded request for Mink's fused objective assembly."""
+        error = self._bounded_error(configuration)
+        if error is None:
+            return self.frame_task.compute_qp_residual(configuration)
+        return self._weighted_residual(error, self.compute_jacobian(configuration))
 
-        Mink 1.2's solver prefers a task's residual and only falls back to
-        :meth:`compute_qp_objective` when it is ``None``. The inherited
-        ``mink.Task`` residual is built from :meth:`compute_error`, which
-        deliberately reports the *full* error, so accepting it would silently
-        drop the bounding this class exists to apply.
-        """
-        return None
-
-    def compute_qp_objective(
-        self,
-        configuration: mink.Configuration,
-    ) -> mink.Objective:
-        """Modulate position by its schedule and always bound orientation."""
+    def _bounded_error(self, configuration: mink.Configuration) -> np.ndarray | None:
         bound_position = self.position_error_limit > 0.0 and self.limit_activation > 0.0
         bound_orientation = self.orientation_error_limit > 0.0
         if not bound_position and not bound_orientation:
-            return self.frame_task.compute_qp_objective(configuration)
+            return None
 
         full_error = self.compute_full_error(configuration)
         limited_error = self._clip_error(full_error)
@@ -195,6 +187,16 @@ class BoundedFrameTask(mink.Task):
             error[:3] += self.limit_activation * (limited_error[:3] - full_error[:3])
         if bound_orientation:
             error[3:] = limited_error[3:]
+        return error
+
+    def compute_qp_objective(
+        self,
+        configuration: mink.Configuration,
+    ) -> mink.Objective:
+        """Modulate position by its schedule and always bound orientation."""
+        error = self._bounded_error(configuration)
+        if error is None:
+            return self.frame_task.compute_qp_objective(configuration)
         nv = configuration.model.nv
         if self._identity is None or self._identity.shape != (nv, nv):
             self._identity = np.eye(nv, dtype=np.float64)

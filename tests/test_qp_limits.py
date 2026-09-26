@@ -84,6 +84,26 @@ def test_configuration_limit_uses_selected_dofs_and_gain() -> None:
     assert limit.gain == 0.8
 
 
+def test_configuration_limit_ignores_unselected_ball_joint() -> None:
+    model = mujoco.MjModel.from_xml_string("""
+        <mujoco><compiler angle="radian"/><worldbody>
+          <body><joint name="object" type="ball" range="0 0.2"/>
+            <geom type="sphere" size="0.1" mass="1"/></body>
+          <body pos="1 0 0"><joint name="arm" range="-1 1"/>
+            <geom type="sphere" size="0.1" mass="1"/></body>
+        </worldbody></mujoco>
+    """)
+    configuration = mink.Configuration(model)
+    configuration.update(q=np.array([np.cos(0.3), np.sin(0.3), 0, 0, 0.25]))
+    limit = ArmConfigurationLimit(model, [4], gain=0.8)
+    constraint = limit.compute_qp_inequalities(configuration, dt=0.004)
+
+    np.testing.assert_array_equal(constraint.G, [[0, 0, 0, 1], [0, 0, 0, -1]])
+    np.testing.assert_allclose(constraint.h, [0.6, 1.0])
+    empty = ArmConfigurationLimit(model, [], gain=0.8)
+    assert empty.compute_qp_inequalities(configuration, dt=0.004).inactive
+
+
 def test_half_braking_distance_allows_quarter_velocity() -> None:
     limit, configuration = _make_joint_limit()
     row = 0

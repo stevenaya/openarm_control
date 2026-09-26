@@ -189,14 +189,7 @@ class NullspacePostureTask(mink.Task):
     def compute_qp_residual(
         self,
         configuration: mink.Configuration,
-    ) -> tuple[np.ndarray, np.ndarray, float] | None:
-        """Fall back to the single-pass objective assembly on Mink 1.2.
-
-        Mink 1.2's solver prefers a task's residual and only falls back to
-        :meth:`compute_qp_objective` when it is ``None``. The inherited
-        ``mink.Task`` residual calls :meth:`compute_error` and
-        :meth:`compute_jacobian` separately, causing each to compute the
-        normalized Jacobian and SVD. Returning ``None`` preserves this class's
-        one-SVD :meth:`compute_qp_objective` path.
-        """
-        return None
+    ) -> tuple[np.ndarray, np.ndarray, float]:
+        """Compute the fused residual from a single nullspace SVD."""
+        error, jacobian = self._compute_terms(configuration)
+        return self._weighted_residual(error, jacobian)

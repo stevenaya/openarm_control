@@ -136,6 +136,62 @@ def test_objective_computes_native_error_once() -> None:
     compute_error.assert_called_once_with(configuration)
 
 
+@pytest.mark.parametrize("origin", ("world", "arm_origin"))
+@pytest.mark.parametrize(
+    "activation,orientation_limit", ((0.0, 0.0), (0.5, 0.2), (1.0, 0.2))
+)
+def test_fused_residuals_preserve_objective_and_single_svd(
+    origin: str, activation: float, orientation_limit: float
+) -> None:
+    setup = make_setup("right", origin_frame=origin)
+    solver = Kinematics(
+        setup, IKParams(nullspace_ratio_low=0.0, nullspace_ratio_high=1e-9)
+    )._ik
+    assert solver is not None
+    configuration = solver._config
+    q = configuration.q
+    q[setup.joint_resolver.arm_qpos_indices("right")] += 0.1
+    configuration.update(q=q)
+    frame = solver._tasks["right"]
+    assert isinstance(frame, BoundedFrameTask)
+    frame.orientation_error_limit = orientation_limit
+    frame.set_limit_activation(activation)
+    target = setup.read_ee_pose("right").astype(np.float64)
+    target[:3] += [0.04, -0.03, 0.02]
+    frame.set_target(pose_to_se3(target))
+    nullspace = solver._nullspace_tasks["right"]
+    tasks = [frame, nullspace, solver._kinetic_energy_task]
+    expected = [task.compute_qp_objective(configuration) for task in tasks]
+
+    with (
+        mock.patch.object(
+            nullspace, "_compute_terms", wraps=nullspace._compute_terms
+        ) as terms,
+        mock.patch.object(
+            BoundedFrameTask,
+            "compute_qp_objective",
+            side_effect=AssertionError("Unexpected fallback"),
+        ),
+        mock.patch.object(
+            NullspacePostureTask,
+            "compute_qp_objective",
+            side_effect=AssertionError("Unexpected fallback"),
+        ),
+    ):
+        problem = mink.build_ik(configuration, tasks, 0.004, damping=0.1, limits=[])
+
+    terms.assert_called_once_with(configuration)
+    np.testing.assert_allclose(
+        problem.P,
+        sum(task.H for task in expected) + 0.1 * np.eye(configuration.nv),
+        rtol=1e-12,
+        atol=1e-12,
+    )
+    np.testing.assert_allclose(
+        problem.q, sum(task.c for task in expected), rtol=1e-12, atol=1e-12
+    )
+
+
 @pytest.mark.parametrize("substeps", (1, 5, 10))
 def test_total_error_budgets_are_independent_of_substep_count(
     substeps: int,
